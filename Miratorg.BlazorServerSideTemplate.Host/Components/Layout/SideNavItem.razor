@@ -1,0 +1,29 @@
+﻿
+<li class="side-nav-item">
+    <a href="@Href" class="side-nav-link">
+        <i class="@ClassIcon"></i>
+            @if(!string.IsNullOrEmpty(Badge))
+            {
+                <span class="badge bg-secondary text-light float-end">@Badge</span>
+            }
+        <span>@Title</span>
+    </a>
+</li>
+
+
+@code {
+    [Parameter]
+    public RenderFragment NavLink { get; set; }
+
+    [Parameter]
+    public string Badge { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string ClassIcon { get; set; }
+
+    [Parameter]
+    public string Href { get; set; }
+}

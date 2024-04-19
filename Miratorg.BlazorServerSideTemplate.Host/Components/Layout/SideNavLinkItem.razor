@@ -1,0 +1,18 @@
+﻿<li>
+    <a href="@HRef">@Title</a>
+</li>
+
+@code {
+
+    /// <summary>
+    /// Ссылка
+    /// </summary>
+    [Parameter]
+    public string HRef { get; set; }
+
+    /// <summary>
+    /// Заголовок
+    /// </summary>
+    [Parameter]
+    public string Title { get; set; }
+}

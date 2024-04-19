@@ -1,0 +1,36 @@
+﻿<div class="leftside-menu">
+
+    @*<Logo />*@
+
+    <div class="h-100 mt-5" id="leftside-menu-container" data-simplebar>
+
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <ul class="side-nav">
+                    <NavTitle Title="general" />
+                    <SideNavItem Badge="" ClassIcon="ri-contacts-fill" Title="Домашняя страница" Href="@RoutePages.HOME" />
+                    <NavTitle Title="details" />
+                </ul>
+            </Authorized>
+        </AuthorizeView>
+
+        <AuthorizeView Roles="User">
+            <Authorized>
+                <ul class="side-nav">
+                    <NavTitle Title="general" />
+                    <SideNavItem Badge="" ClassIcon="ri-contacts-fill" Title="Домашняя страница" Href="@RoutePages.HOME" />
+                </ul>
+            </Authorized>
+        </AuthorizeView>
+
+    </div>
+
+    <!-- End Sidebar -->
+
+    <div class="clearfix"></div>
+
+</div>
+
+@code {
+
+}
