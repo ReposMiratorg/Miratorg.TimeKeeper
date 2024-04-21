@@ -3,17 +3,17 @@ using Microsoft.Extensions.Logging;
 
 namespace Miratorg.TimeKeeper.DataAccess.Contexts;
 
-public interface IDashboardMTSDbContextFactory
+public interface ITemplateDbContextFactory
 {
     Task<TemplateDbContext> Create();
 }
 
-public class DashboardMTSDbContextFactory : IDashboardMTSDbContextFactory
+public class TemplateDbContextFactory : ITemplateDbContextFactory
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
-    private readonly ILogger<DashboardMTSDbContextFactory> _logger;
+    private readonly ILogger<TemplateDbContextFactory> _logger;
 
-    public DashboardMTSDbContextFactory(IServiceScopeFactory serviceScopeFactory, ILogger<DashboardMTSDbContextFactory> logger)
+    public TemplateDbContextFactory(IServiceScopeFactory serviceScopeFactory, ILogger<TemplateDbContextFactory> logger)
     {
         _serviceScopeFactory = serviceScopeFactory;
         _logger = logger;
@@ -22,7 +22,6 @@ public class DashboardMTSDbContextFactory : IDashboardMTSDbContextFactory
     public Task<TemplateDbContext> Create()
     {
         var dbContext = _serviceScopeFactory.CreateScope().ServiceProvider.GetRequiredService<TemplateDbContext>();
-
         return Task.FromResult(dbContext);
     }
 }

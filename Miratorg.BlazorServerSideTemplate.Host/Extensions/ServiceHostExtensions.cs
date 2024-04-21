@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
 using Miratorg.Common.Extensions;
+using Miratorg.TimeKeeper.DataAccess.Contexts;
 using System.Security.Claims;
 
 namespace Miratorg.TimeKeeper.Host.Extensions;
@@ -48,6 +50,14 @@ public static class ServiceHostExtensions
 
         services.AddLdapService();
 
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        services.AddDbContextPool<TemplateDbContext>(options =>
+        {
+            options.UseSqlServer(connectionString, o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
+        });
+
+        services.AddSingleton<ITemplateDbContextFactory, TemplateDbContextFactory>();
+        
         services.AddAuthorization(options =>
         {
             options.DefaultPolicy = new AuthorizationPolicyBuilder(CookieAuthenticationDefaults.AuthenticationScheme)
