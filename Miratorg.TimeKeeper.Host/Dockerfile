@@ -12,12 +12,12 @@ RUN apt-get update && apt-get install -y \
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Miratorg.BlazorServerSideTemplate.Host/Miratorg.TimeKeeper.Host.csproj", "Miratorg.BlazorServerSideTemplate.Host/"]
+COPY ["Miratorg.TimeKeeper.Host/Miratorg.TimeKeeper.Host.csproj", "Miratorg.TimeKeeper.Host/"]
 COPY ["Miratorg.TimeKeeper.BusinessLogic/Miratorg.TimeKeeper.BusinessLogic.csproj", "Miratorg.TimeKeeper.BusinessLogic/"]
 COPY ["Miratorg.TimeKeeper.DataAccess/Miratorg.TimeKeeper.DataAccess.csproj", "Miratorg.TimeKeeper.DataAccess/"]
-RUN dotnet restore "./Miratorg.BlazorServerSideTemplate.Host/Miratorg.TimeKeeper.Host.csproj"
+RUN dotnet restore "./Miratorg.TimeKeeper.Host/Miratorg.TimeKeeper.Host.csproj"
 COPY . .
-WORKDIR "/src/Miratorg.BlazorServerSideTemplate.Host"
+WORKDIR "/src/Miratorg.TimeKeeper.Host"
 RUN dotnet build "./Miratorg.TimeKeeper.Host.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
