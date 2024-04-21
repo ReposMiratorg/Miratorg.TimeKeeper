@@ -4,12 +4,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8D42EA6B-0A8B-407B-88A4-18F951A884C7}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\docker-image.yml = .github\workflows\docker-image.yml
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miratorg.TimeKeeper.Host", "Miratorg.BlazorServerSideTemplate.Host\Miratorg.TimeKeeper.Host.csproj", "{AE5FF11B-B0EB-4E0A-95A7-111FAD54093F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miratorg.TimeKeeper.BusinessLogic", "Miratorg.TimeKeeper.BusinessLogic\Miratorg.TimeKeeper.BusinessLogic.csproj", "{FA964085-A4FE-44C3-83F4-5367BB8D2A5A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miratorg.TimeKeeper.BusinessLogic", "Miratorg.TimeKeeper.BusinessLogic\Miratorg.TimeKeeper.BusinessLogic.csproj", "{FA964085-A4FE-44C3-83F4-5367BB8D2A5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miratorg.TimeKeeper.DataAccess", "Miratorg.TimeKeeper.DataAccess\Miratorg.TimeKeeper.DataAccess.csproj", "{C4B876CC-C6E8-4893-8983-1C482ADD0BB1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miratorg.TimeKeeper.DataAccess", "Miratorg.TimeKeeper.DataAccess\Miratorg.TimeKeeper.DataAccess.csproj", "{C4B876CC-C6E8-4893-8983-1C482ADD0BB1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
