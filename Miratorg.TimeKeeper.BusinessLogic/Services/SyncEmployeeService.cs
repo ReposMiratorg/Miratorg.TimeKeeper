@@ -134,6 +134,7 @@ public class SyncEmployeeService : IHostedService
 
             if (dates.Count == 0)
             {
+                _logger.LogInformation($"not dates for '{codeNav}'");
                 return;
             }
 
@@ -151,6 +152,7 @@ public class SyncEmployeeService : IHostedService
             var schedule = dbContext.Schedules.Include(x => x.Dates).FirstOrDefault(x => x.Name == scheduleName && x.Code == scheduleId);
             if (schedule == null)
             {
+                _logger.LogInformation($"Create schedule '{schedule.Name}'");
                 dbContext.Schedules.Add(new ScheduleEntity() { Code = (int)scheduleId, Name = scheduleName });
                 dbContext.SaveChanges();
 
