@@ -4,9 +4,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace Miratorg.TimeKeeper.DataAccess.Contexts;
 
-public class DesignTimeTemplateDbContextFactory : IDesignTimeDbContextFactory<TemplateDbContext>
+public class DesignTimeTimeKeeperDbContextFactory : IDesignTimeDbContextFactory<TimeKeeperDbContext>
 {
-    public TemplateDbContext CreateDbContext(string[] args)
+    public TimeKeeperDbContext CreateDbContext(string[] args)
     {
         string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
@@ -22,9 +22,9 @@ public class DesignTimeTemplateDbContextFactory : IDesignTimeDbContextFactory<Te
         var conectionString = config.GetConnectionString("DefaultConnection");
         Console.WriteLine($"Connection String: '{conectionString}'");
 
-        var optionsBuilder = new DbContextOptionsBuilder<TemplateDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<TimeKeeperDbContext>();
         optionsBuilder.UseSqlServer(conectionString);
 
-        return new TemplateDbContext(optionsBuilder.Options);
+        return new TimeKeeperDbContext(optionsBuilder.Options);
     }
 }
