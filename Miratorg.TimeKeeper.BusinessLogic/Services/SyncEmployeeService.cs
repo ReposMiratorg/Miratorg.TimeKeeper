@@ -72,8 +72,10 @@ public class SyncEmployeeService : IHostedService
 
             foreach (var employee in employees)
             {
-                var currentEmoployee = dbContext.Employees.FirstOrDefault(x => x.CodeNav == employee.Code);
-                if (currentEmoployee == null)
+                _logger.LogInformation($"Process: '{employee.Code}'");
+
+                var currentEmployee = dbContext.Employees.FirstOrDefault(x => x.CodeNav == employee.Code);
+                if (currentEmployee == null)
                 {
                     dbContext.Employees.Add(new EmployeeEntity()
                     {
@@ -86,21 +88,21 @@ public class SyncEmployeeService : IHostedService
                 }
                 else
                 {
-                    currentEmoployee.Name = $"{employee.LastName} {employee.FirstName} {employee.MiddleName}";
-                    currentEmoployee.CodeNav = employee.Code;
-                    currentEmoployee.Division = employee.Division;
+                    currentEmployee.Name = $"{employee.LastName} {employee.FirstName} {employee.MiddleName}";
+                    currentEmployee.CodeNav = employee.Code;
+                    currentEmployee.Division = employee.Division;
 
                     var boss = dbContext.Employees.FirstOrDefault(x => x.CodeNav == employee.CodeBoss);
                     if (boss != null)
                     {
-                        currentEmoployee.BossId = boss.Id;
+                        currentEmployee.BossId = boss.Id;
                     }
                     else
                     {
-                        currentEmoployee.BossId = null;
+                        currentEmployee.BossId = null;
                     }
 
-                    await UpdateSchedule(currentEmoployee.Id, employee.Code);
+                    await UpdateSchedule(currentEmployee.Id, employee.Code);
 
                     await dbContext.SaveChangesAsync();
                 }
