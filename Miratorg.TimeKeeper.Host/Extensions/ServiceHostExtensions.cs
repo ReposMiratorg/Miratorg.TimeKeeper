@@ -4,6 +4,11 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Miratorg.Common.Extensions;
+using Miratorg.DataService.Contexts;
+using Miratorg.DataService.Extensions;
+using Miratorg.DataService.Interfaces;
+using Miratorg.DataService.Services;
+using Miratorg.TimeKeeper.BusinessLogic.Services;
 using Miratorg.TimeKeeper.DataAccess.Contexts;
 using System.Security.Claims;
 
@@ -49,14 +54,24 @@ public static class ServiceHostExtensions
         services.AddScoped<AuthenticationStateProvider, CustomTokenAuthenticationStateProvider>();
 
         services.AddLdapService();
+        services.AddSingleton<IStuffControlDbContextFactory, StuffControlDbContextFactory>();
+        
+        services.AddSingleton<IStuffControlDbService, StuffControlDbService>();
+        services.AddHostedService<SyncEmployeeService>();
 
         var connectionString = configuration.GetConnectionString("DefaultConnection");
-        services.AddDbContextPool<TemplateDbContext>(options =>
+        services.AddDbContextPool<TimeKeeperDbContext>(options =>
         {
             options.UseSqlServer(connectionString, o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
         });
 
-        services.AddSingleton<ITemplateDbContextFactory, TemplateDbContextFactory>();
+        var connectionStringStuffControlDbContext = configuration.GetConnectionString("StuffControl");
+        services.AddDbContextPool<StuffControlDbContext>(options =>
+        {
+            options.UseSqlServer(connectionStringStuffControlDbContext, o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
+        });
+
+        services.AddSingleton<ITimeKeeperDbContextFactory, TimeKeeperDbContextFactory>();
         
         services.AddAuthorization(options =>
         {

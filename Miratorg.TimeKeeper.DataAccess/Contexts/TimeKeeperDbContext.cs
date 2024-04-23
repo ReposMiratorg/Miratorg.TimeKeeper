@@ -3,14 +3,17 @@ using Miratorg.TimeKeeper.DataAccess.Entities;
 
 namespace Miratorg.TimeKeeper.DataAccess.Contexts;
 
-public class TemplateDbContext : DbContext
+public class TimeKeeperDbContext : DbContext
 {
-    public TemplateDbContext(DbContextOptions<TemplateDbContext> options) : base(options)
+    public TimeKeeperDbContext(DbContextOptions<TimeKeeperDbContext> options) : base(options)
     {
         Database.Migrate();
     }
 
-    public virtual DbSet<SimpleEntity> Simples { get; set; }
+    public virtual DbSet<EmployeeEntity> Employees { get; set; }
+    public virtual DbSet<StoreEntity> Stores { get; set; }
+    public virtual DbSet<ScheduleEntity> Schedules { get; set; }
+    public virtual DbSet<ScheduleDateEntity> ScheduleDates { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
