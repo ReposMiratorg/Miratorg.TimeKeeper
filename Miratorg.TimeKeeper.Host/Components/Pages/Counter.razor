@@ -1,19 +1,65 @@
 ﻿@page "/test"
 @rendermode InteractiveServer
 
-<PageTitle>Counter</PageTitle>
-
 <h1>Counter</h1>
 
-<p role="status">Current count: @currentCount</p>
+<table>
+    <tr>
+        <td>Сотрудники</td>
+        <td>время</td>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+        <td>Пн</td>
+        <td>Вт</td>
+        <td>Ср</td>
+        <td>Чт</td>
+        <td>Пт</td>
+        <td>Сб</td>
+        <td>Вс</td>
+    </tr>
+    @if(employees != null)
+    {
+        @foreach(var employee in employees)
+        {
+            <tr>
+                <td>@employee.Name</td>
+                <td>@employee.CodeNav</td>
+
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        }
+    }
+    
+</table>
 
 @code {
-    private int currentCount = 0;
 
-    private void IncrementCount()
+    [Inject]
+    public ITimeKeeperDbContextFactory contextFactory { get; set; }
+
+    protected override async Task OnInitializedAsync()
     {
-        currentCount++;
+        await Load();
+    }
+
+    private List<EmployeeEntity> employees { get; set; }
+
+    private async Task Load()
+    {
+        try
+        {
+            using var context = await contextFactory.Create();
+            var data = context.Employees.ToList();
+            employees = data;
+        }
+        catch(Exception ex)
+        {
+            
+        }
     }
 }
