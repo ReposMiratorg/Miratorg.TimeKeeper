@@ -12,17 +12,17 @@ public class SyncEmployeeService : IHostedService
 {
     private readonly IStuffControlDbService _stuffControlService;
     private readonly ITimeKeeperDbContextFactory _timeKeeperDbContextFactory;
-    private readonly IStuffControlDbContextFactory _stuffControlDbContextFactory;
+    private readonly IStaffControlDbContextFactory _staffControlDbContextFactory;
     private readonly ILogger<SyncEmployeeService> _logger;
 
     private bool isWork { get; set; }
     private readonly TimeSpan pause = TimeSpan.FromDays(1);
 
-    public SyncEmployeeService(IStuffControlDbService stuffControlService, IStuffControlDbContextFactory stuffControlDbContextFactory, ITimeKeeperDbContextFactory timeKeeperDbContextFactory, ILogger<SyncEmployeeService> logger)
+    public SyncEmployeeService(IStuffControlDbService stuffControlService, IStaffControlDbContextFactory staffControlDbContextFactory, ITimeKeeperDbContextFactory timeKeeperDbContextFactory, ILogger<SyncEmployeeService> logger)
     {
         _stuffControlService = stuffControlService;
         _timeKeeperDbContextFactory = timeKeeperDbContextFactory;
-        _stuffControlDbContextFactory = stuffControlDbContextFactory;
+        _staffControlDbContextFactory = staffControlDbContextFactory;
         _logger = logger;
     }
 
@@ -120,7 +120,7 @@ public class SyncEmployeeService : IHostedService
         {
             var (start, end) = GetFirstAndLastDayOfMonth(DateTime.Now);
             var dbContext = await _timeKeeperDbContextFactory.Create();
-            var stuffContext = await _stuffControlDbContextFactory.Create();
+            var stuffContext = await _staffControlDbContextFactory.Create();
 
             var employee = dbContext.Employees.FirstOrDefault(x => x.Id == userId);
             if (employee == null)

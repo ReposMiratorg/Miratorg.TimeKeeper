@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Miratorg.Common.Extensions;
-using Miratorg.DataService.Contexts;
 using Miratorg.DataService.Extensions;
 using Miratorg.DataService.Interfaces;
 using Miratorg.DataService.Services;
@@ -54,8 +53,8 @@ public static class ServiceHostExtensions
         services.AddScoped<AuthenticationStateProvider, CustomTokenAuthenticationStateProvider>();
 
         services.AddLdapService();
-        services.AddSingleton<IStuffControlDbContextFactory, StuffControlDbContextFactory>();
-        
+        services.AddStaffControlDbContext();
+
         services.AddSingleton<IStuffControlDbService, StuffControlDbService>();
         services.AddHostedService<SyncEmployeeService>();
 
@@ -65,14 +64,8 @@ public static class ServiceHostExtensions
             options.UseSqlServer(connectionString, o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
         });
 
-        var connectionStringStuffControlDbContext = configuration.GetConnectionString("StuffControl");
-        services.AddDbContextPool<StuffControlDbContext>(options =>
-        {
-            options.UseSqlServer(connectionStringStuffControlDbContext, o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
-        });
-
         services.AddSingleton<ITimeKeeperDbContextFactory, TimeKeeperDbContextFactory>();
-        
+
         services.AddAuthorization(options =>
         {
             options.DefaultPolicy = new AuthorizationPolicyBuilder(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -121,7 +114,6 @@ public static class ServiceHostExtensions
             endpoints.MapRazorPages().RequireAuthorization();
             endpoints.MapBlazorHub().RequireAuthorization();
             endpoints.MapFallbackToPage("/_Host");
-            //endpoints.MapFallbackToPage("/Components/Pages/_Host");
         });
     }
 }
