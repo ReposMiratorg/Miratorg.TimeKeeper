@@ -1,10 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Miratorg.DataService.Contexts;
-using Miratorg.DataService.Interfaces;
-using Miratorg.TimeKeeper.DataAccess.Contexts;
-using Miratorg.TimeKeeper.DataAccess.Entities;
 
 namespace Miratorg.TimeKeeper.BusinessLogic.Services;
 
@@ -45,7 +40,7 @@ public class SyncEmployeeService : IHostedService
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, $"Error ''");
+                    _logger.LogError(ex, $"Error '{nameof(SyncEmployeeService)}::{nameof(Process)}'");
                 }
 
                 await Task.Delay(pause);
