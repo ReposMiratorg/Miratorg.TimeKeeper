@@ -78,15 +78,23 @@ public class SyncEmployeeService : IHostedService
                 _logger.LogInformation($"Process: '{employee.Code}'");
 
                 var currentEmployee = dbContext.Employees.FirstOrDefault(x => x.CodeNav == employee.Code);
-                var division = divisions.FirstOrDefault(x => x.Code == employee.CodeDivision)?.Description ?? "n/d";
+                //var division = divisions.FirstOrDefault(x => x.Code == employee.CodeDivision);
+                //var x = divisions.FirstOrDefault(x => x.Code == "58e49a27-e624-11ec-b022-005056af1bb5".ToLower());
+                //if (division?.Description == null)
+                //{
+                //    division = new DataService.Entities.StaffDivision() 
+                //    { 
+                //        Description = "n/d"
+                //    };
+                //}
 
-                var store = dbContext.Stores.FirstOrDefault(x => x.Name == division);
+                var store = dbContext.Stores.FirstOrDefault(x => x.Name == employee.RoutineDivision);
 
                 if (store == null)
                 {
                     store = new StoreEntity()
                     {
-                        Name = division
+                        Name = employee.RoutineDivision
                     };
 
                     dbContext.Stores.Add(store);
@@ -99,7 +107,6 @@ public class SyncEmployeeService : IHostedService
                     {
                         CodeNav = employee.Code,
                         Name = $"{employee.LastName} {employee.FirstName} {employee.MiddleName}",
-                        Division = division,
                         StoreId = store.Id
                     };
 
@@ -113,7 +120,6 @@ public class SyncEmployeeService : IHostedService
                 {
                     currentEmployee.Name = $"{employee.LastName} {employee.FirstName} {employee.MiddleName}";
                     currentEmployee.CodeNav = employee.Code;
-                    currentEmployee.Division = division;
                     currentEmployee.StoreId = store.Id;
 
                     //var boss = dbContext.Employees.FirstOrDefault(x => x.CodeNav == employee.CodeBoss);
