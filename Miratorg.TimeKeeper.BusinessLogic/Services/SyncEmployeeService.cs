@@ -1,10 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Miratorg.DataService.Contexts;
-using Miratorg.DataService.Interfaces;
-using Miratorg.TimeKeeper.DataAccess.Contexts;
-using Miratorg.TimeKeeper.DataAccess.Entities;
 
 namespace Miratorg.TimeKeeper.BusinessLogic.Services;
 
@@ -12,17 +7,17 @@ public class SyncEmployeeService : IHostedService
 {
     private readonly IStuffControlDbService _stuffControlService;
     private readonly ITimeKeeperDbContextFactory _timeKeeperDbContextFactory;
-    private readonly IStuffControlDbContextFactory _stuffControlDbContextFactory;
+    private readonly IStaffControlDbContextFactory _staffControlDbContextFactory;
     private readonly ILogger<SyncEmployeeService> _logger;
 
     private bool isWork { get; set; }
     private readonly TimeSpan pause = TimeSpan.FromDays(1);
 
-    public SyncEmployeeService(IStuffControlDbService stuffControlService, IStuffControlDbContextFactory stuffControlDbContextFactory, ITimeKeeperDbContextFactory timeKeeperDbContextFactory, ILogger<SyncEmployeeService> logger)
+    public SyncEmployeeService(IStuffControlDbService stuffControlService, IStaffControlDbContextFactory staffControlDbContextFactory, ITimeKeeperDbContextFactory timeKeeperDbContextFactory, ILogger<SyncEmployeeService> logger)
     {
         _stuffControlService = stuffControlService;
         _timeKeeperDbContextFactory = timeKeeperDbContextFactory;
-        _stuffControlDbContextFactory = stuffControlDbContextFactory;
+        _staffControlDbContextFactory = staffControlDbContextFactory;
         _logger = logger;
     }
 
@@ -45,7 +40,7 @@ public class SyncEmployeeService : IHostedService
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, $"Error ''");
+                    _logger.LogError(ex, $"Error '{nameof(SyncEmployeeService)}::{nameof(Process)}'");
                 }
 
                 await Task.Delay(pause);
@@ -62,7 +57,15 @@ public class SyncEmployeeService : IHostedService
     {
         try
         {
-            var employees = await _stuffControlService.GetAllEmployees();
+            var staffDbContext = await _staffControlDbContextFactory.Create();
+
+            var employees = await staffDbContext.Staff
+                .Where(x => x.LegalEntity == "ООО \"ПродМир\"" || x.LegalEntity == "ООО «Стейк и Бургер»")
+                .Where(x => x.DismissalDate == null)
+                .ToListAsync();
+
+            var divisions = await staffDbContext.StaffDivisions.ToListAsync();
+
             if (employees == null)
             {
                 return;
@@ -75,35 +78,61 @@ public class SyncEmployeeService : IHostedService
                 _logger.LogInformation($"Process: '{employee.Code}'");
 
                 var currentEmployee = dbContext.Employees.FirstOrDefault(x => x.CodeNav == employee.Code);
+                //var division = divisions.FirstOrDefault(x => x.Code == employee.CodeDivision);
+                //var x = divisions.FirstOrDefault(x => x.Code == "58e49a27-e624-11ec-b022-005056af1bb5".ToLower());
+                //if (division?.Description == null)
+                //{
+                //    division = new DataService.Entities.StaffDivision() 
+                //    { 
+                //        Description = "n/d"
+                //    };
+                //}
+
+                var store = dbContext.Stores.FirstOrDefault(x => x.Name == employee.RoutineDivision);
+
+                if (store == null)
+                {
+                    store = new StoreEntity()
+                    {
+                        Name = employee.RoutineDivision
+                    };
+
+                    dbContext.Stores.Add(store);
+                    await dbContext.SaveChangesAsync();
+                }
+
                 if (currentEmployee == null)
                 {
-                    dbContext.Employees.Add(new EmployeeEntity()
+                    currentEmployee = new EmployeeEntity()
                     {
                         CodeNav = employee.Code,
                         Name = $"{employee.LastName} {employee.FirstName} {employee.MiddleName}",
-                        Division = employee.Division
-                    });
+                        StoreId = store.Id
+                    };
 
+                    dbContext.Employees.Add(currentEmployee);
+                    await dbContext.SaveChangesAsync();
+
+                    await UpdateSchedule(currentEmployee.Id, employee.Code);
                     await dbContext.SaveChangesAsync();
                 }
                 else
                 {
                     currentEmployee.Name = $"{employee.LastName} {employee.FirstName} {employee.MiddleName}";
                     currentEmployee.CodeNav = employee.Code;
-                    currentEmployee.Division = employee.Division;
+                    currentEmployee.StoreId = store.Id;
 
-                    var boss = dbContext.Employees.FirstOrDefault(x => x.CodeNav == employee.CodeBoss);
-                    if (boss != null)
-                    {
-                        currentEmployee.BossId = boss.Id;
-                    }
-                    else
-                    {
-                        currentEmployee.BossId = null;
-                    }
+                    //var boss = dbContext.Employees.FirstOrDefault(x => x.CodeNav == employee.CodeBoss);
+                    //if (boss != null)
+                    //{
+                    //    currentEmployee.BossId = boss.Id;
+                    //}
+                    //else
+                    //{
+                    //    currentEmployee.BossId = null;
+                    //}
 
                     await UpdateSchedule(currentEmployee.Id, employee.Code);
-
                     await dbContext.SaveChangesAsync();
                 }
             }
@@ -120,7 +149,7 @@ public class SyncEmployeeService : IHostedService
         {
             var (start, end) = GetFirstAndLastDayOfMonth(DateTime.Now);
             var dbContext = await _timeKeeperDbContextFactory.Create();
-            var stuffContext = await _stuffControlDbContextFactory.Create();
+            var stuffContext = await _staffControlDbContextFactory.Create();
 
             var employee = dbContext.Employees.FirstOrDefault(x => x.Id == userId);
             if (employee == null)

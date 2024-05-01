@@ -8,10 +8,16 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
-    <PackageReference Include="Miratorg.DataService" Version="1.2.2" />
+    <PackageReference Include="Miratorg.DataService" Version="1.3.5" />
+   <!--
+	  <PackageReference Include="Miratorg.DataService" Version="1.3.3" />
+   -->
   </ItemGroup>
 
   <ItemGroup>
+   <!-- 
+   <ProjectReference Include="..\..\miratorg.miroservices\Miratorg.DataService\Miratorg.DataService.csproj" />
+   -->
     <ProjectReference Include="..\Miratorg.TimeKeeper.DataAccess\Miratorg.TimeKeeper.DataAccess.csproj" />
   </ItemGroup>
 

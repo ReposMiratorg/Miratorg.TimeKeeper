@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Miratorg.TimeKeeper.DataAccess.Entities;
-
-namespace Miratorg.TimeKeeper.DataAccess.Contexts;
+﻿namespace Miratorg.TimeKeeper.DataAccess.Contexts;
 
 public class TimeKeeperDbContext : DbContext
 {
