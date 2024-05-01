@@ -1,0 +1,99 @@
+﻿@attribute [RouteAttribute(RoutePages.SCHEDULE)]
+@rendermode InteractiveServer
+
+<div class="row mt-2 mb-3">
+    <div class="col-3">
+        <label class="">Магазин</label>
+        <select class="form-select form-select-sm" value="@_selectedStore" @onchange="HandleSelectionTypeChange">
+            <option value="@Guid.Empty">Выберете магазин</option>
+            @foreach (var store in allStories)
+            {
+                <option value="@store.Id">@store.Name</option>
+            }
+        </select>
+    </div>
+</div>
+
+<table>
+    <tr>
+        <td>Сотрудники</td>
+        <td>время</td>
+
+        <td>Пн</td>
+        <td>Вт</td>
+        <td>Ср</td>
+        <td>Чт</td>
+        <td>Пт</td>
+        <td>Сб</td>
+        <td>Вс</td>
+    </tr>
+    @if (allEmployees != null)
+    {
+        @foreach (var employee in employees)
+        {
+            <tr>
+                <td>@employee.Name</td>
+                <td></td>
+
+                <td><PlanDayComponent /></td>
+                <td><PlanDayComponent /></td>
+                <td><PlanDayComponent /></td>
+                <td><PlanDayComponent /></td>
+                <td><PlanDayComponent /></td>
+                <td><PlanDayComponent /></td>
+                <td><PlanDayComponent /></td>
+            </tr>
+        }
+    }
+
+</table>
+
+
+
+@code {
+
+    [Inject]
+    public ITimeKeeperDbContextFactory contextFactory { get; set; }
+
+    private Guid _selectedStore { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Load();
+    }
+
+    private List<EmployeeEntity> allEmployees { get; set; }
+    private List<StoreEntity> allStories { get; set; } = new List<StoreEntity>();
+
+    private List<EmployeeEntity> employees { get; set; }
+
+    private async Task SelectStory(Guid storeId)
+    {
+        employees = allEmployees.Where(x => x.StoreId == storeId).ToList();
+    }
+
+    private async void HandleSelectionTypeChange(ChangeEventArgs e)
+    {
+        if (Guid.TryParse(e.Value.ToString(), out Guid id))
+        {
+            await SelectStory(id);
+        }
+    }
+
+    private async Task Load()
+    {
+        try
+        {
+            using var context = await contextFactory.Create();
+
+            allEmployees = context.Employees.ToList();
+            allStories = context.Stores.OrderBy(x => x.Name).ToList();
+
+            await SelectStory(Guid.Empty);
+        }
+        catch(Exception ex)
+        {
+            
+        }
+    }
+}
