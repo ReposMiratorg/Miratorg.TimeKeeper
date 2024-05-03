@@ -3,6 +3,7 @@
 public class EmployeeEntity : BaseEntity
 {
     public string Name { get; set; }
+    public string Position { get; set; }
     public string CodeNav { get; set; }
     //public string Division { get; set; }
 
@@ -13,7 +14,7 @@ public class EmployeeEntity : BaseEntity
     public virtual EmployeeEntity? Boss { get; set; }
 
     public Guid? ScheduleId { get; set; }
-    public virtual ScheduleEntity? ScheduleEntity { get; set; }
+    public virtual ScheduleEntity? Schedule { get; set; }
 }
 
 public class StoreEntity : BaseEntity
