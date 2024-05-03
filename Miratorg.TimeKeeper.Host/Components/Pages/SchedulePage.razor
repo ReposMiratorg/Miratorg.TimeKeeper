@@ -46,7 +46,16 @@
         @foreach (var employee in employees)
         {
             <tr>
-                <td>@employee.Name</td>
+                <td>
+                    <div style="display:flex; flex-direction:column">
+                        <a>
+                            @employee.Name
+                        </a>
+                        <a>
+                            @employee.Position
+                        </a>
+                    </div>
+                </td>
                 <td></td>
 
                 <td><PlanDayComponent WeekDay="DayEnum.Monday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>

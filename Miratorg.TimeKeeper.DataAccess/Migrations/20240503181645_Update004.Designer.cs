@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Miratorg.TimeKeeper.DataAccess.Contexts;
 
@@ -11,9 +12,11 @@ using Miratorg.TimeKeeper.DataAccess.Contexts;
 namespace Miratorg.TimeKeeper.DataAccess.Migrations
 {
     [DbContext(typeof(TimeKeeperDbContext))]
-    partial class TimeKeeperDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240503181645_Update004")]
+    partial class Update004
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,6 +46,9 @@ namespace Miratorg.TimeKeeper.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("ScheduleEntityId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("ScheduleId")
                         .HasColumnType("uniqueidentifier");
 
@@ -53,7 +59,7 @@ namespace Miratorg.TimeKeeper.DataAccess.Migrations
 
                     b.HasIndex("BossId");
 
-                    b.HasIndex("ScheduleId");
+                    b.HasIndex("ScheduleEntityId");
 
                     b.HasIndex("StoreId");
 
@@ -121,9 +127,9 @@ namespace Miratorg.TimeKeeper.DataAccess.Migrations
                         .WithMany()
                         .HasForeignKey("BossId");
 
-                    b.HasOne("Miratorg.TimeKeeper.DataAccess.Entities.ScheduleEntity", "Schedule")
+                    b.HasOne("Miratorg.TimeKeeper.DataAccess.Entities.ScheduleEntity", "ScheduleEntity")
                         .WithMany("Employees")
-                        .HasForeignKey("ScheduleId");
+                        .HasForeignKey("ScheduleEntityId");
 
                     b.HasOne("Miratorg.TimeKeeper.DataAccess.Entities.StoreEntity", "Store")
                         .WithMany()
@@ -131,7 +137,7 @@ namespace Miratorg.TimeKeeper.DataAccess.Migrations
 
                     b.Navigation("Boss");
 
-                    b.Navigation("Schedule");
+                    b.Navigation("ScheduleEntity");
 
                     b.Navigation("Store");
                 });

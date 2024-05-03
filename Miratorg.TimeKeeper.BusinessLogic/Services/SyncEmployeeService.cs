@@ -65,6 +65,7 @@ public class SyncEmployeeService : IHostedService
                 .ToListAsync();
 
             var divisions = await staffDbContext.StaffDivisions.ToListAsync();
+            var positions = await staffDbContext.StaffPositions.ToListAsync();
 
             if (employees == null)
             {
@@ -78,15 +79,7 @@ public class SyncEmployeeService : IHostedService
                 _logger.LogInformation($"Process: '{employee.Code}'");
 
                 var currentEmployee = dbContext.Employees.FirstOrDefault(x => x.CodeNav == employee.Code);
-                //var division = divisions.FirstOrDefault(x => x.Code == employee.CodeDivision);
-                //var x = divisions.FirstOrDefault(x => x.Code == "58e49a27-e624-11ec-b022-005056af1bb5".ToLower());
-                //if (division?.Description == null)
-                //{
-                //    division = new DataService.Entities.StaffDivision() 
-                //    { 
-                //        Description = "n/d"
-                //    };
-                //}
+                var position = positions.FirstOrDefault(x => x.Code.ToLower() == employee.CodePosition);
 
                 var store = dbContext.Stores.FirstOrDefault(x => x.Name == employee.RoutineDivision);
 
@@ -107,13 +100,11 @@ public class SyncEmployeeService : IHostedService
                     {
                         CodeNav = employee.Code,
                         Name = $"{employee.LastName} {employee.FirstName} {employee.MiddleName}",
-                        StoreId = store.Id
+                        StoreId = store.Id,
+                        Position = position?.Description ?? "n/d"
                     };
 
                     dbContext.Employees.Add(currentEmployee);
-                    await dbContext.SaveChangesAsync();
-
-                    await UpdateSchedule(currentEmployee.Id, employee.Code);
                     await dbContext.SaveChangesAsync();
                 }
                 else
@@ -121,20 +112,13 @@ public class SyncEmployeeService : IHostedService
                     currentEmployee.Name = $"{employee.LastName} {employee.FirstName} {employee.MiddleName}";
                     currentEmployee.CodeNav = employee.Code;
                     currentEmployee.StoreId = store.Id;
+                    currentEmployee.Position = position?.Description ?? "n/d";
 
-                    //var boss = dbContext.Employees.FirstOrDefault(x => x.CodeNav == employee.CodeBoss);
-                    //if (boss != null)
-                    //{
-                    //    currentEmployee.BossId = boss.Id;
-                    //}
-                    //else
-                    //{
-                    //    currentEmployee.BossId = null;
-                    //}
-
-                    await UpdateSchedule(currentEmployee.Id, employee.Code);
                     await dbContext.SaveChangesAsync();
                 }
+
+                await UpdateSchedule(currentEmployee.Id, employee.Code);
+                await dbContext.SaveChangesAsync();
             }
         }
         catch (Exception ex)
