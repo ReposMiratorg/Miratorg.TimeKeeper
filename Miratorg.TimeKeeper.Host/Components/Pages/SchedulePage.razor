@@ -20,7 +20,7 @@
         <div style="display:flex; flex-direction: row; ">
             @foreach (var weekStart in weekStarts)
             {
-                <div style="display:flex; ">
+                <div style="display:flex; margin-right: 5px;">
                     <button class="btn btn-info btn-sm">@weekStart.ToShortDateString()</button>
                 </div>
             }
@@ -33,13 +33,13 @@
         <td>Сотрудники</td>
         <td>время</td>
 
-        <td><DayHeader Day="DayEnum.Monday" /></td>
-        <td><DayHeader Day="DayEnum.Tuesday" /></td>
-        <td><DayHeader Day="DayEnum.Wednesday" /></td>
-        <td><DayHeader Day="DayEnum.Thursday" /></td>
-        <td><DayHeader Day="DayEnum.Friday" /></td>
-        <td><DayHeader Day="DayEnum.Saturday" /></td>
-        <td><DayHeader Day="DayEnum.Sunday" /></td>
+        <td><DayHeader WeekDay="DayEnum.Monday" WeekBeginDay="_selectedWeekBeginDay"/></td>
+        <td><DayHeader WeekDay="DayEnum.Tuesday" WeekBeginDay="_selectedWeekBeginDay" /></td>
+        <td><DayHeader WeekDay="DayEnum.Wednesday" WeekBeginDay="_selectedWeekBeginDay" /></td>
+        <td><DayHeader WeekDay="DayEnum.Thursday" WeekBeginDay="_selectedWeekBeginDay" /></td>
+        <td><DayHeader WeekDay="DayEnum.Friday" WeekBeginDay="_selectedWeekBeginDay" /></td>
+        <td><DayHeader WeekDay="DayEnum.Saturday" WeekBeginDay="_selectedWeekBeginDay" /></td>
+        <td><DayHeader WeekDay="DayEnum.Sunday" WeekBeginDay="_selectedWeekBeginDay" /></td>
     </tr>
     @if (allEmployees != null)
     {
@@ -49,13 +49,13 @@
                 <td>@employee.Name</td>
                 <td></td>
 
-                <td><PlanDayComponent /></td>
-                <td><PlanDayComponent /></td>
-                <td><PlanDayComponent /></td>
-                <td><PlanDayComponent /></td>
-                <td><PlanDayComponent /></td>
-                <td><PlanDayComponent /></td>
-                <td><PlanDayComponent /></td>
+                <td><PlanDayComponent WeekDay="DayEnum.Monday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+                <td><PlanDayComponent WeekDay="DayEnum.Tuesday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+                <td><PlanDayComponent WeekDay="DayEnum.Wednesday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+                <td><PlanDayComponent WeekDay="DayEnum.Thursday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+                <td><PlanDayComponent WeekDay="DayEnum.Friday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+                <td><PlanDayComponent WeekDay="DayEnum.Saturday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+                <td><PlanDayComponent WeekDay="DayEnum.Sunday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
             </tr>
         }
     }
@@ -71,13 +71,16 @@
 
     private Guid _selectedStore { get; set; }
     private DateTime _date { get; set; } = DateTime.Now;
+    private DateTime _selectedWeekBeginDay { get; set; }
     private List<DateTime> weekStarts { get; set; } = new List<DateTime>();
+
 
     protected override async Task OnInitializedAsync()
     {
         weekStarts.Clear();
         weekStarts = GetFirstDaysOfWeeksInMonth(_date);
 
+        _selectedWeekBeginDay = weekStarts.FirstOrDefault();
         await Load();
     }
 

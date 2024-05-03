@@ -5,23 +5,23 @@ namespace Miratorg.TimeKeeper.Host.Models;
 public enum DayEnum
 {
     [Display(Name = "Пн")]
-    Monday = 1,
+    Monday = 0,
     
     [Display(Name = "Вт")]
-    Tuesday = 2,
+    Tuesday = 1,
     
     [Display(Name = "Ср")]
-    Wednesday = 3,
+    Wednesday = 2,
 
     [Display(Name = "Чт")]
-    Thursday = 4,
+    Thursday = 3,
 
     [Display(Name = "Пт")]
-    Friday = 5,
+    Friday = 4,
 
     [Display(Name = "Сб")]
-    Saturday = 6,
+    Saturday = 5,
 
     [Display(Name = "Вс")]
-    Sunday = 7
+    Sunday = 6
 }

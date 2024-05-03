@@ -1,7 +1,7 @@
 ﻿
 <div style="display:flex; flex-direction:column; width: 150px; background-color: #ced4da">
     <div style="display: flex; justify-content: space-around; width: 100%; height:20px;">
-        @Day.GetEnumDisplayName()
+        @WeekDay.GetEnumDisplayName() <b>@currentDate.ToString("yyyy-MM-dd")</b>
     </div>
     <div style="display: flex; justify-content: space-around; width: 100%; height:10px;">
         <div style="width: 10px; font-size:9px">4</div>
@@ -17,5 +17,15 @@
 @code {
 
     [Parameter]
-    public DayEnum Day { get; set; }
+    public DayEnum WeekDay { get; set; }
+
+    [Parameter]
+    public DateTime WeekBeginDay { get; set; }
+
+    private DateTime currentDate { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        currentDate = WeekBeginDay.AddDays((int)WeekDay);
+    }
 }

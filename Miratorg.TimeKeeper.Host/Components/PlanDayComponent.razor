@@ -11,4 +11,19 @@
 
 @code {
 
+    [Parameter]
+    public DayEnum WeekDay { get; set; }
+
+    [Parameter]
+    public DateTime WeekBeginDay { get; set; }
+
+    [Parameter]
+    public Guid EmployeeId { get; set; }
+
+    private DateTime currentDate { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        currentDate = WeekBeginDay.AddDays((int)WeekDay);
+    }
 }
