@@ -21,7 +21,7 @@
             @foreach (var weekStart in weekStarts)
             {
                 <div style="display:flex; margin-right: 5px;">
-                    <button class="btn btn-info btn-sm">@weekStart.ToShortDateString()</button>
+                    <button class="btn btn-info btn-sm" @onclick="(() => SelectWeek(weekStart))">@weekStart.ToShortDateString()</button>
                 </div>
             }
         </div>
@@ -102,6 +102,16 @@
     {
         weekStarts.Clear();
         weekStarts = GetFirstDaysOfWeeksInMonth(_date);
+        _selectedWeekBeginDay = weekStarts.FirstOrDefault();
+
+        StateHasChanged();
+    }
+
+    private void SelectWeek(DateTime date)
+    {
+        _selectedWeekBeginDay = date;
+
+        StateHasChanged();
     }
 
     public static List<DateTime> GetFirstDaysOfWeeksInMonth(DateTime date)
