@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Components\Pages\EditCreatePlanDialog.razor" />
     <Content Remove="Components\Pages\WeekPanelComponent.razor" />
   </ItemGroup>
 
@@ -27,6 +28,7 @@
 
   <ItemGroup>
     <None Include="Components\Pages\DayHeader.razor" />
+    <None Include="Components\Pages\EditCreatePlanDialog.razor" />
     <None Include="Components\Pages\WeekPanelComponent.razor" />
   </ItemGroup>
 
@@ -35,7 +37,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <_ContentIncludedByDefault Remove="Components\Pages\EditCreatePlanDialog.razor" />
     <_ContentIncludedByDefault Remove="Components\Pages\WeekPanelComponent.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Components\Pages\EditCreatePlanDialog.razor" />
   </ItemGroup>
 
 </Project>
