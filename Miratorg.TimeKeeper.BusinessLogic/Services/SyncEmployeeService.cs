@@ -13,7 +13,10 @@ public class SyncEmployeeService : IHostedService
     private bool isWork { get; set; }
     private readonly TimeSpan pause = TimeSpan.FromDays(1);
 
-    public SyncEmployeeService(IStuffControlDbService stuffControlService, IStaffControlDbContextFactory staffControlDbContextFactory, ITimeKeeperDbContextFactory timeKeeperDbContextFactory, ILogger<SyncEmployeeService> logger)
+    public SyncEmployeeService(IStuffControlDbService stuffControlService,
+        IStaffControlDbContextFactory staffControlDbContextFactory,
+        ITimeKeeperDbContextFactory timeKeeperDbContextFactory,
+        ILogger<SyncEmployeeService> logger)
     {
         _stuffControlService = stuffControlService;
         _timeKeeperDbContextFactory = timeKeeperDbContextFactory;
