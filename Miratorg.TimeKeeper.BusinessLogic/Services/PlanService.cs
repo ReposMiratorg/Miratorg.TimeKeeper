@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Miratorg.TimeKeeper.DataAccess.Entities;
 
 namespace Miratorg.TimeKeeper.BusinessLogic.Services;
 

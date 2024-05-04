@@ -8,7 +8,6 @@ using Miratorg.DataService.Extensions;
 using Miratorg.DataService.Interfaces;
 using Miratorg.DataService.Services;
 using Miratorg.TimeKeeper.BusinessLogic.Services;
-using Miratorg.TimeKeeper.DataAccess.Contexts;
 using System.Security.Claims;
 
 namespace Miratorg.TimeKeeper.Host.Extensions;
@@ -57,6 +56,8 @@ public static class ServiceHostExtensions
 
         services.AddSingleton<IStuffControlDbService, StuffControlDbService>();
         services.AddHostedService<SyncEmployeeService>();
+
+        services.AddScoped<IPlanService, PlanService>();
 
         var connectionString = configuration.GetConnectionString("DefaultConnection");
         services.AddDbContextPool<TimeKeeperDbContext>(options =>
