@@ -1,0 +1,48 @@
+﻿<CustomModalDialog DialogSize="ModalDialogSize.Standard" @ref="modalDialog">
+
+    <FrontObject>
+        <button class="btn btn-danger btn-sm" @onclick="modalDialog.Open"><span class="mdi mdi-delete"></span></button>
+    </FrontObject>
+
+    <Body>
+        <a>@Message</a>
+    </Body>
+
+    <Footer>
+        <button class="btn btn-danger btn-sm" @onclick="Delete">Удалить</button>
+        <button class="btn btn-info btn-sm" @onclick="Close">Отмена</button>
+    </Footer>
+
+</CustomModalDialog>
+@code {
+
+    [Parameter]
+    public string Message { get; set; }
+
+    [Parameter]
+    public EventCallback Action { get; set; }
+
+    private CustomModalDialog modalDialog { get; set; } = new ();
+
+    private async Task Close()
+    {
+        await modalDialog.Close();
+    }
+
+    private async Task Delete()
+    {
+        if (!Action.HasDelegate)
+        {
+            return;
+        }
+
+        try
+        {
+            await Action.InvokeAsync();
+        }
+        catch (Exception)
+        {
+            //ToDo - записать лог и отобразить сообщение
+        }
+    }
+}

@@ -134,12 +134,12 @@ public class PlanService : IPlanService
 
                 foreach (var date in dates)
                 {
-                    var end = date.TimeEnd ?? date.TimeBegin.Date.AddDays(1);
+                    //var end = date.TimeEnd ?? date.TimeBegin.Date.AddDays(1);
 
                     model.WorkDates.Add(new Schedule1CPlanModel()
                     {
                          Begin = date.TimeBegin,
-                         End = end,
+                         End = date.TimeEnd,
                     });
                 }
             }

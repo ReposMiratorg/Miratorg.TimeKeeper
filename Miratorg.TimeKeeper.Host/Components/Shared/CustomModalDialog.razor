@@ -1,0 +1,85 @@
+﻿
+@FrontObject
+
+<div id="@id" class="modal fade justify-content-start @modalClass" tabindex="-1" style="@styleDisplay" >
+    <div class="modal-dialog @DialogSize.ToStyleCSS()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="standard-modalLabel">@Title</h4>
+                <button type="button" class="btn-close" @onclick="Close"></button>
+            </div>            
+            <div class="modal-body text-start">
+                @Body
+            </div>            
+            <div class="modal-footer">
+                @Footer
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (isModal)
+{   
+    <div class="modal-backdrop fade show" style="animation-duration: 3s; transition-duration:3s;"></div>
+}
+
+@code {
+
+    [Inject]
+    public IJSRuntime? _jsRuntime { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public RenderFragment? FrontObject { get; set; }
+
+    [Parameter]
+    public RenderFragment? Body { get; set; }
+
+    [Parameter]
+    public RenderFragment? Footer { get; set; }
+
+    [Parameter]
+    public string? ButtonBootstrapClasses { get; set; }
+
+    [Parameter]
+    public ModalDialogSize DialogSize { get; set; } = ModalDialogSize.Standard;
+
+    [Parameter]
+    public EventCallback CloseButtonXDialog { get; set; }
+
+    private string id { get; set; } = "id" + Guid.NewGuid().ToStringClear();
+    private string modalClass = string.Empty;
+    private string styleDisplay = string.Empty;
+    private bool isModal = false;
+
+    public async Task Open()
+    {
+        //ToDo - реализовать "замедление" анимации
+        await Task.Delay(80);
+
+        isModal = true;
+        modalClass = "show";
+        styleDisplay = "display: block;";
+
+        StateHasChanged();
+    }
+
+    public async Task Close()
+    {
+        //ToDo - реализовать "замедление" анимации
+        await Task.Delay(80);
+
+        isModal = false;
+        modalClass = string.Empty;
+        styleDisplay = string.Empty;
+
+        if (CloseButtonXDialog.HasDelegate)
+        {
+            await CloseButtonXDialog.InvokeAsync();
+        }
+
+        StateHasChanged();
+    }    
+}
