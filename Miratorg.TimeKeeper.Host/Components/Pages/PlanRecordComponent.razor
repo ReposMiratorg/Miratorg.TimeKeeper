@@ -1,0 +1,50 @@
+﻿<div style="display: flex; flex-direction:row; flex-flow: row nowrap; width: 100%; height:50px; ">
+    @foreach (var item in plan)
+    {
+        <div style="width: 100%; background-color: @(item ? "cadetblue" : "aquamarine");"></div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<DateDetailModel> PlanedIntervals { get; set; }
+
+    [Parameter]
+    public DateTime CurrentDate { get; set; }
+
+    bool[] plan = new bool[24];
+
+    protected override void OnParametersSet()
+    {
+        SetHourValue();
+    }
+
+    private void SetHourValue()
+    {
+        foreach (var planInterval in PlanedIntervals)
+        {
+            if (CurrentDate.AddDays(1) >= planInterval.Begin && CurrentDate <= planInterval.End)
+            {
+                var date = CurrentDate;
+                for (int i = 0; i < 24; i++)
+                {
+                    if (CheckInterval(date, planInterval.Begin, planInterval.End))
+                    {
+                        plan[i] = true;
+                    }
+                }
+                date = date.AddHours(1);
+            }
+        }
+    }
+
+    private bool CheckInterval(DateTime currentTime, DateTime beginInterval, DateTime endInterval)
+    {
+        if (currentTime >= beginInterval && currentTime < endInterval)
+        {
+            return true;
+        }
+
+        return false;
+    }
+}

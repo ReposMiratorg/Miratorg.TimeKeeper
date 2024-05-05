@@ -1,12 +1,14 @@
 ﻿using Microsoft.Extensions.Logging;
+using Miratorg.TimeKeeper.BusinessLogic.Models;
 
 namespace Miratorg.TimeKeeper.BusinessLogic.Services;
 
 public interface IPlanService
 {
-    public Task<List<PlanEntity>> GetPlan(DateTime startDate, DateTime endDate);
-    public Task Create(Guid employeeId, DateTime dateKey, PlanType planType, DateTime startWork, DateTime endWork);
-    public Task Remove(Guid employeeId, DateTime dateKey);
+    public Task<List<PlanEntity>> GetPlan(DateTime beginDate, DateTime endDate);
+    public Task<List<EmployeeModel>> GetPlanModel(DateTime beginDate, DateTime endDate);
+    public Task Create(Guid employeeId, PlanType planType, DateTime beginWork, DateTime endWork);
+    public Task Remove(Guid id);
 }
 
 public class PlanService : IPlanService
@@ -20,12 +22,13 @@ public class PlanService : IPlanService
         _logger = logger;
     }
 
-    public async Task Create(Guid employeeId, DateTime dateKey, PlanType planType, DateTime startWork, DateTime endWork)
+    public async Task Create(Guid employeeId, PlanType planType, DateTime beginWork, DateTime endWork)
     {
-        ValidateDate(dateKey);
+        ValidateDates(beginWork, endWork);
+
         using var dbContext = await _dbContextFactory.Create();
 
-        var existPlans = await dbContext.Plans.Where(x => x.EmployeeId == employeeId && x.DateKey == dateKey && x.PlanType == planType).ToListAsync();
+        var existPlans = await dbContext.Plans.Where(x => x.EmployeeId == employeeId && x.PlanType == planType).ToListAsync();
 
         foreach (var item in existPlans)
         {
@@ -39,8 +42,9 @@ public class PlanService : IPlanService
         dbContext.Plans.Add(new PlanEntity()
         {
             EmployeeId = employeeId,
-             DateKey = dateKey,
-
+            Begin = beginWork,
+            End = endWork,
+            PlanType = planType
         });
 
         await  dbContext.SaveChangesAsync();
@@ -52,15 +56,17 @@ public class PlanService : IPlanService
         ValidateDate(endDate);
 
         using var dbContext = await _dbContextFactory.Create();
-        var plans = await dbContext.Plans.Where(x => x.DateKey >= startDate && x.DateKey <= endDate).ToListAsync();
+        var plans = await dbContext.Plans.Where(x => (x.Begin >= startDate && x.Begin <= endDate) || (x.End >= startDate && x.End <= endDate)).ToListAsync();
         
         return plans;
     }
 
-    public async Task Remove(Guid employeeId, DateTime dateKey)
+    public async Task Remove(Guid id)
     {
-        ValidateDate(dateKey);
         using var dbContext = await _dbContextFactory.Create();
+        var planEntity = await dbContext.Plans.FirstOrDefaultAsync(x => x.Id == id);
+        dbContext.Plans.Remove(planEntity);
+        await dbContext.SaveChangesAsync();
     }
 
     private static void ValidateDate(DateTime dateTime)
@@ -71,6 +77,51 @@ public class PlanService : IPlanService
         {
             throw new InvalidParameterPlanServiceException(dateTime.ToString());
         }
+    }
+
+    private static void ValidateDates(DateTime begin, DateTime end)
+    {
+        if (begin <= end)
+        {
+            throw new InvalidParameterPlanServiceException($"Incorrect interval {begin} - {begin}");
+        }
+    }
+
+    public async Task<List<EmployeeModel>> GetPlanModel(DateTime startDate, DateTime endDate)
+    {
+        ValidateDate(startDate);
+        ValidateDate(endDate);
+
+        using var dbContext = await _dbContextFactory.Create();
+        var plans = await dbContext.Plans.Where(x => x.Begin >= startDate && x.End <= endDate).ToListAsync();
+
+        var models = new List<EmployeeModel>();
+
+        var groups = plans
+            .GroupBy(x => x.EmployeeId)
+            .Select(x => new { key = x.Key, Data = x.ToList()});
+
+        foreach (var item in groups)
+        {
+            var model = new EmployeeModel
+            {
+                EmployeeId = item.key
+            };
+
+            foreach (var d in item.Data)
+            {
+                model.Dates.Add(new DateDetailModel()
+                {
+                    Begin = d.Begin,
+                    End = d.End,
+                    PlanType = d.PlanType
+                });
+            }
+
+            models.Add(model);
+        }
+
+        return models;
     }
 }
 
