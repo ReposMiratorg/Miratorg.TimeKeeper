@@ -22,6 +22,7 @@
 
     private void SetHourValue()
     {
+        plan = new bool[24];
         foreach (var planInterval in Schedule1CPlans)
         {
             if (CurrentDate.AddDays(1) >= planInterval.Begin && CurrentDate <= planInterval.End)
@@ -32,6 +33,10 @@
                     if (CheckInterval(date, planInterval.Begin, planInterval.End))
                     {
                         plan[i] = true;
+                    }
+                    else
+                    {
+                        plan[i] = false;
                     }
                     date = date.AddHours(1);
                 }
@@ -46,7 +51,7 @@
             return false;
         }
 
-        if (currentTime >= beginInterval && currentTime < endInterval)
+        if (currentTime >= beginInterval && currentTime <= endInterval)
         {
             return true;
         }

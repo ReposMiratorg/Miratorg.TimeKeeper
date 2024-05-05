@@ -115,6 +115,7 @@
         var end = weekStarts.Max();
 
         employeeModels = await planService.GetPlanModel(begin, end);
+        StateHasChanged();
     }
 
     private void SelectWeek(DateTime date)
