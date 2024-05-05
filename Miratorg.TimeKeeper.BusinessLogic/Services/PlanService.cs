@@ -95,27 +95,53 @@ public class PlanService : IPlanService
         using var dbContext = await _dbContextFactory.Create();
         var plans = await dbContext.Plans.Where(x => x.Begin >= startDate && x.End <= endDate).ToListAsync();
 
+        var employees = await dbContext.Employees.Include(x => x.Store).Include(x => x.Schedule).ThenInclude(x => x.Dates).ToListAsync();
+
         var models = new List<EmployeeModel>();
 
         var groups = plans
             .GroupBy(x => x.EmployeeId)
             .Select(x => new { key = x.Key, Data = x.ToList()});
 
-        foreach (var item in groups)
+        foreach (var item in employees)
         {
             var model = new EmployeeModel
             {
-                EmployeeId = item.key
+                EmployeeId = item.Id
             };
 
-            foreach (var d in item.Data)
+            var plan = groups.FirstOrDefault(x => x.key == item.Id);
+
+            if (plan != null)
             {
-                model.Dates.Add(new DateDetailModel()
+                foreach (var d in plan.Data)
                 {
-                    Begin = d.Begin,
-                    End = d.End,
-                    PlanType = d.PlanType
-                });
+                    model.Dates.Add(new DateDetailModel()
+                    {
+                        Begin = d.Begin,
+                        End = d.End,
+                        PlanType = d.PlanType
+                    });
+                }
+            }
+
+            var employee = SyncEmployeeService.Employees.FirstOrDefault(x => x.Id == item.Id);
+            if (employee?.Schedule?.Dates != null)
+            {
+                var dates = employee?.Schedule?.Dates
+                    .Where(x => x.TimeBegin >= startDate && x.TimeBegin <= endDate.AddDays(1))
+                    .ToList();
+
+                foreach (var date in dates)
+                {
+                    var end = date.TimeEnd ?? date.TimeBegin.Date.AddDays(1);
+
+                    model.WorkDates.Add(new Schedule1CPlanModel()
+                    {
+                         Begin = date.TimeBegin,
+                         End = end,
+                    });
+                }
             }
 
             models.Add(model);

@@ -5,6 +5,8 @@ namespace Miratorg.TimeKeeper.BusinessLogic.Services;
 
 public class SyncEmployeeService : IHostedService
 {
+    public static List<EmployeeEntity> Employees { get; private set; } = new List<EmployeeEntity>();
+
     private readonly IStuffControlDbService _stuffControlService;
     private readonly ITimeKeeperDbContextFactory _timeKeeperDbContextFactory;
     private readonly IStaffControlDbContextFactory _staffControlDbContextFactory;
@@ -61,6 +63,10 @@ public class SyncEmployeeService : IHostedService
         try
         {
             var staffDbContext = await _staffControlDbContextFactory.Create();
+            using var dbContext = await _timeKeeperDbContextFactory.Create();
+
+            Employees.Clear();
+            Employees = await dbContext.Employees.Include(x => x.Schedule).ThenInclude(x => x.Dates).ToListAsync();
 
             var employees = await staffDbContext.Staff
                 .Where(x => x.LegalEntity == "ООО \"ПродМир\"" || x.LegalEntity == "ООО «Стейк и Бургер»")
@@ -74,8 +80,6 @@ public class SyncEmployeeService : IHostedService
             {
                 return;
             }
-
-            var dbContext = await _timeKeeperDbContextFactory.Create();
 
             foreach (var employee in employees)
             {
@@ -121,7 +125,6 @@ public class SyncEmployeeService : IHostedService
                 }
 
                 await UpdateSchedule(currentEmployee.Id, employee.Code);
-                await dbContext.SaveChangesAsync();
             }
         }
         catch (Exception ex)
