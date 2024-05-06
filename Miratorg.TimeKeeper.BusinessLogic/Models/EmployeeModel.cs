@@ -9,6 +9,7 @@ public class EmployeeModel
 
 public class DateDetailModel
 {
+    public Guid Id { get; set; }
     public DateTime Begin { get; set; }
     public DateTime End { get; set; }
     public PlanType PlanType { get; set; }

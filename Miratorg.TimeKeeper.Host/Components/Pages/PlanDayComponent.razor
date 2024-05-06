@@ -1,16 +1,60 @@
-﻿<div style="display:flex; flex-direction:column; width: 190px; height: 60px; background-color: #ced4da">
+﻿
+<CustomModalDialog DialogSize="ModalDialogSize.Standard" @ref="modalDialog">
 
-    <PlanRecordComponent CurrentDate="currentDate" PlanedIntervals="planedIntervals" />
+    <FrontObject>
+        <div style="display:flex; flex-direction:column; width: 190px; height: 60px; background-color: #ced4da" @onclick="Open">
 
-    <FactComponent CurrentDate="currentDate" Schedule1CPlans="schedule1CPlanModels" />
+            <PlanRecordComponent CurrentDate="currentDate" PlanedIntervals="planedIntervals" />
 
-    <div style="display: flex; width: 100%; height:50px;">
-        
-    </div>
+            <FactComponent CurrentDate="currentDate" Schedule1CPlans="schedule1CPlanModels" />
 
-</div>
+            <div style="display: flex; width: 100%; height:50px;">
+            </div>
+
+        </div>
+    </FrontObject>
+
+    <Body>
+        <div class="row mb-2">
+            <div class="col">
+                <CreatePlanDialogComponent Action="Action" CurrentDate="currentDate" EmployeeId="EmployeeId"  />
+            </div>
+        </div>
+
+        @if (planedIntervals != null)
+        {
+            foreach (var plan in planedIntervals)
+            {
+                var message = $"{plan.Begin.ToShortTimeString()} - {plan.End.ToShortTimeString()}";
+
+                <div class="row">
+                    <div class="col-9">
+                        <input class="form-control form-control-sm" value="@message" disabled />
+                    </div>
+                    <div class="col-3">
+                        <CustomDeleteDialogComponent Message="@message" Action="@(() => RemovePaln(plan.Id))" />
+                    </div>
+                </div>
+            }
+        }
+    </Body>
+
+    <Footer>
+        <button class="btn btn-primary btn-sm" @onclick="Close">Закрыть</button>
+    </Footer>
+
+</CustomModalDialog>
+
 
 @code {
+
+    [Parameter]
+    public EventCallback Action { get; set; }
+
+    [Inject]
+    public IPlanService PlanService { get; set; }
+
+    private CustomModalDialog modalDialog { get; set; } = new();
 
     [Parameter]
     public DayEnum WeekDay { get; set; }
@@ -34,11 +78,43 @@
     {
         currentDate = WeekBeginDay.AddDays((int)WeekDay);
 
-        var dates = EmployeeModels.Where(x => x.EmployeeId == EmployeeId).SelectMany(x => x.Dates);
-        planedIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate && x.PlanType == PlanType.Plan).ToList();
-        overworkIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate && x.PlanType == PlanType.Overwork).ToList();
+        var dates = EmployeeModels.Where(x => x.EmployeeId == EmployeeId).SelectMany(x => x.Dates).ToList();
+        planedIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate.AddDays(1) && x.PlanType == PlanType.Plan).ToList();
+        overworkIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate.AddDays(1) && x.PlanType == PlanType.Overwork).ToList();
 
         var schedules = EmployeeModels.Where(x => x.EmployeeId == EmployeeId).SelectMany(x => x.WorkDates);
         schedule1CPlanModels = schedules.Where(x => x.Begin.Date == currentDate).ToList();
+    }
+
+    private async Task RemovePaln(Guid id)
+    {
+        await PlanService.Remove(id);
+    }
+
+    private async Task Open()
+    {
+        await modalDialog.Open();
+    }
+
+    private async Task Close()
+    {
+        await modalDialog.Close();
+    }
+
+    private async Task Delete()
+    {
+        if (!Action.HasDelegate)
+        {
+            return;
+        }
+
+        try
+        {
+            await Action.InvokeAsync();
+        }
+        catch (Exception)
+        {
+            //ToDo - записать лог и отобразить сообщение
+        }
     }
 }
