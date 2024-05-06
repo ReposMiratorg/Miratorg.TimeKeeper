@@ -124,7 +124,18 @@ public class SyncEmployeeService : IHostedService
                     await dbContext.SaveChangesAsync();
                 }
 
-                await UpdateSchedule(currentEmployee.Id, employee.Code);
+                var (start, end) = GetFirstAndLastDayOfMonth(DateTime.Now);
+
+                // обрабатываем данные из проховов СКУД
+                var tempDate = start.Date;
+                for (int i = 0; tempDate <= end; i++)
+                {
+                    await UpdateScudData(currentEmployee.Id, employee.Code, tempDate, tempDate.AddDays(1));
+                    tempDate = tempDate.AddDays(1);
+                }
+
+                // обрабатываем данные из плана проходов 1С
+                await UpdateSchedule(currentEmployee.Id, employee.Code, start, end);
             }
         }
         catch (Exception ex)
@@ -133,11 +144,61 @@ public class SyncEmployeeService : IHostedService
         }
     }
 
-    private async Task UpdateSchedule(Guid userId, string codeNav)
+    private async Task UpdateScudData(Guid userId, string codeNav, DateTime start, DateTime end)
     {
         try
         {
-            var (start, end) = GetFirstAndLastDayOfMonth(DateTime.Now);
+            var dbContext = await _timeKeeperDbContextFactory.Create();
+            var stuffContext = await _staffControlDbContextFactory.Create();
+
+            var scudInfo = dbContext.ScudInfos.FirstOrDefault(x => x.EmployeeId == userId && x.Input >= start && x.Output < end);
+
+            if (scudInfo != null)
+            {
+                return;
+            }
+
+            var scudStaff = await stuffContext.SkudStaffs.FirstOrDefaultAsync(x => x.Code.ToLower() == codeNav.ToLower());
+            if (scudStaff == null)
+            {
+                _logger.LogInformation($"ScudStaff :'{codeNav}' - not found.");
+                return;
+            }
+
+            var datas = await stuffContext.SkudDatas
+                .Where(x => x.IdStaff == scudStaff.Id && start <= x.RepDate && end > x.RepDate)
+                .ToListAsync();
+
+            if (datas.Count == 0)
+            {
+                return;
+            }
+
+            var input = datas.Where(x => x.TypePass == 1).MinBy(x => x.RepDate)?.RepDate;
+            var output = datas.Where(x => x.TypePass == 2).MaxBy(x => x.RepDate)?.RepDate;
+
+            if (input != null && output != null && input < output)
+            {
+                dbContext.ScudInfos.Add(new ScudInfo()
+                {
+                    EmployeeId = userId,
+                    Input = (DateTime)input,
+                    Output = (DateTime)output
+                });
+
+                await dbContext.SaveChangesAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"'{nameof(UpdateScudData)}': {ex.Message}");
+        }
+    }
+
+    private async Task UpdateSchedule(Guid userId, string codeNav, DateTime start, DateTime end)
+    {
+        try
+        {
             var dbContext = await _timeKeeperDbContextFactory.Create();
             var stuffContext = await _staffControlDbContextFactory.Create();
 
@@ -199,7 +260,7 @@ public class SyncEmployeeService : IHostedService
         }
         catch (Exception ex)
         {
-            _logger.LogError($"'{nameof(UpdateSchedule)}': {ex.Message}", ex);
+            _logger.LogError(ex, $"'{nameof(UpdateSchedule)}': {ex.Message}");
         }
     }
 
