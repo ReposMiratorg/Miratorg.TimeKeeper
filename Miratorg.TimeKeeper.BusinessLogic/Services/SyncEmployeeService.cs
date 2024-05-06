@@ -66,7 +66,10 @@ public class SyncEmployeeService : IHostedService
             using var dbContext = await _timeKeeperDbContextFactory.Create();
 
             Employees.Clear();
-            Employees = await dbContext.Employees.Include(x => x.Schedule).ThenInclude(x => x.Dates).ToListAsync();
+            Employees = await dbContext.Employees
+                .Include(x => x.Schedule).ThenInclude(x => x.Dates)
+                .Include(x => x.ScudInfos)
+                .ToListAsync();
 
             var employees = await staffDbContext.Staff
                 .Where(x => x.LegalEntity == "ООО \"ПродМир\"" || x.LegalEntity == "ООО «Стейк и Бургер»")
