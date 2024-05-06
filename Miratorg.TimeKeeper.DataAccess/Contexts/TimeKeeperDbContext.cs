@@ -12,6 +12,7 @@ public class TimeKeeperDbContext : DbContext
     public virtual DbSet<ScheduleEntity> Schedules { get; set; }
     public virtual DbSet<ScheduleDateEntity> ScheduleDates { get; set; }
     public virtual DbSet<PlanEntity> Plans { get; set; }
+    public virtual DbSet<ScudInfo> ScudInfos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
