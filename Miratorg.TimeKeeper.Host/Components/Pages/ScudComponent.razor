@@ -16,7 +16,7 @@
 @code {
 
     [Parameter]
-    public List<Schedule1CPlanModel> Schedule1CPlans { get; set; }
+    public List<ScudInfoModel> ScudInfoModels { get; set; }
 
     [Parameter]
     public DateTime CurrentDate { get; set; }
@@ -34,11 +34,11 @@
     {
         plan = new bool[24];
         interval = string.Empty;
-        foreach (var planInterval in Schedule1CPlans)
+        foreach (var planInterval in ScudInfoModels)
         {
             if (CurrentDate.AddDays(1) >= planInterval.Begin && CurrentDate <= planInterval.End)
             {
-                interval = $"{planInterval.Begin.ToString("HH:mm")} - {planInterval.End?.ToString("HH:mm")}";
+                interval = $"{planInterval.Begin.ToString("HH:mm")} - {planInterval.End.ToString("HH:mm")}";
                 var date = CurrentDate;
                 for (int i = 0; i < 24; i++)
                 {

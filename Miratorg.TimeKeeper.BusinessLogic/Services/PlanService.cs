@@ -143,6 +143,18 @@ public class PlanService : IPlanService
                          End = date.TimeEnd,
                     });
                 }
+
+                var scudInfos = employee?.ScudInfos?.Where(x => x.Input >= startDate && x.Output <= endDate)
+                    .ToList();
+
+                foreach (var scudFact in scudInfos)
+                {
+                    model.ScudInfos.Add(new ScudInfoModel()
+                    {
+                        Begin = scudFact.Input,
+                        End = scudFact.Output
+                    });
+                }
             }
 
             models.Add(model);
