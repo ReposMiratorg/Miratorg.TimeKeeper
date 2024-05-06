@@ -22,9 +22,9 @@ public class PlanService : IPlanService
         _logger = logger;
     }
 
-    public async Task Create(Guid employeeId, PlanType planType, DateTime beginWork, DateTime endWork)
+    public async Task Create(Guid employeeId, PlanType planType, DateTime begin, DateTime end)
     {
-        ValidateDates(beginWork, endWork);
+        ValidateDates(begin, end);
 
         using var dbContext = await _dbContextFactory.Create();
 
@@ -42,8 +42,8 @@ public class PlanService : IPlanService
         dbContext.Plans.Add(new PlanEntity()
         {
             EmployeeId = employeeId,
-            Begin = beginWork,
-            End = endWork,
+            Begin = begin,
+            End = end,
             PlanType = planType
         });
 
@@ -81,7 +81,7 @@ public class PlanService : IPlanService
 
     private static void ValidateDates(DateTime begin, DateTime end)
     {
-        if (begin <= end)
+        if (begin >= end)
         {
             throw new InvalidParameterPlanServiceException($"Incorrect interval {begin} - {begin}");
         }
@@ -118,6 +118,7 @@ public class PlanService : IPlanService
                 {
                     model.Dates.Add(new DateDetailModel()
                     {
+                        Id = d.Id,
                         Begin = d.Begin,
                         End = d.End,
                         PlanType = d.PlanType

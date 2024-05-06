@@ -58,13 +58,13 @@
                 </td>
                 <td>@employee.CodeNav</td>
 
-                <td><PlanDayComponent EmployeeModels="employeeModels" WeekDay="DayEnum.Monday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
-                <td><PlanDayComponent EmployeeModels="employeeModels" WeekDay="DayEnum.Tuesday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
-                <td><PlanDayComponent EmployeeModels="employeeModels" WeekDay="DayEnum.Wednesday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
-                <td><PlanDayComponent EmployeeModels="employeeModels" WeekDay="DayEnum.Thursday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
-                <td><PlanDayComponent EmployeeModels="employeeModels" WeekDay="DayEnum.Friday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
-                <td><PlanDayComponent EmployeeModels="employeeModels" WeekDay="DayEnum.Saturday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
-                <td><PlanDayComponent EmployeeModels="employeeModels" WeekDay="DayEnum.Sunday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+                <td><PlanDayComponent EmployeeModels="employeeModels" Action="UpdateDates" WeekDay="DayEnum.Monday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+                <td><PlanDayComponent EmployeeModels="employeeModels" Action="UpdateDates" WeekDay="DayEnum.Tuesday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+                <td><PlanDayComponent EmployeeModels="employeeModels" Action="UpdateDates" WeekDay="DayEnum.Wednesday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+                <td><PlanDayComponent EmployeeModels="employeeModels" Action="UpdateDates" WeekDay="DayEnum.Thursday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+                <td><PlanDayComponent EmployeeModels="employeeModels" Action="UpdateDates" WeekDay="DayEnum.Friday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+                <td><PlanDayComponent EmployeeModels="employeeModels" Action="UpdateDates" WeekDay="DayEnum.Saturday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+                <td><PlanDayComponent EmployeeModels="employeeModels" Action="UpdateDates" WeekDay="DayEnum.Sunday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
             </tr>
         }
     }
@@ -101,8 +101,6 @@
     private void HandleOnChange(ChangeEventArgs e)
     {
         UpdateDates();
-
-        StateHasChanged();
     }
 
     private async void UpdateDates()
