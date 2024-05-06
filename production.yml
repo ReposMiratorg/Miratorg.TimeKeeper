@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  loader-master:
+    container_name: time-keeper
+    image: kluchnikov/time-keeper:0.0.2
+    restart: always
+    ports:
+      - 7004:8080
+    environment:
+      - ConnectionStrings__DefaultConnection=Packet Size=32767;user id=111111; password=11111;Initial Catalog=1111111;Data Source=11111111.agrohold.ru;Encrypt=False
+      - ConnectionStrings__StaffControl=Packet Size=32767; Persist Security Info=true; user id=SalesDataUser; password=SalesDataUser!; Initial Catalog=StaffControl; Data Source=CONS-DB02.agrohold.ru;Encrypt=False;
+      - TZ=Europe/Moscow

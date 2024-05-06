@@ -31,7 +31,7 @@
 <div style="display: flex; flex-direction: row" class="mb-3">
 
     <div class="form-check form-switch me-2">
-        <input type="checkbox" class="form-check-input" id="customSwitch1" style="margin-right: 10px; ">
+        <input type="checkbox" class="form-check-input" id="customSwitch1" style="margin-right: 10px; " @bind="_isShowPlan">
         <label class="form-check-label" for="customSwitch1" style="flex-grow: 1; background-color: #2c8ef8; padding: 5px 10px; border-radius: 5px;">Запланированный график</label>
     </div>
     <div class="form-check form-switch me-2">
@@ -39,7 +39,7 @@
         <label class="form-check-label" for="customSwitch1" style="flex-grow: 1; background-color: #2c8ef8; padding: 5px 10px; border-radius: 5px;">Подработки</label>
     </div>
     <div class="form-check form-switch me-2">
-        <input type="checkbox" class="form-check-input" id="customSwitch1" style="margin-right: 10px; ">
+        <input type="checkbox" class="form-check-input" id="customSwitch1" style="margin-right: 10px; " @bind="_isShow1C">
         <label class="form-check-label" for="customSwitch1" style="flex-grow: 1; background-color: #0acf97; padding: 5px 10px; border-radius: 5px;">Отображать график 1C</label>
     </div>
     <div class="form-check form-switch me-2">
@@ -83,13 +83,13 @@
                 </td>
                 <td>@employee.CodeNav</td>
 
-                <td><PlanDayComponent EmployeeModels="employeeModels" Action="UpdateDates" WeekDay="DayEnum.Monday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
-                <td><PlanDayComponent EmployeeModels="employeeModels" Action="UpdateDates" WeekDay="DayEnum.Tuesday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
-                <td><PlanDayComponent EmployeeModels="employeeModels" Action="UpdateDates" WeekDay="DayEnum.Wednesday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
-                <td><PlanDayComponent EmployeeModels="employeeModels" Action="UpdateDates" WeekDay="DayEnum.Thursday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
-                <td><PlanDayComponent EmployeeModels="employeeModels" Action="UpdateDates" WeekDay="DayEnum.Friday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
-                <td><PlanDayComponent EmployeeModels="employeeModels" Action="UpdateDates" WeekDay="DayEnum.Saturday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
-                <td><PlanDayComponent EmployeeModels="employeeModels" Action="UpdateDates" WeekDay="DayEnum.Sunday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+                <td><PlanDayComponent EmployeeModels="employeeModels" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShow1C="_isShow1C" WeekDay="DayEnum.Monday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+                <td><PlanDayComponent EmployeeModels="employeeModels" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShow1C="_isShow1C" WeekDay="DayEnum.Tuesday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+                <td><PlanDayComponent EmployeeModels="employeeModels" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShow1C="_isShow1C" WeekDay="DayEnum.Wednesday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+                <td><PlanDayComponent EmployeeModels="employeeModels" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShow1C="_isShow1C" WeekDay="DayEnum.Thursday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+                <td><PlanDayComponent EmployeeModels="employeeModels" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShow1C="_isShow1C" WeekDay="DayEnum.Friday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+                <td><PlanDayComponent EmployeeModels="employeeModels" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShow1C="_isShow1C" WeekDay="DayEnum.Saturday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+                <td><PlanDayComponent EmployeeModels="employeeModels" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShow1C="_isShow1C" WeekDay="DayEnum.Sunday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
             </tr>
         }
     }
@@ -110,6 +110,9 @@
     private DateTime _date { get; set; } = DateTime.Now;
     private DateTime _selectedWeekBeginDay { get; set; }
     private List<DateTime> weekStarts { get; set; } = new List<DateTime>();
+
+    private bool _isShowPlan { get; set; }
+    private bool _isShow1C { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
