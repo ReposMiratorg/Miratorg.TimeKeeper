@@ -12,6 +12,7 @@
     <Content Remove="Components\Pages\FactComponent.razor" />
     <Content Remove="Components\Pages\WeekPanelComponent.razor" />
     <Content Remove="Components\PlanRecordComponent.razor" />
+    <Content Remove="Components\ScudComponent.razor" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Components\Pages\ScudComponent.razor" />
     <None Include="Components\Pages\DayHeader.razor" />
     <None Include="Components\Pages\EditCreatePlanDialog.razor" />
     <None Include="Components\FactComponent.razor" />
