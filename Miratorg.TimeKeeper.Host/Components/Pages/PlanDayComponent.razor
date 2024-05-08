@@ -9,6 +9,11 @@
                 <PlanRecordComponent CurrentDate="currentDate" PlanedIntervals="planedIntervals" />
             }
 
+            @if (IsShowOverWork)
+            {
+                <OveWorkRecordComponent CurrentDate="currentDate" PlanedIntervals="planedIntervals" />
+            }
+
             @if (IsShow1C)
             {
                 <FactComponent CurrentDate="currentDate" Schedule1CPlans="schedule1CPlanModels" />
@@ -28,7 +33,7 @@
     <Body>
         <div class="row mb-2">
             <div class="col">
-                <CreatePlanDialogComponent Action="Action" CurrentDate="currentDate" EmployeeId="EmployeeId"  />
+                <CreatePlanDialogComponent Action="Action" CurrentDate="currentDate" EmployeeId="EmployeeId" StoreId="StoreId" />
             </div>
         </div>
 
@@ -68,6 +73,9 @@
     private CustomModalDialog modalDialog { get; set; } = new();
 
     [Parameter]
+    public Guid StoreId { get; set; }
+
+    [Parameter]
     public DayEnum WeekDay { get; set; }
 
     [Parameter]
@@ -80,7 +88,13 @@
     public List<EmployeeModel> EmployeeModels { get; set; }
 
     [Parameter]
+    public List<EmployeeModel> AdditionalEmployeeModels { get; set; }
+
+    [Parameter]
     public bool IsShowPlan { get; set; }
+
+    [Parameter]
+    public bool IsShowOverWork { get; set; }
 
     [Parameter]
     public bool IsShow1C { get; set; }
@@ -90,8 +104,8 @@
 
     private DateTime currentDate { get; set; }
 
-    private List<DateDetailModel> planedIntervals { get; set; }
-    private List<DateDetailModel> overworkIntervals { get; set; }
+    private List<PlanDetailModel> planedIntervals { get; set; }
+    private List<PlanDetailModel> overworkIntervals { get; set; }
     private List<Schedule1CPlanModel> schedule1CPlanModels { get; set; }
     private List<ScudInfoModel> scudInfoModels { get; set; }
 
@@ -99,7 +113,7 @@
     {
         currentDate = WeekBeginDay.AddDays((int)WeekDay);
 
-        var dates = EmployeeModels.Where(x => x.EmployeeId == EmployeeId).SelectMany(x => x.Dates).ToList();
+        var dates = EmployeeModels.Where(x => x.EmployeeId == EmployeeId).SelectMany(x => x.Plans).ToList();
         planedIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate.AddDays(1) && x.PlanType == PlanType.Plan).ToList();
         overworkIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate.AddDays(1) && x.PlanType == PlanType.Overwork).ToList();
 

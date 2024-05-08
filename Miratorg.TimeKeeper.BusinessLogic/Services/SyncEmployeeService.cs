@@ -86,7 +86,7 @@ public class SyncEmployeeService : IHostedService
 
             foreach (var employee in employees)
             {
-                _logger.LogInformation($"Process: '{employee.Code}'");
+                //_logger.LogInformation($"Process: '{employee.Code}'");
 
                 var currentEmployee = dbContext.Employees.FirstOrDefault(x => x.CodeNav == employee.Code);
                 var position = positions.FirstOrDefault(x => x.Code.ToLower() == employee.CodePosition);
@@ -164,7 +164,7 @@ public class SyncEmployeeService : IHostedService
             var scudStaff = await stuffContext.SkudStaffs.FirstOrDefaultAsync(x => x.Code.ToLower() == codeNav.ToLower());
             if (scudStaff == null)
             {
-                _logger.LogInformation($"ScudStaff :'{codeNav}' - not found.");
+                //_logger.LogInformation($"ScudStaff :'{codeNav}' - not found.");
                 return;
             }
 

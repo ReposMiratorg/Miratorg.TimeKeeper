@@ -8,7 +8,7 @@ public class PlanEntity : BaseEntity
     public DateTime End { get; set; }
     public PlanType PlanType { get; set; }
     public Guid? StoreId { get; set; }
-    public virtual StoreEntity? Store { get; set; }
+    //public virtual StoreEntity? Store { get; set; }
 }
 
 public enum PlanType

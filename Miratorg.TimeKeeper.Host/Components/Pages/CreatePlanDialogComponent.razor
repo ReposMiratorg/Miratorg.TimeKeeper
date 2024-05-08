@@ -1,7 +1,7 @@
 ﻿<CustomModalDialog DialogSize="ModalDialogSize.Large" @ref="modalDialog">
 
     <FrontObject>
-        <button class="btn btn-primary btn-sm" @onclick="modalDialog.Open">Добавить план/подработку</button>
+        <button class="btn btn-primary btn-sm" @onclick="Open">Добавить план/подработку</button>
     </FrontObject>
 
     <Body>
@@ -21,6 +21,26 @@
                     <option value="@PlanType.Overwork">Подработка</option>
                 </select>
             </div>
+
+        </div>
+
+        <div class="row">
+            @if (planType == PlanType.Overwork)
+            {
+                <div class="col-8">
+                    <label>Тип</label>
+                    <select class="form-select form-select-sm" name="name" @bind="storeId">
+                        <option value="@Guid.Empty">Не выбран</option>
+                        @if (allStories != null)
+                        {
+                            @foreach (var store in allStories)
+                            {
+                                <option value="@store.Id">@store.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+            }
         </div>
     </Body>
 
@@ -41,17 +61,45 @@
     [Parameter]
     public DateTime CurrentDate { get; set; }
 
+    [Parameter]
+    public Guid StoreId { get; set; }
+
+    [Inject]
+    public ITimeKeeperDbContextFactory contextFactory { get; set; }
+
     [Inject]
     public IPlanService PlanService { get; set; }
 
     [Inject]
     public ILogger<CreatePlanDialogComponent> Logger { get; set; }
 
-    private DateTime begin { get; set; } = DateTime.Now.Date.AddHours(8);
-    private DateTime end { get; set; } = DateTime.Now.Date.AddHours(20);
+    private List<StoreEntity> allStories { get; set; }
+    private DateTime begin { get; set; }
+    private DateTime end { get; set; }
     private PlanType planType { get; set; } = PlanType.Plan;
+    private Guid storeId { get; set; }
 
     private CustomModalDialog modalDialog { get; set; } = new ();
+
+    private async Task Open()
+    {
+        storeId = StoreId;
+        begin = CurrentDate.Date.AddHours(8);
+        end = CurrentDate.Date.AddHours(20);
+
+        await modalDialog.Open();
+
+        try
+        {
+            using var context = await contextFactory.Create();
+
+            allStories = context.Stores.OrderBy(x => x.Name).ToList();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, $"Ошибка пр открытии окна плана");
+        }
+    }
 
     private async Task Close()
     {
@@ -62,21 +110,19 @@
     {
         try
         {
-            await PlanService.Create(EmployeeId, planType, begin, end);
+            await PlanService.Create(EmployeeId, planType, begin, end, storeId);
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Ошибка при создании плана");
         }
 
-        if (!Action.HasDelegate)
-        {
-            return;
-        }
-
         try
         {
-            await Action.InvokeAsync();
+            if (Action.HasDelegate)
+            {
+                await Action.InvokeAsync();
+            }
         }
         catch (Exception)
         {

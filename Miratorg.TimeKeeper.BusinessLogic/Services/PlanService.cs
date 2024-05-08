@@ -7,7 +7,7 @@ public interface IPlanService
 {
     public Task<List<PlanEntity>> GetPlan(DateTime beginDate, DateTime endDate);
     public Task<List<EmployeeModel>> GetPlanModel(DateTime beginDate, DateTime endDate);
-    public Task Create(Guid employeeId, PlanType planType, DateTime beginWork, DateTime endWork);
+    public Task Create(Guid employeeId, PlanType planType, DateTime beginWork, DateTime endWork, Guid? storeId);
     public Task Remove(Guid id);
 }
 
@@ -22,7 +22,7 @@ public class PlanService : IPlanService
         _logger = logger;
     }
 
-    public async Task Create(Guid employeeId, PlanType planType, DateTime begin, DateTime end)
+    public async Task Create(Guid employeeId, PlanType planType, DateTime begin, DateTime end, Guid? storeId)
     {
         ValidateDates(begin, end);
 
@@ -39,13 +39,16 @@ public class PlanService : IPlanService
             }
         }
 
-        dbContext.Plans.Add(new PlanEntity()
+        var plan = new PlanEntity()
         {
             EmployeeId = employeeId,
             Begin = begin,
             End = end,
-            PlanType = planType
-        });
+            PlanType = planType,
+            StoreId = storeId
+        };
+
+        dbContext.Plans.Add(plan);
 
         await  dbContext.SaveChangesAsync();
     }
@@ -107,7 +110,8 @@ public class PlanService : IPlanService
         {
             var model = new EmployeeModel
             {
-                EmployeeId = item.Id
+                EmployeeId = item.Id,
+                StoreId = item.StoreId
             };
 
             var plan = groups.FirstOrDefault(x => x.key == item.Id);
@@ -116,12 +120,13 @@ public class PlanService : IPlanService
             {
                 foreach (var d in plan.Data)
                 {
-                    model.Dates.Add(new DateDetailModel()
+                    model.Plans.Add(new PlanDetailModel()
                     {
                         Id = d.Id,
                         Begin = d.Begin,
                         End = d.End,
-                        PlanType = d.PlanType
+                        PlanType = d.PlanType,
+                        StoryId = d.StoreId
                     });
                 }
             }
@@ -135,8 +140,6 @@ public class PlanService : IPlanService
 
                 foreach (var date in dates)
                 {
-                    //var end = date.TimeEnd ?? date.TimeBegin.Date.AddDays(1);
-
                     model.WorkDates.Add(new Schedule1CPlanModel()
                     {
                          Begin = date.TimeBegin,

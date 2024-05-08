@@ -30,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Components\Pages\OveWorkRecordComponent.razor" />
     <None Include="Components\Pages\ScudComponent.razor" />
     <None Include="Components\Pages\DayHeader.razor" />
     <None Include="Components\Pages\EditCreatePlanDialog.razor" />

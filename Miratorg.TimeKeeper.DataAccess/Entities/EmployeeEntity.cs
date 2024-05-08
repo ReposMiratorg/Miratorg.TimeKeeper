@@ -17,6 +17,7 @@ public class EmployeeEntity : BaseEntity
     public virtual ScheduleEntity? Schedule { get; set; }
 
     public virtual List<ScudInfo> ScudInfos { get; set; }
+    public virtual List<PlanEntity> Plans { get; set; }
 }
 
 public class StoreEntity : BaseEntity
