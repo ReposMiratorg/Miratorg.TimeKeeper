@@ -13,6 +13,7 @@ public class TimeKeeperDbContext : DbContext
     public virtual DbSet<ScheduleDateEntity> ScheduleDates { get; set; }
     public virtual DbSet<PlanEntity> Plans { get; set; }
     public virtual DbSet<ScudInfo> ScudInfos { get; set; }
+    public virtual DbSet<CustomTypeWorkEntity> CustomTypeWorks { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

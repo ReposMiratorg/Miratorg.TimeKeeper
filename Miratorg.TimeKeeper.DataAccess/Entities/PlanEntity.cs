@@ -1,4 +1,6 @@
-﻿namespace Miratorg.TimeKeeper.DataAccess.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Miratorg.TimeKeeper.DataAccess.Entities;
 
 public class PlanEntity : BaseEntity
 {
@@ -9,6 +11,10 @@ public class PlanEntity : BaseEntity
     public PlanType PlanType { get; set; }
     public Guid? StoreId { get; set; }
     //public virtual StoreEntity? Store { get; set; }
+    public Guid? CustomTypeWorkId { get; set; }
+
+    [ForeignKey("CustomTypeWorkId")]
+    public virtual CustomTypeWorkEntity CustomTypeWork { get; set; }
 }
 
 public enum PlanType
