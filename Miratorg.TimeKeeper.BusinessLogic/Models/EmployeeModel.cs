@@ -3,6 +3,7 @@
 public class EmployeeModel
 {
     public Guid EmployeeId { get; set; }
+    public string Name { get; set; }
     public Guid? StoreId { get; set; }
     public List<PlanDetailModel> Plans { get; set; } = new List<PlanDetailModel>();
     public List<Schedule1CPlanModel> WorkDates { get; set; } = new List<Schedule1CPlanModel>();
@@ -15,7 +16,7 @@ public class PlanDetailModel
     public DateTime Begin { get; set; }
     public DateTime End { get; set; }
     public PlanType PlanType { get; set; }
-    public Guid? StoryId { get; set; }
+    public Guid? StoreId { get; set; }
 }
 
 public class Schedule1CPlanModel

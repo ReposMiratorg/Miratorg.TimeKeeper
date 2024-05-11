@@ -11,7 +11,7 @@
 
             @if (IsShowOverWork)
             {
-                <OveWorkRecordComponent CurrentDate="currentDate" PlanedIntervals="planedIntervals" />
+                <OveWorkRecordComponent CurrentDate="currentDate" PlanedIntervals="overworkIntervals" />
             }
 
             @if (IsShow1C)
@@ -111,6 +111,7 @@
 
     protected override void OnParametersSet()
     {
+        var currentEmployeeId = EmployeeId;
         currentDate = WeekBeginDay.AddDays((int)WeekDay);
 
         var dates = EmployeeModels.Where(x => x.EmployeeId == EmployeeId).SelectMany(x => x.Plans).ToList();

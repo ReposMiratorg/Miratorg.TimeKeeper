@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Miratorg.TimeKeeper.BusinessLogic.Models;
-
-namespace Miratorg.TimeKeeper.BusinessLogic.Services;
+﻿namespace Miratorg.TimeKeeper.BusinessLogic.Services;
 
 public interface IPlanService
 {
@@ -59,7 +56,9 @@ public class PlanService : IPlanService
         ValidateDate(endDate);
 
         using var dbContext = await _dbContextFactory.Create();
-        var plans = await dbContext.Plans.Where(x => (x.Begin >= startDate && x.Begin <= endDate) || (x.End >= startDate && x.End <= endDate)).ToListAsync();
+        var plans = await dbContext.Plans
+            .Where(x => (x.Begin >= startDate && x.Begin <= endDate) || (x.End >= startDate && x.End <= endDate))
+            .ToListAsync();
         
         return plans;
     }
@@ -126,36 +125,36 @@ public class PlanService : IPlanService
                         Begin = d.Begin,
                         End = d.End,
                         PlanType = d.PlanType,
-                        StoryId = d.StoreId
+                        StoreId = d.StoreId
                     });
                 }
             }
 
-            var employee = SyncEmployeeService.Employees.FirstOrDefault(x => x.Id == item.Id);
-            if (employee?.Schedule?.Dates != null)
+            var employee = SyncEmployeeService.Employees.FirstOrDefault(x => x.EmployeeId == item.Id);
+            if (employee?.WorkDates != null)
             {
-                var dates = employee?.Schedule?.Dates
-                    .Where(x => x.TimeBegin >= startDate && x.TimeBegin <= endDate.AddDays(1))
+                var dates = employee?.WorkDates
+                    .Where(x => x.Begin >= startDate && x.Begin <= endDate.AddDays(1))
                     .ToList();
 
                 foreach (var date in dates)
                 {
                     model.WorkDates.Add(new Schedule1CPlanModel()
                     {
-                         Begin = date.TimeBegin,
-                         End = date.TimeEnd,
+                         Begin = date.Begin,
+                         End = date.End,
                     });
                 }
 
-                var scudInfos = employee?.ScudInfos?.Where(x => x.Input >= startDate && x.Output <= endDate)
+                var scudInfos = employee?.ScudInfos?.Where(x => x.Begin >= startDate && x.End <= endDate)
                     .ToList();
 
                 foreach (var scudFact in scudInfos)
                 {
                     model.ScudInfos.Add(new ScudInfoModel()
                     {
-                        Begin = scudFact.Input,
-                        End = scudFact.Output
+                        Begin = scudFact.Begin,
+                        End = scudFact.End
                     });
                 }
             }
