@@ -2,7 +2,7 @@
 
 public class SyncEmployeeService : IHostedService
 {
-    public static List<EmployeeEntity> Employees { get; private set; } = new List<EmployeeEntity>();
+    public static List<EmployeeModel> Employees { get; private set; } = new List<EmployeeModel>();
 
     private readonly IStuffControlDbService _stuffControlService;
     private readonly ITimeKeeperDbContextFactory _timeKeeperDbContextFactory;
@@ -66,8 +66,16 @@ public class SyncEmployeeService : IHostedService
             .AsNoTrackingWithIdentityResolution()
             .ToListAsync();
 
+        List<EmployeeModel> models = new List<EmployeeModel>();
+
+        foreach (var employee in employees)
+        {
+            var model = TimeKeeperConverter.Convert(employee);
+            models.Add(model);
+        }
+
         Employees.Clear();
-        Employees = employees;
+        Employees = models;
     }
 
     private async Task UpdateUser(Guid userId)
@@ -81,15 +89,15 @@ public class SyncEmployeeService : IHostedService
             .AsNoTrackingWithIdentityResolution()
             .FirstOrDefaultAsync(x => x.Id == userId);
 
-        var existUser = Employees.FirstOrDefault(x => x.Id == userId);
+        var existUser = Employees.FirstOrDefault(x => x.EmployeeId == userId);
 
         if (existUser != null)
         {
-            existUser = employee;
+            existUser = TimeKeeperConverter.Convert(employee);
         }
         else
         {
-            Employees.Add(employee);
+            Employees.Add(TimeKeeperConverter.Convert(employee));
         }
     }
 
