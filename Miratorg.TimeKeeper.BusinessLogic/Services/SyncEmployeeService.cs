@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-
-namespace Miratorg.TimeKeeper.BusinessLogic.Services;
+﻿namespace Miratorg.TimeKeeper.BusinessLogic.Services;
 
 public class SyncEmployeeService : IHostedService
 {
@@ -58,6 +55,44 @@ public class SyncEmployeeService : IHostedService
         isWork = false;
     }
 
+    private async Task UpdateUsers()
+    {
+        using var dbContext = await _timeKeeperDbContextFactory.Create();
+
+        var employees = await dbContext.Employees
+            .Include(x => x.Schedule).ThenInclude(x => x.Dates)
+            .Include(x => x.ScudInfos)
+            .Include(x => x.Plans)
+            .AsNoTrackingWithIdentityResolution()
+            .ToListAsync();
+
+        Employees.Clear();
+        Employees = employees;
+    }
+
+    private async Task UpdateUser(Guid userId)
+    {
+        using var dbContext = await _timeKeeperDbContextFactory.Create();
+
+        var employee = await dbContext.Employees
+            .Include(x => x.Schedule).ThenInclude(x => x.Dates)
+            .Include(x => x.ScudInfos)
+            .Include(x => x.Plans)
+            .AsNoTrackingWithIdentityResolution()
+            .FirstOrDefaultAsync(x => x.Id == userId);
+
+        var existUser = Employees.FirstOrDefault(x => x.Id == userId);
+
+        if (existUser != null)
+        {
+            existUser = employee;
+        }
+        else
+        {
+            Employees.Add(employee);
+        }
+    }
+
     private async Task Process()
     {
         try
@@ -65,11 +100,7 @@ public class SyncEmployeeService : IHostedService
             var staffDbContext = await _staffControlDbContextFactory.Create();
             using var dbContext = await _timeKeeperDbContextFactory.Create();
 
-            Employees.Clear();
-            Employees = await dbContext.Employees
-                .Include(x => x.Schedule).ThenInclude(x => x.Dates)
-                .Include(x => x.ScudInfos)
-                .ToListAsync();
+            await UpdateUsers();
 
             var employees = await staffDbContext.Staff
                 .Where(x => x.LegalEntity == "ООО \"ПродМир\"" || x.LegalEntity == "ООО «Стейк и Бургер»")
@@ -139,6 +170,8 @@ public class SyncEmployeeService : IHostedService
 
                 // обрабатываем данные из плана проходов 1С
                 await UpdateSchedule(currentEmployee.Id, employee.Code, start, end);
+
+                await UpdateUser(currentEmployee.Id);
             }
         }
         catch (Exception ex)
@@ -161,7 +194,7 @@ public class SyncEmployeeService : IHostedService
                 return;
             }
 
-            var scudStaff = await stuffContext.SkudStaffs.FirstOrDefaultAsync(x => x.Code.ToLower() == codeNav.ToLower());
+            var scudStaff = await stuffContext.SkudStaffs.FirstOrDefaultAsync(x => x.Code != null && x.Code.ToLower() == codeNav.ToLower());
             if (scudStaff == null)
             {
                 //_logger.LogInformation($"ScudStaff :'{codeNav}' - not found.");

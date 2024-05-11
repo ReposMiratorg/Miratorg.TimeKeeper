@@ -189,7 +189,7 @@
 
         foreach (var item in xxx)
         {
-            var testData = item.Plans.Where(x => x.PlanType == PlanType.Overwork && x.StoryId == storeId);
+            var testData = item.Plans.Where(x => x.PlanType == PlanType.Overwork && x.StoreId == storeId);
 
             if (testData.Count() == 0)
             {
@@ -213,7 +213,7 @@
                         End = plan.End,
                         PlanType = plan.PlanType,
                         Id = plan.Id,
-                        StoryId = plan.StoryId
+                        StoreId = plan.StoreId
                     });
             }
 

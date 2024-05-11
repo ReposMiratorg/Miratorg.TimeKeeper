@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Miratorg.TimeKeeper.BusinessLogic.Models;
-
-namespace Miratorg.TimeKeeper.BusinessLogic.Services;
+﻿namespace Miratorg.TimeKeeper.BusinessLogic.Services;
 
 public interface IPlanService
 {
@@ -59,7 +56,9 @@ public class PlanService : IPlanService
         ValidateDate(endDate);
 
         using var dbContext = await _dbContextFactory.Create();
-        var plans = await dbContext.Plans.Where(x => (x.Begin >= startDate && x.Begin <= endDate) || (x.End >= startDate && x.End <= endDate)).ToListAsync();
+        var plans = await dbContext.Plans
+            .Where(x => (x.Begin >= startDate && x.Begin <= endDate) || (x.End >= startDate && x.End <= endDate))
+            .ToListAsync();
         
         return plans;
     }
@@ -126,7 +125,7 @@ public class PlanService : IPlanService
                         Begin = d.Begin,
                         End = d.End,
                         PlanType = d.PlanType,
-                        StoryId = d.StoreId
+                        StoreId = d.StoreId
                     });
                 }
             }
