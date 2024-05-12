@@ -1,0 +1,28 @@
+﻿@attribute [RouteAttribute(RoutePages.STORE_LIMIT)]
+
+@code {
+
+    [Inject]
+    public ITimeKeeperDbContextFactory contextFactory { get; set; }
+
+    [Inject]
+    public ILogger<StoreLimitPage> Logger { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    private async Task UpdateStores()
+    {
+        try
+        {
+            var dbContext = await contextFactory.Create();
+            var stores = await dbContext.Stores.OrderBy(x => x.Name).ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Ошибка при загрузке магазинов");
+        }
+    }
+}
