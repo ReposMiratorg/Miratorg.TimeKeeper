@@ -56,7 +56,7 @@
 <table>
     <tr>
         <td>Сотрудники</td>
-        <td>NavCode</td>
+        <td>Время</td>
 
         <td><DayHeader WeekDay="DayEnum.Monday" WeekBeginDay="_selectedWeekBeginDay"/></td>
         <td><DayHeader WeekDay="DayEnum.Tuesday" WeekBeginDay="_selectedWeekBeginDay" /></td>
@@ -82,7 +82,15 @@
                         </a>
                     </div>
                 </td>
-                <td>@employee.CodeNav</td>
+                <td>
+                    @{
+                        var x = GetFirstDay(_date);
+                        var time = employee.MountHours[x];
+                        <div class="text-center">
+                            <a class="text-center">@time.ToString("0.0")</a>
+                        </div>
+                    }
+                 </td>
 
                 <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" WeekDay="DayEnum.Monday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
                 <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" WeekDay="DayEnum.Tuesday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
@@ -106,7 +114,7 @@
     public IPlanService planService { get; set; }
 
     private Guid _selectedStore { get; set; }
-    private DateTime _date { get; set; } = DateTime.Now;
+    private DateTime _date { get; set; } = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
     private DateTime _selectedWeekBeginDay { get; set; }
     private List<DateTime> weekStarts { get; set; } = new List<DateTime>();
 
@@ -151,6 +159,12 @@
         _selectedWeekBeginDay = date;
 
         StateHasChanged();
+    }
+
+    public static DateTime GetFirstDay(DateTime date)
+    {
+        DateTime firstDayOfMonth = new DateTime(date.Year, date.Month, 1);
+        return firstDayOfMonth;
     }
 
     public static List<DateTime> GetFirstDaysOfWeeksInMonth(DateTime date)

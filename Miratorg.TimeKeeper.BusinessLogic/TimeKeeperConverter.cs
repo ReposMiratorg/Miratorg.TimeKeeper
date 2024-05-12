@@ -14,7 +14,8 @@ public  class TimeKeeperConverter
 
             Plans = new List<PlanDetailModel>(),
             ScudInfos = new List<ScudInfoModel>(),
-            WorkDates = new List<Schedule1CPlanModel>()
+            WorkDates = new List<Schedule1CPlanModel>(),
+            MountHours = new Dictionary<DateTime, double>()
         };
 
         foreach (var plan in entity.Plans)
@@ -52,6 +53,24 @@ public  class TimeKeeperConverter
                     End = item.TimeEnd,
                 });
             }
+        }
+
+        DateTime start = new DateTime(2024, 1, 1);
+
+        for (int i = 0; i < 100; i++)
+        {
+            TimeSpan t = TimeSpan.FromSeconds(0);
+            var end = start.AddMonths(1);
+            var plans = entity.Plans.Where(x => x.Begin >= start &&  x.End < end).ToList();
+
+            foreach (var item in plans)
+            {
+                var time = item.End - item.Begin;
+                t += time;
+            }
+
+            employee.MountHours.Add(start, t.TotalHours);
+            start = start.AddMonths(1);
         }
 
         return employee;

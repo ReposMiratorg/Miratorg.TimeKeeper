@@ -7,6 +7,7 @@ public class EmployeeModel
     public string Position { get; set; }
     public string CodeNav { get; set; }
     public Guid? StoreId { get; set; }
+    public Dictionary<DateTime, double> MountHours { get; set; } = new Dictionary<DateTime, double>();
     public List<PlanDetailModel> Plans { get; set; } = new List<PlanDetailModel>();
     public List<Schedule1CPlanModel> WorkDates { get; set; } = new List<Schedule1CPlanModel>();
     public List<ScudInfoModel> ScudInfos { get; set; } = new List<ScudInfoModel>();
