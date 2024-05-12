@@ -6,9 +6,12 @@ public  class TimeKeeperConverter
     {
         EmployeeModel employee = new EmployeeModel()
         {
-            EmployeeId = entity.Id,
+            Id = entity.Id,
             StoreId = entity.StoreId,
             Name = entity.Name,
+            Position = entity.Position,
+            CodeNav = entity.CodeNav,
+
             Plans = new List<PlanDetailModel>(),
             ScudInfos = new List<ScudInfoModel>(),
             WorkDates = new List<Schedule1CPlanModel>()

@@ -2,8 +2,10 @@
 
 public class EmployeeModel
 {
-    public Guid EmployeeId { get; set; }
+    public Guid Id { get; set; }
     public string Name { get; set; }
+    public string Position { get; set; }
+    public string CodeNav { get; set; }
     public Guid? StoreId { get; set; }
     public List<PlanDetailModel> Plans { get; set; } = new List<PlanDetailModel>();
     public List<Schedule1CPlanModel> WorkDates { get; set; } = new List<Schedule1CPlanModel>();
