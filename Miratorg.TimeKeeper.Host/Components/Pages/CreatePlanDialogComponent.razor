@@ -111,6 +111,9 @@
         try
         {
             await PlanService.Create(EmployeeId, planType, begin, end, storeId);
+            await SyncEmployeeService.UpdateUser(EmployeeId);
+
+            StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -122,6 +125,7 @@
             if (Action.HasDelegate)
             {
                 await Action.InvokeAsync();
+                StateHasChanged();
             }
         }
         catch (Exception)

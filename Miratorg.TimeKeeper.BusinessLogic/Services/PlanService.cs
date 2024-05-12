@@ -109,7 +109,7 @@ public class PlanService : IPlanService
         {
             var model = new EmployeeModel
             {
-                EmployeeId = item.Id,
+                Id = item.Id,
                 StoreId = item.StoreId
             };
 
@@ -130,7 +130,7 @@ public class PlanService : IPlanService
                 }
             }
 
-            var employee = SyncEmployeeService.Employees.FirstOrDefault(x => x.EmployeeId == item.Id);
+            var employee = SyncEmployeeService.Employees.FirstOrDefault(x => x.Id == item.Id);
             if (employee?.WorkDates != null)
             {
                 var dates = employee?.WorkDates

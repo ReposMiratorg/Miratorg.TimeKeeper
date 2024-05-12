@@ -33,7 +33,7 @@
     <Body>
         <div class="row mb-2">
             <div class="col">
-                <CreatePlanDialogComponent Action="Action" CurrentDate="currentDate" EmployeeId="EmployeeId" StoreId="StoreId" />
+                <CreatePlanDialogComponent Action="UdateUIAction" CurrentDate="currentDate" EmployeeId="EmployeeId" StoreId="StoreId" />
             </div>
         </div>
 
@@ -44,6 +44,23 @@
                 var message = $"{plan.Begin.ToShortTimeString()} - {plan.End.ToShortTimeString()}";
 
                 <div class="row">
+                    <div class="col-9">
+                        <input class="form-control form-control-sm" value="@message" disabled />
+                    </div>
+                    <div class="col-3">
+                        <CustomDeleteDialogComponent Message="@message" Action="@(() => RemovePaln(plan.Id))" />
+                    </div>
+                </div>
+            }
+        }
+
+        @if (overworkIntervals != null)
+        {
+            foreach (var plan in overworkIntervals)
+            {
+                var message = $"{plan.Begin.ToShortTimeString()} - {plan.End.ToShortTimeString()} - ";
+
+                <div class="row mt-2">
                     <div class="col-9">
                         <input class="form-control form-control-sm" value="@message" disabled />
                     </div>
@@ -72,6 +89,8 @@
 
     private CustomModalDialog modalDialog { get; set; } = new();
 
+    public ILogger<PlanDayComponent> Logger { get; set; }
+
     [Parameter]
     public Guid StoreId { get; set; }
 
@@ -83,9 +102,6 @@
 
     [Parameter]
     public Guid EmployeeId { get; set; }
-
-    [Parameter]
-    public List<EmployeeModel> EmployeeModels { get; set; }
 
     [Parameter]
     public List<EmployeeModel> AdditionalEmployeeModels { get; set; }
@@ -109,25 +125,49 @@
     private List<Schedule1CPlanModel> schedule1CPlanModels { get; set; }
     private List<ScudInfoModel> scudInfoModels { get; set; }
 
-    protected override void OnParametersSet()
+    protected override async void OnParametersSet()
     {
-        var currentEmployeeId = EmployeeId;
+        await UpdateUI();
+    }
+
+    private async Task UpdateUI()
+    {
         currentDate = WeekBeginDay.AddDays((int)WeekDay);
 
-        var dates = EmployeeModels.Where(x => x.EmployeeId == EmployeeId).SelectMany(x => x.Plans).ToList();
+        var dates = SyncEmployeeService.Employees.Where(x => x.Id == EmployeeId).SelectMany(x => x.Plans).ToList();
         planedIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate.AddDays(1) && x.PlanType == PlanType.Plan).ToList();
         overworkIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate.AddDays(1) && x.PlanType == PlanType.Overwork).ToList();
 
-        var schedules = EmployeeModels.Where(x => x.EmployeeId == EmployeeId).SelectMany(x => x.WorkDates);
+        var schedules = SyncEmployeeService.Employees.Where(x => x.Id == EmployeeId).SelectMany(x => x.WorkDates);
         schedule1CPlanModels = schedules.Where(x => x.Begin.Date == currentDate).ToList();
 
-        var scudInfos = EmployeeModels.Where(x => x.EmployeeId == EmployeeId).SelectMany(x => x.ScudInfos).ToList();
+        var scudInfos = SyncEmployeeService.Employees.Where(x => x.Id == EmployeeId).SelectMany(x => x.ScudInfos).ToList();
         scudInfoModels = scudInfos.Where(x => x.Begin.Date == currentDate).ToList();
     }
 
     private async Task RemovePaln(Guid id)
     {
         await PlanService.Remove(id);
+        await UpdateUI();
+    }
+
+    private async Task UdateUIAction()
+    {
+        try
+        {
+            if (Action.HasDelegate)
+            {
+                await Action.InvokeAsync();
+            }
+
+            await UpdateUI();
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Ошибка при обновлении текущего диалога");
+        }
     }
 
     private async Task Open()

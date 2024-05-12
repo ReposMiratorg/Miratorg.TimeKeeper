@@ -5,9 +5,9 @@ public class SyncEmployeeService : IHostedService
     public static List<EmployeeModel> Employees { get; private set; } = new List<EmployeeModel>();
 
     private readonly IStuffControlDbService _stuffControlService;
-    private readonly ITimeKeeperDbContextFactory _timeKeeperDbContextFactory;
+    private static ITimeKeeperDbContextFactory _timeKeeperDbContextFactory;
     private readonly IStaffControlDbContextFactory _staffControlDbContextFactory;
-    private readonly ILogger<SyncEmployeeService> _logger;
+    private static ILogger<SyncEmployeeService> _logger;
 
     private bool isWork { get; set; }
     private readonly TimeSpan pause = TimeSpan.FromDays(1);
@@ -78,26 +78,39 @@ public class SyncEmployeeService : IHostedService
         Employees = models;
     }
 
-    private async Task UpdateUser(Guid userId)
+    public static async Task UpdateUser(Guid userId)
     {
-        using var dbContext = await _timeKeeperDbContextFactory.Create();
-
-        var employee = await dbContext.Employees
-            .Include(x => x.Schedule).ThenInclude(x => x.Dates)
-            .Include(x => x.ScudInfos)
-            .Include(x => x.Plans)
-            .AsNoTrackingWithIdentityResolution()
-            .FirstOrDefaultAsync(x => x.Id == userId);
-
-        var existUser = Employees.FirstOrDefault(x => x.EmployeeId == userId);
-
-        if (existUser != null)
+        try
         {
-            existUser = TimeKeeperConverter.Convert(employee);
+            using var dbContext = await _timeKeeperDbContextFactory.Create();
+
+            var employee = await dbContext.Employees
+                .Include(x => x.Schedule).ThenInclude(x => x.Dates)
+                .Include(x => x.ScudInfos)
+                .Include(x => x.Plans)
+                .AsNoTrackingWithIdentityResolution()
+                .FirstOrDefaultAsync(x => x.Id == userId);
+
+            var existUser = Employees.FirstOrDefault(x => x.Id == userId);
+
+            if (existUser != null)
+            {
+                for (var i = 0; i < Employees.Count; i++)
+                {
+                    if(Employees[i].Id == userId)
+                    {
+                        Employees[i] = TimeKeeperConverter.Convert(employee);
+                    }
+                }
+            }
+            else
+            {
+                Employees.Add(TimeKeeperConverter.Convert(employee));
+            }
         }
-        else
+        catch (Exception ex)
         {
-            Employees.Add(TimeKeeperConverter.Convert(employee));
+            _logger.LogError(ex, "Ошибка при обновлении");
         }
     }
 
@@ -179,7 +192,7 @@ public class SyncEmployeeService : IHostedService
                 // обрабатываем данные из плана проходов 1С
                 await UpdateSchedule(currentEmployee.Id, employee.Code, start, end);
 
-                await UpdateUser(currentEmployee.Id);
+                //await UpdateUser(currentEmployee.Id);
             }
         }
         catch (Exception ex)
