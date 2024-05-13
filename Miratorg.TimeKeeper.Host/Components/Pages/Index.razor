@@ -55,7 +55,7 @@
 
 <table>
     <tr>
-        <td>Сотрудники</td>
+        <td class="col-3">Сотрудники</td>
         <td>Время</td>
 
         <td><DayHeader WeekDay="DayEnum.Monday" WeekBeginDay="_selectedWeekBeginDay"/></td>
@@ -87,7 +87,7 @@
                         var x = GetFirstDay(_date);
                         var time = employee.MountHours[x];
                         <div class="text-center">
-                            <a class="text-center">@time.ToString("0.0")</a>
+                            <a class="text-center">@time.ToString("0")</a>
                         </div>
                     }
                  </td>
@@ -99,6 +99,19 @@
                 <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" WeekDay="DayEnum.Friday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
                 <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" WeekDay="DayEnum.Saturday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
                 <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" WeekDay="DayEnum.Sunday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+            </tr>
+        }
+
+        @if (_selectedStore != Guid.Empty)
+        {
+            <tr>
+                <td><b>Итого часов: @totalMessage</b></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
             </tr>
         }
     }
@@ -123,17 +136,16 @@
     private bool _isShow1C { get; set; }
     private bool _isShowScud { get; set; }
 
+    private string totalMessage { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         UpdateDates();
         await Load();
     }
 
-    // private List<EmployeeEntity> allEmployees { get; set; }
     private List<StoreEntity> allStories { get; set; } = new List<StoreEntity>();
-
     private List<EmployeeModel> employees { get; set; } = new List<EmployeeModel>();
-    // private List<EmployeeModel> employeeModels { get; set; } = new List<EmployeeModel>();
     private List<EmployeeModel> additionalEmployees { get; set; } = new List<EmployeeModel>();
 
     private void HandleOnChange(ChangeEventArgs e)
@@ -194,7 +206,10 @@
 
     private async Task SelectStory(Guid storeId)
     {
+        var store = allStories.FirstOrDefault(x => x.Id == storeId);
         employees = SyncEmployeeService.Employees.Where(x => x.StoreId == storeId).ToList();
+
+        var date = GetFirstDay(_date);
 
         var xxx = SyncEmployeeService.Employees.Where(x => x.StoreId != storeId).ToList();
 
@@ -234,6 +249,21 @@
         }
 
         additionalEmployees = additionals;
+        double hours = 0;
+
+        if (store != null)
+        {
+
+            foreach (var empl in employees)
+            {
+                if (empl.MountHours.TryGetValue(date, out var time))
+                {
+                    hours += time;
+                }
+            }
+        }
+
+        totalMessage = $"{hours.ToString("0")} из {(store?.HourLimit.ToString("0") ?? "0")}";
     }
 
     private async void HandleSelectionTypeChange(ChangeEventArgs e)

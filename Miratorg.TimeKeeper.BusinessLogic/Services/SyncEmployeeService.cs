@@ -63,6 +63,7 @@ public class SyncEmployeeService : IHostedService
             .Include(x => x.Schedule).ThenInclude(x => x.Dates)
             .Include(x => x.ScudInfos)
             .Include(x => x.Plans)
+            .OrderBy(x => x.Name)
             .AsNoTrackingWithIdentityResolution()
             .ToListAsync();
 

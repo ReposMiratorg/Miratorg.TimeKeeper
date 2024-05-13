@@ -2,8 +2,8 @@
 
 public interface IPlanService
 {
-    public Task<List<PlanEntity>> GetPlan(DateTime beginDate, DateTime endDate);
-    public Task<List<EmployeeModel>> GetPlanModel(DateTime beginDate, DateTime endDate);
+    //public Task<List<PlanEntity>> GetPlan(DateTime beginDate, DateTime endDate);
+    //public Task<List<EmployeeModel>> GetPlanModel(DateTime beginDate, DateTime endDate);
     public Task Create(Guid employeeId, PlanType planType, DateTime beginWork, DateTime endWork, Guid? storeId);
     public Task Remove(Guid id);
 }

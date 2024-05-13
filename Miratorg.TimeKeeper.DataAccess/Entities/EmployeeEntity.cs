@@ -5,7 +5,6 @@ public class EmployeeEntity : BaseEntity
     public string Name { get; set; }
     public string Position { get; set; }
     public string CodeNav { get; set; }
-    //public string Division { get; set; }
 
     public Guid? StoreId { get; set; }
     public virtual StoreEntity? Store { get; set; }
@@ -18,9 +17,4 @@ public class EmployeeEntity : BaseEntity
 
     public virtual List<ScudInfo> ScudInfos { get; set; }
     public virtual List<PlanEntity> Plans { get; set; }
-}
-
-public class StoreEntity : BaseEntity
-{
-    public string Name { get; set; }
 }

@@ -1,0 +1,59 @@
+﻿<tr>
+    @if (Store != null)
+    {
+        <td>@Store.Name</td>
+        <td><input class="form-control from-control-sm" @bind="Store.HourLimit" /></td>
+        <td><button class="btn btn-info btn-sm" @onclick="SetValue">Изменить</button></td>
+    }
+</tr>
+
+@code {
+
+    [Parameter]
+    public Guid StoreId { get; set; }
+
+    [Parameter]
+    public EventCallback Action { get; set; }
+
+    public StoreEntity Store { get; set; }
+
+    [Inject]
+    public ITimeKeeperDbContextFactory contextFactory { get; set; }
+
+    [Inject]
+    public ILogger<StoreLimitComponent> Logger { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var context = await contextFactory.Create();
+            var store = await context.Stores.FirstOrDefaultAsync(x => x.Id == StoreId);
+            Store = store;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, $"Error: {nameof(OnInitializedAsync)}, {nameof(StoreId)}: {StoreId}");
+        }
+    }
+
+    private async Task SetValue()
+    {
+        try
+        {
+            var context = await contextFactory.Create();
+            var store = await context.Stores.FirstOrDefaultAsync(x => x.Id == StoreId);
+            store.HourLimit = Store.HourLimit;
+            await context.SaveChangesAsync();
+
+            if (Action.HasDelegate)
+            {
+                await Action.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, $"Error: {nameof(SetValue)}, {nameof(StoreId)}: {StoreId}");
+        }
+    }
+}
