@@ -1,5 +1,28 @@
 ﻿@attribute [RouteAttribute(RoutePages.STORE_LIMIT)]
 
+<div class="row">
+    <div class="col-6">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th class="col-8">Название магазина</th>
+                    <th class="col-2">Лимит час.</th>
+                    <th class="col-2"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if(stores != null)
+                {
+                    foreach (var store in stores)
+                    {
+                        <StoreLimitComponent StoreId="store.Id" Action="UpdateStores"/>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
 @code {
 
     [Inject]
@@ -8,9 +31,11 @@
     [Inject]
     public ILogger<StoreLimitPage> Logger { get; set; }
 
+    private List<StoreEntity> stores { get; set; } = new List<StoreEntity>();
+
     protected override async Task OnInitializedAsync()
     {
-
+        await UpdateStores();
     }
 
     private async Task UpdateStores()
@@ -18,7 +43,7 @@
         try
         {
             var dbContext = await contextFactory.Create();
-            var stores = await dbContext.Stores.OrderBy(x => x.Name).ToListAsync();
+            stores = await dbContext.Stores.OrderBy(x => x.Name).AsNoTracking().ToListAsync();
         }
         catch (Exception ex)
         {
