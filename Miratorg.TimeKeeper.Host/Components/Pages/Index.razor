@@ -2,15 +2,15 @@
 @rendermode InteractiveServer
 
 <div class="row mt-4 mb-3 align-items-end">
-    @* <div class="col-3">
-        <label class="">Магазин</label>
-        <select class="form-select form-select-sm" value="@_selectedStore" @onchange="HandleSelectionTypeChange">
-            <option value="@Guid.Empty">Выберете магазин</option>
-            @foreach (var store in allStories)
-            {
-                <option value="@store.Id">@store.Name</option>
-            }
-        </select>
+@*     <div class="col-3">
+    <label class="">Магазин</label>
+    <select class="form-select form-select-sm" value="@_selectedStore" @onchange="HandleSelectionTypeChange">
+    <option value="@Guid.Empty">Выберете магазин</option>
+    @foreach (var store in allStories)
+    {
+    <option value="@store.Id">@store.Name</option>
+    }
+    </select>
     </div> *@
     <div class="col-3">
         <label class="">Магазин</label>
@@ -34,7 +34,7 @@
             @foreach (var weekStart in weekStarts)
             {
                 <div style="display:flex; margin-right: 5px;">
-                    <button class="btn btn-info btn-sm" @onclick="(() => SelectWeek(weekStart))">@weekStart.ToShortDateString()</button>
+                    <button class="btn btn-info btn-sm" @onclick="(() => SelectWeek(weekStart))">@weekStart.ToString("dd.MM.yyyy")</button>
                 </div>
             }
         </div>
@@ -64,14 +64,19 @@
         <label class="form-check-label" for="customSwitch1" style="flex-grow: 1; background-color: #ffc35a; padding: 5px 10px; border-radius: 5px;">Фактические переработки</label>
     </div>
 
+    <div class="ms-5">
+        <button class="btn btn-sm btn-primary" @onclick="ResetOn">сброс</button>
+    </div>
+
 </div>
 
 <table>
+    <thead>
     <tr>
         <td class="col-3">Сотрудники</td>
         <td>Время</td>
 
-        <td><DayHeader WeekDay="DayEnum.Monday" WeekBeginDay="_selectedWeekBeginDay"/></td>
+        <td><DayHeader WeekDay="DayEnum.Monday" WeekBeginDay="_selectedWeekBeginDay" /></td>
         <td><DayHeader WeekDay="DayEnum.Tuesday" WeekBeginDay="_selectedWeekBeginDay" /></td>
         <td><DayHeader WeekDay="DayEnum.Wednesday" WeekBeginDay="_selectedWeekBeginDay" /></td>
         <td><DayHeader WeekDay="DayEnum.Thursday" WeekBeginDay="_selectedWeekBeginDay" /></td>
@@ -79,7 +84,9 @@
         <td><DayHeader WeekDay="DayEnum.Saturday" WeekBeginDay="_selectedWeekBeginDay" /></td>
         <td><DayHeader WeekDay="DayEnum.Sunday" WeekBeginDay="_selectedWeekBeginDay" /></td>
     </tr>
+     </thead>
 
+    <tbody>
     @if (employees != null)
     {
         @foreach (var employee in employees)
@@ -103,7 +110,7 @@
                             <a class="text-center">@time.ToString("0")</a>
                         </div>
                     }
-                 </td>
+                </td>
 
                 <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" WeekDay="DayEnum.Monday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
                 <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" WeekDay="DayEnum.Tuesday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
@@ -128,6 +135,7 @@
             </tr>
         }
     }
+    </tbody>
 
 </table>
 
@@ -145,7 +153,7 @@
     private List<DateTime> weekStarts { get; set; } = new List<DateTime>();
 
     private bool _isShowPlan { get; set; }
-    private bool _isShowOverWork{ get; set; }
+    private bool _isShowOverWork { get; set; }
     private bool _isShow1C { get; set; }
     private bool _isShowScud { get; set; }
 
@@ -154,17 +162,41 @@
     private bool isShowList { get; set; } = false;
     private string filterText = string.Empty;
 
+    private void ResetOn()
+    {
+        var result = _isShowPlan || _isShowOverWork || _isShow1C || _isShowScud;
+
+        if (result)
+        {
+            _isShowPlan = false;
+            _isShowOverWork = false;
+            _isShow1C = false;
+            _isShowScud = false;
+        }
+        else
+        {
+            _isShowPlan = true;
+            _isShowOverWork = true;
+            _isShow1C = true;
+            _isShowScud = true;
+        }
+
+        StateHasChanged();
+    }
+
     private void OnFockus()
     {
         isShowList = true;
     }
 
-    private void SelectItem(Guid itemId, string text)
+    private async Task SelectItem(Guid itemId, string text)
     {
         _selectedStore = itemId;
         filterText = text;
 
         isShowList = false;
+
+        await SelectStory(_selectedStore);
     }
 
     private void FilterChanged(ChangeEventArgs e)
@@ -178,6 +210,8 @@
     {
         UpdateDates();
         await Load();
+
+        filteredItems = allStories;
     }
 
     private List<StoreEntity> allStories { get; set; } = new List<StoreEntity>();
@@ -323,9 +357,9 @@
 
             await SelectStory(Guid.Empty);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            
+
         }
     }
 }
