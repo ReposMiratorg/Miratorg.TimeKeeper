@@ -34,7 +34,7 @@
             @foreach (var weekStart in weekStarts)
             {
                 <div style="display:flex; margin-right: 5px;">
-                    <button class="btn btn-info btn-sm" @onclick="(() => SelectWeek(weekStart))">@weekStart.ToString("dd.MM.yyyy")</button>
+                    <button class="btn @(weekStart == _selectedWeekBeginDay ? "btn-primary" : "btn-secondary") btn-sm" @onclick="(() => SelectWeek(weekStart))">@weekStart.ToString("dd.MM.yyyy")</button>
                 </div>
             }
         </div>
