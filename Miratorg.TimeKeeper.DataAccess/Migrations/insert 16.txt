@@ -1,0 +1,32 @@
+﻿add-migration InitializeDb
+add-migration Update001
+add-migration -Context TimeKeeperDbContext Update010
+
+update-database
+
+
+
+INSERT INTO [dbo].[TypeOverWork] ([Id], [Name], [Code]) VALUES
+
+
+(NEWID(), 'Подр-Администратор', 'administrator'),
+(NEWID(),'Подр-ЗУ', 'deputymanager'),
+(NEWID(),'Подр-ОТЗ', 'OTZ'),
+(NEWID(),'Подр-ПГ', 'gastronomseller'),
+(NEWID(),'Подр-ПК', 'sellercashier'),
+(NEWID(),'Подр-ПКХл3', 'baker'),
+(NEWID(),'Подр-ПКОФ', 'vegetableseller'),
+(NEWID(),'Подр-СПТ', 'productacceptancespecialist'),
+(NEWID(),'Подр-СК', 'seniorcashier'),
+(NEWID(),'Подр-УМ', 'manager'),
+(NEWID(),'Подр-Эксперт по мясу', 'butcher'),
+(NEWID(),'Подр-Пиццерист', 'pizzer'),
+(NEWID(),'Подр-Заготовщик', 'preparer'),
+(NEWID(),'Подр-ПРО', 'fishman'),
+(NEWID(),'Подр-Повар', 'cook'),
+(NEWID(),'Подр-Мен', 'pordmen'),
+(NEWID(),'Подр-Дворник', 'podrdvor'),
+(NEWID(),'Подр-Офис', 'podroffice'),
+(NEWID(),'Подр-Кассир', 'cashier'),
+(NEWID(),'Подр-Уборщица', 'clean'),
+(NEWID(),'Подр-Эксперт по мясу-кассир', 'butcher-cashier')

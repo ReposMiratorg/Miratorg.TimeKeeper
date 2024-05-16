@@ -24,7 +24,7 @@
 
         </div>
 
-        <div class="row">
+        <div class="row mt-2">
             @if (planType == PlanType.Overwork)
             {
                 <div class="col-8">
@@ -36,6 +36,19 @@
                             @foreach (var store in allStories)
                             {
                                 <option value="@store.Id">@store.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-4">
+                    <label>Тип</label>
+                    <select class="form-select form-select-sm" name="name" @bind="typeOverWork">
+                        <option value="@Guid.Empty">Тип</option>
+                        @if (typeWorks != null)
+                        {
+                            @foreach (var typeWork in typeWorks)
+                            {
+                                <option value="@typeWork.Id">@typeWork.Name</option>
                             }
                         }
                     </select>
@@ -74,10 +87,12 @@
     public ILogger<CreatePlanDialogComponent> Logger { get; set; }
 
     private List<StoreEntity> allStories { get; set; }
+    private List<TypeOverWork> typeWorks { get; set; } = new List<TypeOverWork>();
     private DateTime begin { get; set; }
     private DateTime end { get; set; }
     private PlanType planType { get; set; } = PlanType.Plan;
     private Guid storeId { get; set; }
+    private Guid typeOverWork { get; set; }
 
     private CustomModalDialog modalDialog { get; set; } = new ();
 
@@ -94,6 +109,8 @@
             using var context = await contextFactory.Create();
 
             allStories = context.Stores.OrderBy(x => x.Name).ToList();
+            typeWorks = context.TypeOverWorks.OrderBy(x => x.Name).ToList();
+            typeOverWork = typeWorks.FirstOrDefault().Id;
         }
         catch (Exception ex)
         {
@@ -110,7 +127,7 @@
     {
         try
         {
-            await PlanService.Create(EmployeeId, planType, begin, end, storeId);
+            await PlanService.Create(EmployeeId, planType, begin, end, storeId, typeOverWork);
             await SyncEmployeeService.UpdateUser(EmployeeId);
 
             StateHasChanged();

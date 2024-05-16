@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Miratorg.TimeKeeper.DataAccess.Contexts;
 
@@ -11,9 +12,11 @@ using Miratorg.TimeKeeper.DataAccess.Contexts;
 namespace Miratorg.TimeKeeper.DataAccess.Migrations
 {
     [DbContext(typeof(TimeKeeperDbContext))]
-    partial class TimeKeeperDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240516201809_Update015")]
+    partial class Update015
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -199,17 +202,13 @@ namespace Miratorg.TimeKeeper.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("TypeOverWorks");
+                    b.ToTable("TypeOverWork");
                 });
 
             modelBuilder.Entity("Miratorg.TimeKeeper.DataAccess.Entities.EmployeeEntity", b =>
