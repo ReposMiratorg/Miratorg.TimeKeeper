@@ -15,6 +15,11 @@ public class PlanEntity : BaseEntity
 
     [ForeignKey("CustomTypeWorkId")]
     public virtual CustomTypeWorkEntity CustomTypeWork { get; set; }
+
+    public Guid? TypeOverWorkId { get; set; }
+
+    [ForeignKey("TypeOverWorkId")]
+    public virtual TypeOverWork TypeOverWork { get; set; }
 }
 
 public enum PlanType
