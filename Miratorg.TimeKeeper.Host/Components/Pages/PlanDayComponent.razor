@@ -94,11 +94,16 @@
     [Parameter]
     public Guid StoreId { get; set; }
 
-    [Parameter]
-    public DayEnum WeekDay { get; set; }
+    // [Parameter]
+    // public DayEnum WeekDay { get; set; }
+
+    // [Parameter]
+    // public DateTime WeekBeginDay { get; set; }
 
     [Parameter]
-    public DateTime WeekBeginDay { get; set; }
+    public DateTime Day { get; set; }
+
+    private DayEnum weekDay { get; set; }
 
     [Parameter]
     public Guid EmployeeId { get; set; }
@@ -132,7 +137,8 @@
 
     private async Task UpdateUI()
     {
-        currentDate = WeekBeginDay.AddDays((int)WeekDay);
+        currentDate = Day;
+        weekDay = Helpers.WeekConverter.Convert(currentDate);
 
         var dates = SyncEmployeeService.Employees.Where(x => x.Id == EmployeeId).SelectMany(x => x.Plans).ToList();
         planedIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate.AddDays(1) && x.PlanType == PlanType.Plan).ToList();

@@ -29,16 +29,26 @@
         <label class="">Период</label>
         <input class="form-control form-control-sm" @bind-value="_date" @bind-value:event="oninput" @onchange="HandleOnChange" type="month" />
     </div>
-    <div class="col-7">
-        <div style="display:flex; flex-direction: row; ">
-            @foreach (var weekStart in weekStarts)
-            {
-                <div style="display:flex; margin-right: 5px;">
-                    <button class="btn @(weekStart == _selectedWeekBeginDay ? "btn-primary" : "btn-secondary") btn-sm" @onclick="(() => SelectWeek(weekStart))">@weekStart.ToString("dd.MM.yyyy")</button>
-                </div>
-            }
-        </div>
+    <div class="col-1">
+        <label class="form-label">Вид</label>
+        <select class="form-control form-control-sm" @bind="periodMode">
+            <option value="@PeriodMode.Week">Неделя</option>
+            <option value="@PeriodMode.Month">Месяц</option>
+        </select>
     </div>
+    @if (periodMode == PeriodMode.Week)
+    {
+        <div class="col-6">
+            <div style="display:flex; flex-direction: row; ">
+                @foreach (var weekStart in weekStarts)
+                {
+                    <div style="display:flex; margin-right: 5px;">
+                        <button class="btn @(weekStart == _selectedWeekBeginDay ? "btn-primary" : "btn-secondary") btn-sm" @onclick="(() => SelectWeek(weekStart))">@weekStart.ToString("dd.MM.yyyy")</button>
+                    </div>
+                }
+            </div>
+        </div>
+    }
 </div>
 
 <div style="display: flex; flex-direction: row" class="mb-3">
@@ -70,74 +80,100 @@
 
 </div>
 
-<table>
-    <thead>
-    <tr>
-        <td class="col-3">Сотрудники</td>
-        <td>Время</td>
-
-        <td><DayHeader WeekDay="DayEnum.Monday" WeekBeginDay="_selectedWeekBeginDay" /></td>
-        <td><DayHeader WeekDay="DayEnum.Tuesday" WeekBeginDay="_selectedWeekBeginDay" /></td>
-        <td><DayHeader WeekDay="DayEnum.Wednesday" WeekBeginDay="_selectedWeekBeginDay" /></td>
-        <td><DayHeader WeekDay="DayEnum.Thursday" WeekBeginDay="_selectedWeekBeginDay" /></td>
-        <td><DayHeader WeekDay="DayEnum.Friday" WeekBeginDay="_selectedWeekBeginDay" /></td>
-        <td><DayHeader WeekDay="DayEnum.Saturday" WeekBeginDay="_selectedWeekBeginDay" /></td>
-        <td><DayHeader WeekDay="DayEnum.Sunday" WeekBeginDay="_selectedWeekBeginDay" /></td>
-    </tr>
-     </thead>
-
-    <tbody>
-    @if (employees != null)
-    {
-        @foreach (var employee in employees)
-        {
+<div style=" overflow-x: auto;">
+    <table>
+        <thead>
             <tr>
-                <td>
-                    <div style="display:flex; flex-direction:column">
-                        <b>
-                            @employee.Name
-                        </b>
-                        <a>
-                            @employee.Position
-                        </a>
-                    </div>
-                </td>
-                <td>
-                    @{
-                        var x = GetFirstDay(_date);
-                        var time = employee.MountHours[x];
-                        <div class="text-center">
-                            <a class="text-center">@time.ToString("0")</a>
-                        </div>
+                <td class="col-3">Сотрудники</td>
+                <td>Время</td>
+                @if (periodMode == PeriodMode.Week)
+                {
+                    <td><DayHeader WeekDay="DayEnum.Monday" WeekBeginDay="_selectedWeekBeginDay" /></td>
+                    <td><DayHeader WeekDay="DayEnum.Tuesday" WeekBeginDay="_selectedWeekBeginDay" /></td>
+                    <td><DayHeader WeekDay="DayEnum.Wednesday" WeekBeginDay="_selectedWeekBeginDay" /></td>
+                    <td><DayHeader WeekDay="DayEnum.Thursday" WeekBeginDay="_selectedWeekBeginDay" /></td>
+                    <td><DayHeader WeekDay="DayEnum.Friday" WeekBeginDay="_selectedWeekBeginDay" /></td>
+                    <td><DayHeader WeekDay="DayEnum.Saturday" WeekBeginDay="_selectedWeekBeginDay" /></td>
+                    <td><DayHeader WeekDay="DayEnum.Sunday" WeekBeginDay="_selectedWeekBeginDay" /></td>
+                }
+                else
+                {
+                    var s = GetFirstDay(_date);
+                    var s_max = s.AddMonths(1);
+
+                    for (var i = s; i < s_max; i = i.AddDays(1))
+                    {
+                        var weekDay = Helpers.WeekConverter.Convert(i);
+                        <td><DayHeader WeekDay="weekDay" WeekBeginDay="i" /></td>
                     }
-                </td>
-
-                <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" WeekDay="DayEnum.Monday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
-                <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" WeekDay="DayEnum.Tuesday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
-                <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" WeekDay="DayEnum.Wednesday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
-                <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" WeekDay="DayEnum.Thursday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
-                <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" WeekDay="DayEnum.Friday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
-                <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" WeekDay="DayEnum.Saturday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
-                <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" WeekDay="DayEnum.Sunday" WeekBeginDay="_selectedWeekBeginDay" EmployeeId="employee.Id" /></td>
+                }
             </tr>
-        }
+        </thead>
 
-        @if (_selectedStore != Guid.Empty)
-        {
-            <tr>
-                <td><b>Итого часов: @totalMessage</b></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-        }
-    }
-    </tbody>
+        <tbody>
+            @if (employees != null)
+            {
+                @foreach (var employee in employees)
+                {
+                    <tr>
+                        <td>
+                            <div style="display:flex; flex-direction:column">
+                                <b>
+                                    @employee.Name
+                                </b>
+                                <a>
+                                    @employee.Position
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            @{
+                                var x = GetFirstDay(_date);
+                                var time = employee.MountHours[x];
+                                <div class="text-center">
+                                    <a class="text-center">@time.ToString("0")</a>
+                                </div>
+                            }
+                        </td>
 
-</table>
+                        @if (periodMode == PeriodMode.Week)
+                        {
+                            for (int i = 0; i < 7; i++)
+                            {
+                                var currentDate = _selectedWeekBeginDay.AddDays(i);
+                                <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" Day="currentDate" EmployeeId="employee.Id" /></td>
+                            }
+                        }
+                        else
+                        {
+                            var s = GetFirstDay(_date);
+
+                            for (var i = s; i < s.AddMonths(1); i = i.AddDays(1))
+                            {
+                                <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" Day="i" EmployeeId="employee.Id" /></td>
+                            }
+                        }
+                    </tr>
+                }
+
+                @if (_selectedStore != Guid.Empty)
+                {
+                    <tr>
+                        <td><b>Итого часов: @totalMessage</b></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                }
+            }
+        </tbody>
+
+    </table>
+</div>
+
 
 @code {
 
@@ -157,10 +193,12 @@
     private bool _isShow1C { get; set; }
     private bool _isShowScud { get; set; }
 
+    private PeriodMode periodMode { get; set; } = PeriodMode.Week;
+
     private string totalMessage { get; set; }
 
     private bool isShowList { get; set; } = false;
-    private string filterText = string.Empty;
+    private string filterText { get; set; } = string.Empty;
 
     private void ResetOn()
     {
@@ -345,6 +383,15 @@
             await SelectStory(id);
         }
     }
+
+    // private async void HandleSelectionTypeChange(ChangeEventArgs e)
+    // {
+    //     if (Guid.TryParse(e.Value.ToString(), out Guid id))
+    //     {
+    //         _selectedStore = id;
+    //         await SelectStory(id);
+    //     }
+    // }
 
     private async Task Load()
     {
