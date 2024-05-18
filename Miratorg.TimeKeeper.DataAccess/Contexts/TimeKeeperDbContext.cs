@@ -14,7 +14,8 @@ public class TimeKeeperDbContext : DbContext
     public virtual DbSet<PlanEntity> Plans { get; set; }
     public virtual DbSet<ScudInfo> ScudInfos { get; set; }
     public virtual DbSet<CustomTypeWorkEntity> CustomTypeWorks { get; set; }
-    public virtual DbSet<TypeOverWork> TypeOverWorks { get; set; }
+    public virtual DbSet<TypeOverWorkEntity> TypeOverWorks { get; set; }
+    public virtual DbSet<TypeTimeZupEntity> TypeTimeZups { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

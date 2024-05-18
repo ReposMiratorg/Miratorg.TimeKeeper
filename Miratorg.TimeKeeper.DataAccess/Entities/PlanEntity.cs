@@ -19,7 +19,7 @@ public class PlanEntity : BaseEntity
     public Guid? TypeOverWorkId { get; set; }
 
     [ForeignKey("TypeOverWorkId")]
-    public virtual TypeOverWork TypeOverWork { get; set; }
+    public virtual TypeOverWorkEntity TypeOverWork { get; set; }
 }
 
 public enum PlanType
