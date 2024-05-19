@@ -84,6 +84,7 @@ public class ApiService : IApiService
                                 dvalue = CalcTimeMinutes(plan.Begin, plan.End),
                                 dovertime = 0,
                                 novertime = 0,
+                                worktype = "\u042F",
                                 worktime = new List<Worktime>()
                             };
 
