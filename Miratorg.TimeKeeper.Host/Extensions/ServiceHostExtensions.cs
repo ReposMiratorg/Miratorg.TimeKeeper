@@ -8,6 +8,7 @@ using Miratorg.DataService.Extensions;
 using Miratorg.DataService.Interfaces;
 using Miratorg.DataService.Services;
 using Miratorg.TimeKeeper.BusinessLogic.Services;
+using Miratorg.TimeKeeper.Host.Controllers;
 using System.Security.Claims;
 
 namespace Miratorg.TimeKeeper.Host.Extensions;
@@ -18,7 +19,8 @@ public static class ServiceHostExtensions
 
     internal static void AddHostComponents(this IServiceCollection services)
     {
-        services.AddControllers();
+        services.AddControllers()
+            .AddApplicationPart(typeof(ApiController).Assembly);
 
         var configuration = services.BuildServiceProvider().GetService<IConfiguration>();
 
@@ -58,6 +60,7 @@ public static class ServiceHostExtensions
         services.AddHostedService<SyncEmployeeService>();
 
         services.AddScoped<IPlanService, PlanService>();
+        services.AddScoped<IApiService, ApiService>();
 
         var connectionString = configuration.GetConnectionString("DefaultConnection");
         services.AddDbContextPool<TimeKeeperDbContext>(options =>
