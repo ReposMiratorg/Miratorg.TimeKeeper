@@ -1,4 +1,6 @@
-﻿namespace Miratorg.TimeKeeper.BusinessLogic.Services;
+﻿using System;
+
+namespace Miratorg.TimeKeeper.BusinessLogic.Services;
 
 public class SyncEmployeeService : IHostedService
 {
@@ -198,14 +200,23 @@ public class SyncEmployeeService : IHostedService
 
                 var store = dbContext.Stores.FirstOrDefault(x => x.Name == employee.RoutineDivision);
 
+                Guid store1C = Guid.Parse(employee.CodeRoutineDivision);
+
                 if (store == null)
                 {
                     store = new StoreEntity()
                     {
-                        Name = employee.RoutineDivision
+                        Name = employee.RoutineDivision,
+                        StoreId1C = store1C
                     };
 
                     dbContext.Stores.Add(store);
+                    await dbContext.SaveChangesAsync();
+                }
+                else
+                {
+                    store.Name = employee.RoutineDivision;
+                    store.StoreId1C = store1C;
                     await dbContext.SaveChangesAsync();
                 }
 
@@ -216,7 +227,8 @@ public class SyncEmployeeService : IHostedService
                         CodeNav = employee.Code,
                         Name = $"{employee.LastName} {employee.FirstName} {employee.MiddleName}",
                         StoreId = store.Id,
-                        Position = position?.Description ?? "n/d"
+                        Position = position?.Description ?? "n/d",
+                        Guid1C = employee.Guid ?? Guid.Empty
                     };
 
                     dbContext.Employees.Add(currentEmployee);
@@ -228,12 +240,12 @@ public class SyncEmployeeService : IHostedService
                     currentEmployee.CodeNav = employee.Code;
                     currentEmployee.StoreId = store.Id;
                     currentEmployee.Position = position?.Description ?? "n/d";
+                    currentEmployee.Guid1C = employee.Guid ?? Guid.Empty;
 
                     await dbContext.SaveChangesAsync();
                 }
 
                 var (start, end) = GetFirstAndLastDayOfMonth(DateTime.Now);
-
 
                 var tempDate = start.Date;
                 for (int i = 0; tempDate <= end; i++)
@@ -241,11 +253,10 @@ public class SyncEmployeeService : IHostedService
                     // обрабатываем данные из проховов СКУД
                     await UpdateScudData(currentEmployee.Id, employee.Code, tempDate, tempDate.AddDays(1));
 
-                    // Обновляем причины отсутствия
-
                     tempDate = tempDate.AddDays(1);
                 }
-                
+
+                    // Обновляем причины отсутствия
                 await SyncAbsence(currentEmployee.Id, end, tempDate);
 
                 // обрабатываем данные из плана проходов 1С

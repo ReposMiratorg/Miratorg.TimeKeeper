@@ -84,7 +84,13 @@ public  class TimeKeeperConverter
                 t += time;
             }
 
-            employee.MountHours.Add(start, t.TotalHours);
+            var workHours = t.TotalHours;
+            if (workHours > 3)
+            {
+                workHours = workHours - 1;
+            }
+
+            employee.MountHours.Add(start, workHours);
             start = start.AddMonths(1);
         }
 

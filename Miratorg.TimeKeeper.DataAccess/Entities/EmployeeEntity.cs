@@ -6,6 +6,8 @@ public class EmployeeEntity : BaseEntity
     public string Position { get; set; }
     public string CodeNav { get; set; }
 
+    public Guid Guid1C { get; set; }
+
     public Guid? StoreId { get; set; }
     public virtual StoreEntity? Store { get; set; }
 
