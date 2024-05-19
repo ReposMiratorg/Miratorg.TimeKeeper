@@ -24,8 +24,10 @@
                 <ScudComponent CurrentDate="currentDate" ScudInfoModels="scudInfoModels" />
             }
 
-            <div style="display: flex; width: 100%; height:5px;">
-            </div>
+            @if (IsShowReasonAbsent)
+            {
+                <ReasonAbcentComponent ReasonAbsent="@risonAbsent" />
+            }
 
         </div>
     </FrontObject>
@@ -117,12 +119,16 @@
     [Parameter]
     public bool IsShowScud { get; set; }
 
+    [Parameter]
+    public bool IsShowReasonAbsent { get; set; }
+
     private DateTime currentDate { get; set; }
 
     private List<PlanDetailModel> planedIntervals { get; set; }
     private List<PlanDetailModel> overworkIntervals { get; set; }
     private List<Schedule1CPlanModel> schedule1CPlanModels { get; set; }
     private List<ScudInfoModel> scudInfoModels { get; set; }
+    private string risonAbsent { get; set; }
 
     protected override async void OnParametersSet()
     {
@@ -145,6 +151,10 @@
 
             var scudInfos = SyncEmployeeService.Employees.Where(x => x.Id == EmployeeId).SelectMany(x => x.ScudInfos).ToList();
             scudInfoModels = scudInfos.Where(x => x.Begin.Date == currentDate).ToList();
+
+            var reasonAbsentInfos = SyncEmployeeService.Employees.Where(x => x.Id == EmployeeId).SelectMany(x => x.Absences).ToList();
+            var currentReason = reasonAbsentInfos.FirstOrDefault(x => x.RepDate == currentDate);
+            risonAbsent = currentReason?.Description;
         }
         catch (Exception ex)
         {

@@ -2,16 +2,6 @@
 @rendermode InteractiveServer
 
 <div class="row mt-4 mb-3 align-items-end">
-@*     <div class="col-3">
-    <label class="">Магазин</label>
-    <select class="form-select form-select-sm" value="@_selectedStore" @onchange="HandleSelectionTypeChange">
-    <option value="@Guid.Empty">Выберете магазин</option>
-    @foreach (var store in allStories)
-    {
-    <option value="@store.Id">@store.Name</option>
-    }
-    </select>
-    </div> *@
     <div class="col-3">
         <label class="">Магазин</label>
         <input type="text" class="form-control form-control-sm" placeholder="Введите для фильтрации..." @bind="@filterText" @oninput="@FilterChanged" @onfocus="OnFockus" />
@@ -58,20 +48,24 @@
         <label class="form-check-label" for="customSwitch1" style="flex-grow: 1; background-color: @ColorConfig.BackgroundPlan; padding: 5px 10px; border-radius: 5px;">Запланированный график</label>
     </div>
     <div class="form-check form-switch me-2">
-        <input type="checkbox" class="form-check-input" id="customSwitch1" style="margin-right: 10px; " @bind="_isShowOverWork">
-        <label class="form-check-label" for="customSwitch1" style="flex-grow: 1; background-color: @ColorConfig.BackgroundOverWork; padding: 5px 10px; border-radius: 5px;">Подработки</label>
+        <input type="checkbox" class="form-check-input" id="customSwitch2" style="margin-right: 10px; " @bind="_isShowOverWork">
+        <label class="form-check-label" for="customSwitch2" style="flex-grow: 1; background-color: @ColorConfig.BackgroundOverWork; padding: 5px 10px; border-radius: 5px;">Подработки</label>
     </div>
     <div class="form-check form-switch me-2">
-        <input type="checkbox" class="form-check-input" id="customSwitch1" style="margin-right: 10px; " @bind="_isShow1C">
-        <label class="form-check-label" for="customSwitch1" style="flex-grow: 1; background-color: @ColorConfig.Background1C; padding: 5px 10px; border-radius: 5px;">Отображать график 1C</label>
+        <input type="checkbox" class="form-check-input" id="customSwitch3" style="margin-right: 10px; " @bind="_isShow1C">
+        <label class="form-check-label" for="customSwitch3" style="flex-grow: 1; background-color: @ColorConfig.Background1C; padding: 5px 10px; border-radius: 5px;">Отображать график 1C</label>
     </div>
     <div class="form-check form-switch me-2">
-        <input type="checkbox" class="form-check-input" id="customSwitch1" style="margin-right: 10px; " @bind="_isShowScud">
-        <label class="form-check-label" for="customSwitch1" style="flex-grow: 1; background-color: @ColorConfig.BackgroundScud; padding: 5px 10px; border-radius: 5px;">Фактическое время</label>
+        <input type="checkbox" class="form-check-input" id="customSwitch4" style="margin-right: 10px; " @bind="_isShowScud">
+        <label class="form-check-label" for="customSwitch4" style="flex-grow: 1; background-color: @ColorConfig.BackgroundScud; padding: 5px 10px; border-radius: 5px;">Фактическое время</label>
     </div>
     <div class="form-check form-switch me-2">
-        <input type="checkbox" class="form-check-input" id="customSwitch1" style="margin-right: 10px; ">
-        <label class="form-check-label" for="customSwitch1" style="flex-grow: 1; background-color: @ColorConfig.BackgroundFActOverWork; padding: 5px 10px; border-radius: 5px;">Фактические переработки</label>
+        <input type="checkbox" class="form-check-input" id="customSwitch5" style="margin-right: 10px; ">
+        <label class="form-check-label" for="customSwitch5" style="flex-grow: 1; background-color: @ColorConfig.BackgroundFActOverWork; padding: 5px 10px; border-radius: 5px;">Фактические переработки</label>
+    </div>
+    <div class="form-check form-switch me-2">
+        <input type="checkbox" class="form-check-input" id="customSwitch7" style="margin-right: 10px; " @bind="_isShowReasonAbcent">
+        <label class="form-check-label" for="customSwitch7" style="flex-grow: 1; background-color: @ColorConfig.BackgroundReasonAbsent; padding: 5px 10px; border-radius: 5px;">Причины отсутствия</label>
     </div>
 
     <div class="ms-5">
@@ -141,7 +135,7 @@
                             for (int i = 0; i < 7; i++)
                             {
                                 var currentDate = _selectedWeekBeginDay.AddDays(i);
-                                <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" Day="currentDate" EmployeeId="employee.Id" /></td>
+                                <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" IsShowReasonAbsent="_isShowReasonAbcent" Day="currentDate" EmployeeId="employee.Id" /></td>
                             }
                         }
                         else
@@ -150,7 +144,7 @@
 
                             for (var i = s; i < s.AddMonths(1); i = i.AddDays(1))
                             {
-                                <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" Day="i" EmployeeId="employee.Id" /></td>
+                                <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" IsShowReasonAbsent="_isShowReasonAbcent" Day="i" EmployeeId="employee.Id" /></td>
                             }
                         }
                     </tr>
@@ -192,6 +186,7 @@
     private bool _isShowOverWork { get; set; }
     private bool _isShow1C { get; set; }
     private bool _isShowScud { get; set; }
+    private bool _isShowReasonAbcent { get; set; }
 
     private PeriodMode periodMode { get; set; } = PeriodMode.Week;
 
@@ -210,6 +205,7 @@
             _isShowOverWork = false;
             _isShow1C = false;
             _isShowScud = false;
+            _isShowReasonAbcent = false;
         }
         else
         {
@@ -217,6 +213,7 @@
             _isShowOverWork = true;
             _isShow1C = true;
             _isShowScud = true;
+            _isShowReasonAbcent = true;
         }
 
         StateHasChanged();
