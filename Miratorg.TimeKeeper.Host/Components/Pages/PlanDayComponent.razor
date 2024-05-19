@@ -94,12 +94,6 @@
     [Parameter]
     public Guid StoreId { get; set; }
 
-    // [Parameter]
-    // public DayEnum WeekDay { get; set; }
-
-    // [Parameter]
-    // public DateTime WeekBeginDay { get; set; }
-
     [Parameter]
     public DateTime Day { get; set; }
 
@@ -137,18 +131,25 @@
 
     private async Task UpdateUI()
     {
-        currentDate = Day;
-        weekDay = Helpers.WeekConverter.Convert(currentDate);
+        try
+        {
+            currentDate = Day;
+            weekDay = Helpers.WeekConverter.Convert(currentDate);
 
-        var dates = SyncEmployeeService.Employees.Where(x => x.Id == EmployeeId).SelectMany(x => x.Plans).ToList();
-        planedIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate.AddDays(1) && x.PlanType == PlanType.Plan).ToList();
-        overworkIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate.AddDays(1) && x.PlanType == PlanType.Overwork).ToList();
+            var dates = SyncEmployeeService.Employees.Where(x => x.Id == EmployeeId).SelectMany(x => x.Plans).ToList();
+            planedIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate.AddDays(1) && x.PlanType == PlanType.Plan).ToList();
+            overworkIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate.AddDays(1) && x.PlanType == PlanType.Overwork).ToList();
 
-        var schedules = SyncEmployeeService.Employees.Where(x => x.Id == EmployeeId).SelectMany(x => x.WorkDates);
-        schedule1CPlanModels = schedules.Where(x => x.Begin.Date == currentDate).ToList();
+            var schedules = SyncEmployeeService.Employees.Where(x => x.Id == EmployeeId).SelectMany(x => x.WorkDates);
+            schedule1CPlanModels = schedules.Where(x => x.Begin.Date == currentDate).ToList();
 
-        var scudInfos = SyncEmployeeService.Employees.Where(x => x.Id == EmployeeId).SelectMany(x => x.ScudInfos).ToList();
-        scudInfoModels = scudInfos.Where(x => x.Begin.Date == currentDate).ToList();
+            var scudInfos = SyncEmployeeService.Employees.Where(x => x.Id == EmployeeId).SelectMany(x => x.ScudInfos).ToList();
+            scudInfoModels = scudInfos.Where(x => x.Begin.Date == currentDate).ToList();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, $"Error {nameof(UpdateUI)}: EmployeeId: '{EmployeeId}'. Day: '{Day}'. '{ex.Message}'");
+        }
     }
 
     private async Task RemovePaln(Guid id)
