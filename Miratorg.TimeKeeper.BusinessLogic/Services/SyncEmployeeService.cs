@@ -200,14 +200,23 @@ public class SyncEmployeeService : IHostedService
 
                 var store = dbContext.Stores.FirstOrDefault(x => x.Name == employee.RoutineDivision);
 
+                Guid store1C = Guid.Parse(employee.CodeRoutineDivision);
+
                 if (store == null)
                 {
                     store = new StoreEntity()
                     {
-                        Name = employee.RoutineDivision
+                        Name = employee.RoutineDivision,
+                        StoreId1C = store1C
                     };
 
                     dbContext.Stores.Add(store);
+                    await dbContext.SaveChangesAsync();
+                }
+                else
+                {
+                    store.Name = employee.RoutineDivision;
+                    store.StoreId1C = store1C;
                     await dbContext.SaveChangesAsync();
                 }
 
