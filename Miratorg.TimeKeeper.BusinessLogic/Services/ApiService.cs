@@ -34,7 +34,7 @@ public class ApiService : IApiService
         return new ResponseDto();
     }
 
-    private int CalcTime(DateTime begin, DateTime end)
+    private static int CalcTimeMinutes(DateTime begin, DateTime end)
     {
         var timeMinutes = (end - begin).TotalMinutes;
 
@@ -81,7 +81,7 @@ public class ApiService : IApiService
                                 date = plan.Begin.ToString("yyyy-MM-dd"),
                                 dep = new Dep() { code = store1cId.ToString() },
                                 nvalue = 0,
-                                dvalue = CalcTime(plan.Begin, plan.End),
+                                dvalue = CalcTimeMinutes(plan.Begin, plan.End),
                                 dovertime = 0,
                                 novertime = 0,
                                 worktime = new List<Worktime>()
@@ -89,7 +89,7 @@ public class ApiService : IApiService
 
                             timesheet.worktime.Add(new Worktime()
                             {
-                                dvalue = CalcTime(plan.Begin, plan.End),
+                                dvalue = CalcTimeMinutes(plan.Begin, plan.End),
                                 nvalue = 0,
                                 type = "regular"
                             });
