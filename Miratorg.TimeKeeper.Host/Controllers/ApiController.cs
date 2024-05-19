@@ -55,6 +55,10 @@ public class ApiController : ControllerBase
                 var responseFiscal = await _apiService.GetFiscal(dto);
                 return responseFiscal;
 
+            case "manual":
+                var responseManual = await _apiService.GetManual(dto);
+                return responseManual;
+
             default:
                 throw new Exception("incorrect source");
         }

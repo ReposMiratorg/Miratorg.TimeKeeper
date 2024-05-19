@@ -6,6 +6,7 @@ public interface IApiService
 {
     Task<ResponseDto> GetBoimetry(RequestDto requestDto);
     Task<ResponseDto> GetFiscal(RequestDto dto);
+    Task<ResponseDto> GetManual(RequestDto dto);
 }
 
 public class ApiService : IApiService
@@ -34,6 +35,20 @@ public class ApiService : IApiService
     }
 
     public async Task<ResponseDto> GetFiscal(RequestDto requestDto)
+    {
+        try
+        {
+            return new ResponseDto();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "");
+        }
+
+        return new ResponseDto();
+    }
+
+    public async Task<ResponseDto> GetManual(RequestDto requestDto)
     {
         try
         {
