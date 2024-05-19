@@ -25,7 +25,7 @@ public class ApiController : ControllerBase
         _logger = logger;
     }
 
-    [HttpPost("rest")]
+    [HttpPost]
     public async Task<BusinessLogic.Models.api.ResponseDto> Rest(BusinessLogic.Models.api.RequestDto dto)
     {
         if (dto == null)
