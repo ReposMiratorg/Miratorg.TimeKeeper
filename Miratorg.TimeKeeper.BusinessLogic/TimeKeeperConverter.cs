@@ -26,7 +26,8 @@ public  class TimeKeeperConverter
                 StoreId = plan.StoreId,
                 Begin = plan.Begin,
                 End = plan.End,
-                PlanType = plan.PlanType
+                PlanType = plan.PlanType,
+                TypeOverWorkName = plan.TypeOverWork?.Name ?? "N/D"
             };
 
             employee.Plans.Add(planDetail);

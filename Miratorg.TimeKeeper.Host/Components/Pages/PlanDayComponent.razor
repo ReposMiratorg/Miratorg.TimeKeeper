@@ -41,7 +41,7 @@
         {
             foreach (var plan in planedIntervals)
             {
-                var message = $"{plan.Begin.ToShortTimeString()} - {plan.End.ToShortTimeString()}";
+                var message = $"{plan.Begin.ToShortTimeString()} - {plan.End.ToShortTimeString()} План";
 
                 <div class="row">
                     <div class="col-9">
@@ -58,7 +58,7 @@
         {
             foreach (var plan in overworkIntervals)
             {
-                var message = $"{plan.Begin.ToShortTimeString()} - {plan.End.ToShortTimeString()} - ";
+                var message = $"{plan.Begin.ToShortTimeString()} - {plan.End.ToShortTimeString()} Подработка: {plan.TypeOverWorkName}";
 
                 <div class="row mt-2">
                     <div class="col-9">

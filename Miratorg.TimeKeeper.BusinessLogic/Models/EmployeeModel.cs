@@ -21,6 +21,7 @@ public class PlanDetailModel
     public DateTime End { get; set; }
     public PlanType PlanType { get; set; }
     public Guid? StoreId { get; set; }
+    public string TypeOverWorkName { get; set; }
 }
 
 public class Schedule1CPlanModel

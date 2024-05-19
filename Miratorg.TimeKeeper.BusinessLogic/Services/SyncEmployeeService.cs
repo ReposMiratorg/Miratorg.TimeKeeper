@@ -62,7 +62,7 @@ public class SyncEmployeeService : IHostedService
         var employees = await dbContext.Employees
             .Include(x => x.Schedule).ThenInclude(x => x.Dates)
             .Include(x => x.ScudInfos)
-            .Include(x => x.Plans)
+            .Include(x => x.Plans).ThenInclude(x => x.TypeOverWork)
             .Include(x => x.Absences)
             .OrderBy(x => x.Name)
             .AsNoTrackingWithIdentityResolution()
@@ -191,7 +191,7 @@ public class SyncEmployeeService : IHostedService
 
             foreach (var employee in employees)
             {
-                //_logger.LogInformation($"Process: '{employee.Code}'");
+                _logger.LogInformation($"Process: '{employee.Code}'");
 
                 var currentEmployee = dbContext.Employees.FirstOrDefault(x => x.CodeNav == employee.Code);
                 var position = positions.FirstOrDefault(x => x.Code.ToLower() == employee.CodePosition);
@@ -234,7 +234,7 @@ public class SyncEmployeeService : IHostedService
 
                 var (start, end) = GetFirstAndLastDayOfMonth(DateTime.Now);
 
-                
+
                 var tempDate = start.Date;
                 for (int i = 0; tempDate <= end; i++)
                 {
@@ -245,6 +245,8 @@ public class SyncEmployeeService : IHostedService
 
                     tempDate = tempDate.AddDays(1);
                 }
+                
+                await SyncAbsence(currentEmployee.Id, end, tempDate);
 
                 // обрабатываем данные из плана проходов 1С
                 await UpdateSchedule(currentEmployee.Id, employee.Code, start, end);
