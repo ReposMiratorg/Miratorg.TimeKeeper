@@ -55,6 +55,20 @@ public  class TimeKeeperConverter
             }
         }
 
+        if (entity.Absences != null)
+        {
+            foreach (var item in entity.Absences)
+            {
+                employee.Absences.Add(new AbsenceModel()
+                {
+                    RepDate = item.RepDate,
+                    Description = item.AbsenceDescription
+                });
+            }
+        }
+
+
+        // Подсчет часов в магазине за месяц //ToDo -  необходимо учитывать по магазинам
         DateTime start = new DateTime(2024, 1, 1);
 
         for (int i = 0; i < 100; i++)
