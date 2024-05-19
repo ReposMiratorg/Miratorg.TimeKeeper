@@ -2,7 +2,7 @@
 
 public class ResponseDto
 {
-    public Timesheet[] timesheets { get; set; }
+    public List<Timesheet> timesheets { get; set; }
 }
 
 public class Timesheet
@@ -15,7 +15,7 @@ public class Timesheet
     public int dovertime { get; set; }
     public int novertime { get; set; }
     public string worktype { get; set; }
-    public Worktime[] worktime { get; set; }
+    public List<Worktime> worktime { get; set; }
 }
 
 public class Worktime
