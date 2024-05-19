@@ -62,7 +62,8 @@ public class SyncEmployeeService : IHostedService
         var employees = await dbContext.Employees
             .Include(x => x.Schedule).ThenInclude(x => x.Dates)
             .Include(x => x.ScudInfos)
-            .Include(x => x.Plans)
+            .Include(x => x.Plans).ThenInclude(x => x.TypeOverWork)
+            .Include(x => x.Absences)
             .OrderBy(x => x.Name)
             .AsNoTrackingWithIdentityResolution()
             .ToListAsync();
@@ -77,6 +78,57 @@ public class SyncEmployeeService : IHostedService
 
         Employees.Clear();
         Employees = models;
+    }
+
+    private async Task SyncAbsence(Guid userId, DateTime begin, DateTime end)
+    {
+        try
+        {
+            using var staffDbContext = await _staffControlDbContextFactory.Create();
+            using var dbContext = await _timeKeeperDbContextFactory.Create();
+
+            var employee = await dbContext.Employees.FirstOrDefaultAsync(x => x.Id == userId);
+            if (employee == null)
+            {
+                throw new Exception("employee not found");
+            }
+
+            var absences = await staffDbContext.StaffAbsences
+                .Where(x => x.Code == employee.CodeNav && x.RepDate >= begin && x.RepDate <= end)
+                .AsNoTracking()
+                .ToListAsync();
+
+            var absencesExist = await dbContext.Absences
+                .Where(x => x.Id == employee.Id && x.RepDate >= begin && x.RepDate < end)
+                .AsNoTracking()
+                .ToListAsync();
+
+            if (absencesExist.Count > 0)
+            {
+                dbContext.Absences.RemoveRange(absencesExist);
+                await dbContext.SaveChangesAsync();
+            }
+
+            if (absences.Count > 0)
+            {
+                foreach (var absence in absences)
+                {
+                    dbContext.Absences.Add(new AbsenceEntity()
+                    {
+                        EmployeeId = employee.Id,
+                        AbsenceCode = absence.CodeType,
+                        AbsenceDescription = absence.Description1,
+                        RepDate = absence.RepDate
+                    });
+                }
+
+                await dbContext.SaveChangesAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error sync absence: {ex.Message}");
+        }
     }
 
     public static async Task UpdateUser(Guid userId)
@@ -139,7 +191,7 @@ public class SyncEmployeeService : IHostedService
 
             foreach (var employee in employees)
             {
-                //_logger.LogInformation($"Process: '{employee.Code}'");
+                _logger.LogInformation($"Process: '{employee.Code}'");
 
                 var currentEmployee = dbContext.Employees.FirstOrDefault(x => x.CodeNav == employee.Code);
                 var position = positions.FirstOrDefault(x => x.Code.ToLower() == employee.CodePosition);
@@ -182,18 +234,25 @@ public class SyncEmployeeService : IHostedService
 
                 var (start, end) = GetFirstAndLastDayOfMonth(DateTime.Now);
 
-                // обрабатываем данные из проховов СКУД
+
                 var tempDate = start.Date;
                 for (int i = 0; tempDate <= end; i++)
                 {
+                    // обрабатываем данные из проховов СКУД
                     await UpdateScudData(currentEmployee.Id, employee.Code, tempDate, tempDate.AddDays(1));
+
+                    // Обновляем причины отсутствия
+
                     tempDate = tempDate.AddDays(1);
                 }
+                
+                await SyncAbsence(currentEmployee.Id, end, tempDate);
 
                 // обрабатываем данные из плана проходов 1С
                 await UpdateSchedule(currentEmployee.Id, employee.Code, start, end);
 
-                //await UpdateUser(currentEmployee.Id);
+                // обновляем модель после обновления в БД
+                await UpdateUser(currentEmployee.Id);
             }
         }
         catch (Exception ex)
@@ -324,7 +383,7 @@ public class SyncEmployeeService : IHostedService
 
     public static (DateTime FirstDayOfMonth, DateTime LastDayOfMonth) GetFirstAndLastDayOfMonth(DateTime date)
     {
-        DateTime firstDayOfMonth = new DateTime(date.Year, date.Month, 1);
+        DateTime firstDayOfMonth = date.AddMonths(-1);
         DateTime lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
 
         return (firstDayOfMonth, lastDayOfMonth);

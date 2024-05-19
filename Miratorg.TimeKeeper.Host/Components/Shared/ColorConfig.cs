@@ -8,4 +8,5 @@ public static class ColorConfig
     public const string Background1C = "#0acf97";
     public const string BackgroundScud = "#ffc35a";
     public const string BackgroundFActOverWork = "#ff679b";
+    public const string BackgroundReasonAbsent = "#642532";
 }

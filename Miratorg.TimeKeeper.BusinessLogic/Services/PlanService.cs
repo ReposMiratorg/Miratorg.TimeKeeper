@@ -4,7 +4,7 @@ public interface IPlanService
 {
     //public Task<List<PlanEntity>> GetPlan(DateTime beginDate, DateTime endDate);
     //public Task<List<EmployeeModel>> GetPlanModel(DateTime beginDate, DateTime endDate);
-    public Task Create(Guid employeeId, PlanType planType, DateTime beginWork, DateTime endWork, Guid? storeId, Guid? typeOverwork);
+    public Task Create(Guid employeeId, PlanType planType, DateTime beginWork, DateTime endWork, Guid storeId, Guid? typeOverwork);
     public Task Remove(Guid id);
 }
 
@@ -19,9 +19,14 @@ public class PlanService : IPlanService
         _logger = logger;
     }
 
-    public async Task Create(Guid employeeId, PlanType planType, DateTime begin, DateTime end, Guid? storeId, Guid? typeOverwork)
+    public async Task Create(Guid employeeId, PlanType planType, DateTime begin, DateTime end, Guid storeId, Guid? typeOverwork)
     {
         ValidateDates(begin, end);
+
+        if (storeId == Guid.Empty)
+        {
+            throw new Exception("StoreId == Guid.Empty");
+        }
 
         using var dbContext = await _dbContextFactory.Create();
 

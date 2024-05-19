@@ -11,6 +11,7 @@ public class EmployeeModel
     public List<PlanDetailModel> Plans { get; set; } = new List<PlanDetailModel>();
     public List<Schedule1CPlanModel> WorkDates { get; set; } = new List<Schedule1CPlanModel>();
     public List<ScudInfoModel> ScudInfos { get; set; } = new List<ScudInfoModel>();
+    public List<AbsenceModel> Absences { get; set; } = new List<AbsenceModel>();
 }
 
 public class PlanDetailModel
@@ -20,6 +21,7 @@ public class PlanDetailModel
     public DateTime End { get; set; }
     public PlanType PlanType { get; set; }
     public Guid? StoreId { get; set; }
+    public string TypeOverWorkName { get; set; }
 }
 
 public class Schedule1CPlanModel
@@ -32,5 +34,14 @@ public class ScudInfoModel
 {
     public DateTime Begin { get; set; }
     public DateTime End { get; set; }
+}
+
+/// <summary>
+/// Причина отсуствия
+/// </summary>
+public class AbsenceModel
+{
+    public DateTime RepDate { get; internal set; }
+    public string Description { get; internal set; }
 }
 

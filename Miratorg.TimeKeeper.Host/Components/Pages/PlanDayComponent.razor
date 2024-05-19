@@ -24,8 +24,10 @@
                 <ScudComponent CurrentDate="currentDate" ScudInfoModels="scudInfoModels" />
             }
 
-            <div style="display: flex; width: 100%; height:5px;">
-            </div>
+            @if (IsShowReasonAbsent)
+            {
+                <ReasonAbcentComponent ReasonAbsent="@risonAbsent" />
+            }
 
         </div>
     </FrontObject>
@@ -41,7 +43,7 @@
         {
             foreach (var plan in planedIntervals)
             {
-                var message = $"{plan.Begin.ToShortTimeString()} - {plan.End.ToShortTimeString()}";
+                var message = $"{plan.Begin.ToShortTimeString()} - {plan.End.ToShortTimeString()} План";
 
                 <div class="row">
                     <div class="col-9">
@@ -58,7 +60,7 @@
         {
             foreach (var plan in overworkIntervals)
             {
-                var message = $"{plan.Begin.ToShortTimeString()} - {plan.End.ToShortTimeString()} - ";
+                var message = $"{plan.Begin.ToShortTimeString()} - {plan.End.ToShortTimeString()} Подработка: {plan.TypeOverWorkName}";
 
                 <div class="row mt-2">
                     <div class="col-9">
@@ -94,12 +96,6 @@
     [Parameter]
     public Guid StoreId { get; set; }
 
-    // [Parameter]
-    // public DayEnum WeekDay { get; set; }
-
-    // [Parameter]
-    // public DateTime WeekBeginDay { get; set; }
-
     [Parameter]
     public DateTime Day { get; set; }
 
@@ -123,12 +119,16 @@
     [Parameter]
     public bool IsShowScud { get; set; }
 
+    [Parameter]
+    public bool IsShowReasonAbsent { get; set; }
+
     private DateTime currentDate { get; set; }
 
     private List<PlanDetailModel> planedIntervals { get; set; }
     private List<PlanDetailModel> overworkIntervals { get; set; }
     private List<Schedule1CPlanModel> schedule1CPlanModels { get; set; }
     private List<ScudInfoModel> scudInfoModels { get; set; }
+    private string risonAbsent { get; set; }
 
     protected override async void OnParametersSet()
     {
@@ -137,18 +137,29 @@
 
     private async Task UpdateUI()
     {
-        currentDate = Day;
-        weekDay = Helpers.WeekConverter.Convert(currentDate);
+        try
+        {
+            currentDate = Day;
+            weekDay = Helpers.WeekConverter.Convert(currentDate);
 
-        var dates = SyncEmployeeService.Employees.Where(x => x.Id == EmployeeId).SelectMany(x => x.Plans).ToList();
-        planedIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate.AddDays(1) && x.PlanType == PlanType.Plan).ToList();
-        overworkIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate.AddDays(1) && x.PlanType == PlanType.Overwork).ToList();
+            var dates = SyncEmployeeService.Employees.Where(x => x.Id == EmployeeId).SelectMany(x => x.Plans).ToList();
+            planedIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate.AddDays(1) && x.PlanType == PlanType.Plan).ToList();
+            overworkIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate.AddDays(1) && x.PlanType == PlanType.Overwork).ToList();
 
-        var schedules = SyncEmployeeService.Employees.Where(x => x.Id == EmployeeId).SelectMany(x => x.WorkDates);
-        schedule1CPlanModels = schedules.Where(x => x.Begin.Date == currentDate).ToList();
+            var schedules = SyncEmployeeService.Employees.Where(x => x.Id == EmployeeId).SelectMany(x => x.WorkDates);
+            schedule1CPlanModels = schedules.Where(x => x.Begin.Date == currentDate).ToList();
 
-        var scudInfos = SyncEmployeeService.Employees.Where(x => x.Id == EmployeeId).SelectMany(x => x.ScudInfos).ToList();
-        scudInfoModels = scudInfos.Where(x => x.Begin.Date == currentDate).ToList();
+            var scudInfos = SyncEmployeeService.Employees.Where(x => x.Id == EmployeeId).SelectMany(x => x.ScudInfos).ToList();
+            scudInfoModels = scudInfos.Where(x => x.Begin.Date == currentDate).ToList();
+
+            var reasonAbsentInfos = SyncEmployeeService.Employees.Where(x => x.Id == EmployeeId).SelectMany(x => x.Absences).ToList();
+            var currentReason = reasonAbsentInfos.FirstOrDefault(x => x.RepDate == currentDate);
+            risonAbsent = currentReason?.Description;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, $"Error {nameof(UpdateUI)}: EmployeeId: '{EmployeeId}'. Day: '{Day}'. '{ex.Message}'");
+        }
     }
 
     private async Task RemovePaln(Guid id)
