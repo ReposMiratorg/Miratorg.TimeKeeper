@@ -1,0 +1,101 @@
+﻿<CustomModalDialog DialogSize="ModalDialogSize.Standard" @ref="modalDialog">
+
+    <FrontObject>
+        <button class="btn btn-info btn-sm" @onclick="modalDialog.Open">Добавить факт SCUD</button>
+    </FrontObject>
+
+    <Body>
+        <div class="row">
+            <div class="col-6">
+                <label>Вход</label>
+                <input class="form-control form-control-sm" type="datetime-local" @bind="begin" />
+            </div>
+
+            <div class="col-6">
+                <label>Выход</label>
+                <input class="form-control form-control-sm" type="datetime-local" @bind="end" />
+            </div>
+        </div>
+    </Body>
+
+    <Footer>
+        <button class="btn btn-danger btn-sm" @onclick="Save">Добавить</button>
+        <button class="btn btn-info btn-sm" @onclick="Close">Отмена</button>
+    </Footer>
+
+</CustomModalDialog>
+
+@code {
+    [Parameter]
+    public Guid EmoloyeeId { get; set; }
+
+    [Parameter]
+    public DateTime CurrentDate { get; set; }
+
+    [Parameter]
+    public EventCallback Action { get; set; }
+
+    [Inject]
+    public ITimeKeeperDbContextFactory dbContextFactory { get; set; }
+
+    private DateTime begin { get; set; } = DateTime.Now.Date.AddHours(8);
+    private DateTime end { get; set; } = DateTime.Now.Date.AddHours(20);
+
+    private CustomModalDialog modalDialog { get; set; } = new();
+
+    private async Task Close()
+    {
+        await modalDialog.Close();
+    }
+
+    private void Open()
+    {
+        begin = CurrentDate.Date.AddHours(8);
+        end = CurrentDate.Date.AddHours(20);
+    }
+
+    private async Task Save()
+    {
+        if (begin >= end)
+        {
+            return;
+        }
+
+        try
+        {
+            var context = await dbContextFactory.Create();
+            ManualScudEntity manualScudEntity = new ManualScudEntity()
+                {
+                    CreateAt = DateTime.Now,
+                    EmployeeId = EmoloyeeId,
+                    Input = begin,
+                    Output = end,
+                    UserAutorName = "n/d"
+                };
+
+            context.ManualScuds.Add(manualScudEntity);
+            await context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            //ToDo - записать лог и отобразить сообщение
+        }
+
+        begin = CurrentDate.Date.AddHours(8);
+        end = CurrentDate.Date.AddHours(20);
+
+        try
+        {
+            if (Action.HasDelegate)
+            {
+                await Action.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            //ToDo - записать лог и отобразить сообщение
+        }
+
+        await Close();
+    }
+}

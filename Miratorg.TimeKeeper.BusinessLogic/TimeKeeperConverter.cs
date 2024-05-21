@@ -2,6 +2,21 @@
 
 public  class TimeKeeperConverter
 {
+    public static bool CheckInterval(DateTime currentTime, DateTime beginInterval, DateTime? endInterval)
+    {
+        if (endInterval == null)
+        {
+            return false;
+        }
+
+        if (beginInterval <= currentTime && currentTime <= endInterval)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public static EmployeeModel Convert(EmployeeEntity entity)
     {
         EmployeeModel employee = new EmployeeModel()

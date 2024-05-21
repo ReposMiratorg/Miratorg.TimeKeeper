@@ -67,7 +67,7 @@
                 var date = CurrentDate;
                 for (int i = 0; i < 24; i++)
                 {
-                    if (CheckInterval(date, scudnterval.Begin, scudnterval.End))
+                    if (TimeKeeperConverter.CheckInterval(date, scudnterval.Begin, scudnterval.End))
                     {
                         scud[i] = true;
                     }
@@ -78,7 +78,7 @@
 
                     foreach (var planDetailModel in PlanedIntervals)
                     {
-                        var result = CheckInterval(date, planDetailModel.Begin, planDetailModel.End);
+                        var result = TimeKeeperConverter.CheckInterval(date, planDetailModel.Begin, planDetailModel.End);
                         if(result == true)
                         {
                             plan[i] = true;
@@ -87,7 +87,7 @@
 
                     foreach (var overwork in OverWorkPlanedIntervals)
                     {
-                        var result = CheckInterval(date, overwork.Begin, overwork.End);
+                        var result = TimeKeeperConverter.CheckInterval(date, overwork.Begin, overwork.End);
                         if (result == true)
                         {
                             plan[i] = true;
@@ -98,22 +98,5 @@
                 }
             }
         }
-
-
-    }
-
-    private bool CheckInterval(DateTime currentTime, DateTime beginInterval, DateTime? endInterval)
-    {
-        if (endInterval == null)
-        {
-            return false;
-        }
-
-        if (beginInterval <= currentTime && currentTime <= endInterval)
-        {
-            return true;
-        }
-
-        return false;
     }
 }
