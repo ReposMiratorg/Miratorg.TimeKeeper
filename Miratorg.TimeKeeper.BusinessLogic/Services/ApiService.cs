@@ -1,6 +1,4 @@
 ﻿using Miratorg.TimeKeeper.BusinessLogic.Models.api;
-using System.Numerics;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Miratorg.TimeKeeper.BusinessLogic.Services;
 
