@@ -2,13 +2,28 @@
 
 <div style="display: flex; position: relative; width: 100%; height:25px; ">
     <div style="display: flex; position: absolute; flex-direction:row; flex-flow: row nowrap; width: 100%; height:25px;  z-index: 1">
-        @foreach (var item in scud)
+        @for(int i = 0; i < 24; i++)
+        {
+            var color = string.Empty;
+
+            if (plan[i] == false && scud[i] == true)
+            {
+                color = ColorConfig.BackgroundFActOverWork;
+            }
+            else
+            {
+                color = scud[i] ? @ColorConfig.BackgroundScud : @ColorConfig.BackgroundDefault;
+            }
+
+            <div style="width: 100%; background-color: @color ;"></div>
+        }
+       @*  @foreach (var item in scud)
         {
             var color = string.Empty;
             color = item ? @ColorConfig.BackgroundScud : @ColorConfig.BackgroundDefault;
 
             <div style="width: 100%; background-color: @color ;"></div>
-        }
+        } *@
     </div>
     <div style="display: flex; position: absolute; flex-direction:row; flex-flow: row nowrap; justify-content: center; align-items: center;height:25px; width: 100%; z-index: 2">
         <a>@interval</a>
@@ -31,7 +46,7 @@
     public DateTime CurrentDate { get; set; }
 
     bool[] scud { get; set; } = new bool[24];
-    bool[] overwork { get; set; } = new bool[24];
+    bool[] plan { get; set; } = new bool[24];
 
     protected override void OnParametersSet()
     {
@@ -60,6 +75,25 @@
                     {
                         scud[i] = false;
                     }
+
+                    foreach (var planDetailModel in PlanedIntervals)
+                    {
+                        var result = CheckInterval(date, planDetailModel.Begin, planDetailModel.End);
+                        if(result == true)
+                        {
+                            plan[i] = true;
+                        }
+                    }
+
+                    foreach (var overwork in OverWorkPlanedIntervals)
+                    {
+                        var result = CheckInterval(date, overwork.Begin, overwork.End);
+                        if (result == true)
+                        {
+                            plan[i] = true;
+                        }
+                    }
+
                     date = date.AddHours(1);
                 }
             }
