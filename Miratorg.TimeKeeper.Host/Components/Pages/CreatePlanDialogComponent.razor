@@ -24,11 +24,11 @@
 
         </div>
 
-        <div class="row mt-2">
+        <div class="row mt-3">
             @if (planType == PlanType.Overwork)
             {
-                <div class="col-8">
-                    <label>Тип</label>
+                <div class="col-7">
+                    <label>Магазин</label>
                     <select class="form-select form-select-sm" name="name" @bind="storeId">
                         <option value="@Guid.Empty">Не выбран</option>
                         @if (allStories != null)
@@ -40,13 +40,32 @@
                         }
                     </select>
                 </div>
-                <div class="col-4">
-                    <label>Тип</label>
+                <div class="col-5">
+                    <label>Вид подработки (1С)</label>
                     <select class="form-select form-select-sm" name="name" @bind="typeOverWork">
-                        <option value="@Guid.Empty">Тип</option>
+                        <option value="@Guid.Empty">Не выбран</option>
                         @if (typeWorks != null)
                         {
                             @foreach (var typeWork in typeWorks)
+                            {
+                                <option value="@typeWork.Id">@typeWork.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+            }
+        </div>
+
+        <div class="row mt-3">
+            @if (planType == PlanType.Overwork)
+            {
+                <div class="col-7">
+                    <label>Детальное описание (не для 1С)</label>
+                    <select class="form-select form-select-sm" name="name" @bind="customOverwork">
+                        <option value="@Guid.Empty">Не выбран</option>
+                        @if (customTypeWorks != null)
+                        {
+                            @foreach (var typeWork in customTypeWorks)
                             {
                                 <option value="@typeWork.Id">@typeWork.Name</option>
                             }
@@ -88,11 +107,13 @@
 
     private List<StoreEntity> allStories { get; set; }
     private List<TypeOverWorkEntity> typeWorks { get; set; } = new List<TypeOverWorkEntity>();
+    private List<CustomTypeWorkEntity> customTypeWorks { get; set; } = new List<CustomTypeWorkEntity>();
     private DateTime begin { get; set; }
     private DateTime end { get; set; }
     private PlanType planType { get; set; } = PlanType.Plan;
     private Guid storeId { get; set; }
     private Guid typeOverWork { get; set; }
+    private Guid customOverwork { get; set; }
 
     private CustomModalDialog modalDialog { get; set; } = new ();
 
@@ -109,7 +130,8 @@
             using var context = await contextFactory.Create();
 
             allStories = context.Stores.OrderBy(x => x.Name).ToList();
-            typeWorks = context.TypeOverWorks.OrderBy(x => x.Name).ToList();
+            typeWorks = await context.TypeOverWorks.OrderBy(x => x.Name).ToListAsync();
+            customTypeWorks = context.CustomTypeWorks.OrderBy(x => x.Name).ToList();
             typeOverWork = typeWorks.FirstOrDefault().Id;
         }
         catch (Exception ex)
@@ -127,7 +149,8 @@
     {
         try
         {
-            await PlanService.Create(EmployeeId, planType, begin, end, storeId, typeOverWork);
+            Guid? customOverworkId = customOverwork == Guid.Empty ? null : customOverwork;
+            await PlanService.Create(EmployeeId, planType, begin, end, storeId, typeOverWork, customOverworkId);
             await SyncEmployeeService.UpdateUser(EmployeeId);
 
             StateHasChanged();
