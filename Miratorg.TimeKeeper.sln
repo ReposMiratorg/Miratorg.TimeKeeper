@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miratorg.TimeKeeper.Busines
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miratorg.TimeKeeper.DataAccess", "Miratorg.TimeKeeper.DataAccess\Miratorg.TimeKeeper.DataAccess.csproj", "{C4B876CC-C6E8-4893-8983-1C482ADD0BB1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miratorg.TimeKeeper.Tests", "Miratorg.TimeKeeper.Tests\Miratorg.TimeKeeper.Tests.csproj", "{BCBD118B-73D4-417D-946B-75C32298B87F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,14 @@ Global
 		{C4B876CC-C6E8-4893-8983-1C482ADD0BB1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C4B876CC-C6E8-4893-8983-1C482ADD0BB1}.Release|x64.ActiveCfg = Release|Any CPU
 		{C4B876CC-C6E8-4893-8983-1C482ADD0BB1}.Release|x64.Build.0 = Release|Any CPU
+		{BCBD118B-73D4-417D-946B-75C32298B87F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCBD118B-73D4-417D-946B-75C32298B87F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCBD118B-73D4-417D-946B-75C32298B87F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BCBD118B-73D4-417D-946B-75C32298B87F}.Debug|x64.Build.0 = Debug|Any CPU
+		{BCBD118B-73D4-417D-946B-75C32298B87F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCBD118B-73D4-417D-946B-75C32298B87F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCBD118B-73D4-417D-946B-75C32298B87F}.Release|x64.ActiveCfg = Release|Any CPU
+		{BCBD118B-73D4-417D-946B-75C32298B87F}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
