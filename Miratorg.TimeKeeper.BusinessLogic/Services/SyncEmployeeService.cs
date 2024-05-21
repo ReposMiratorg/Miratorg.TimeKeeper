@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Miratorg.TimeKeeper.BusinessLogic.Services;
+﻿namespace Miratorg.TimeKeeper.BusinessLogic.Services;
 
 public class SyncEmployeeService : IHostedService
 {
@@ -66,6 +64,7 @@ public class SyncEmployeeService : IHostedService
             .Include(x => x.ScudInfos)
             .Include(x => x.Plans).ThenInclude(x => x.TypeOverWork)
             .Include(x => x.Absences)
+            .Include(x => x.ManualScuds)
             .OrderBy(x => x.Name)
             .AsNoTrackingWithIdentityResolution()
             .ToListAsync();
@@ -142,7 +141,9 @@ public class SyncEmployeeService : IHostedService
             var employee = await dbContext.Employees
                 .Include(x => x.Schedule).ThenInclude(x => x.Dates)
                 .Include(x => x.ScudInfos)
-                .Include(x => x.Plans)
+                .Include(x => x.Plans).ThenInclude(x => x.TypeOverWork)
+                .Include(x => x.Absences)
+                .Include(x => x.ManualScuds)
                 .AsNoTrackingWithIdentityResolution()
                 .FirstOrDefaultAsync(x => x.Id == userId);
 

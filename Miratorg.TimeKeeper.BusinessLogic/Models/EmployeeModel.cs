@@ -34,6 +34,20 @@ public class ScudInfoModel
 {
     public DateTime Begin { get; set; }
     public DateTime End { get; set; }
+    public ScudInfoType ScudInfoType { get; set; }
+}
+
+public enum ScudInfoType
+{
+    /// <summary>
+    /// Данные получены из СКУДа
+    /// </summary>
+    Scud = 1,
+
+    /// <summary>
+    /// Данные введены в ручную
+    /// </summary>
+    Manual = 2
 }
 
 /// <summary>

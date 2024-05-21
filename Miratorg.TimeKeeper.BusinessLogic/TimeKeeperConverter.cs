@@ -2,6 +2,21 @@
 
 public  class TimeKeeperConverter
 {
+    public static bool CheckInterval(DateTime currentTime, DateTime beginInterval, DateTime? endInterval)
+    {
+        if (endInterval == null)
+        {
+            return false;
+        }
+
+        if (beginInterval <= currentTime && currentTime <= endInterval)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public static EmployeeModel Convert(EmployeeEntity entity)
     {
         EmployeeModel employee = new EmployeeModel()
@@ -38,7 +53,20 @@ public  class TimeKeeperConverter
             var scudModel = new ScudInfoModel()
             {
                 Begin = scudInfoEntity.Input,
-                End = scudInfoEntity.Output
+                End = scudInfoEntity.Output,
+                ScudInfoType = ScudInfoType.Scud
+            };
+
+            employee.ScudInfos.Add(scudModel);
+        }
+
+        foreach (var item in entity.ManualScuds)
+        {
+            var scudModel = new ScudInfoModel()
+            {
+                Begin = item.Input,
+                End = item.Output,
+                ScudInfoType = ScudInfoType.Manual
             };
 
             employee.ScudInfos.Add(scudModel);
