@@ -97,7 +97,7 @@ public class ApiService : IApiService
         for (DateTime currentDate = from; currentDate <= to; currentDate = currentDate.AddDays(1))
         {
             List<PlanEntity> currentPlans = plans
-                .Where(x => x.StoreId == storeId)
+                //.Where(x => x.StoreId == storeId)
                 .Where(x => x.Begin >= currentDate && x.Begin <= currentDate.AddDays(1))
                 .ToList();
 
@@ -118,7 +118,7 @@ public class ApiService : IApiService
                     employeeId = code1C,
                     dovertime = overwork_minutesDay,
                     novertime = overwork_minutesNight,
-                    worktype = @"\u042F",
+                    worktype = "Я",
                     worktime = new List<Worktime>()
                 };
 
@@ -175,7 +175,7 @@ public class ApiService : IApiService
                     
                     dovertime = 0,
                     novertime = 0,
-                    worktype = @"\u0412",
+                    worktype = "я",
                     worktime = new List<Worktime>()
                 };
 
