@@ -11,7 +11,7 @@
 
             @if (IsShowOverWork)
             {
-                <OveWorkRecordComponent CurrentDate="currentDate" PlanedIntervals="overworkIntervals" />
+                <OveWorkRecordComponent CurrentDate="currentDate" OverWorkPlanedIntervals="overworkIntervals" />
             }
 
             @if (IsShow1C)
@@ -21,7 +21,7 @@
 
             @if (IsShowScud)
             {
-                <ScudComponent CurrentDate="currentDate" ScudInfoModels="scudInfoModels" />
+                <ScudComponent CurrentDate="currentDate" ScudInfoModels="scudInfoModels" PlanedIntervals="planedIntervals" OverWorkPlanedIntervals="overworkIntervals" />
             }
 
             @if (IsShowReasonAbsent)
