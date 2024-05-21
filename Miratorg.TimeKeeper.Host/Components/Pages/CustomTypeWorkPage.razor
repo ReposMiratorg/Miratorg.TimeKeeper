@@ -1,0 +1,108 @@
+﻿@attribute [RouteAttribute(RoutePages.WORK_CUSTOM)]
+
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                
+            </div>
+            <h4 class="page-title">Пользовательские виды работ</h4>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-6">
+        <div class="card">
+            <div class="card-header">
+                <div class="row mt-3">
+                    <div class="col-9">
+                        <input class="form-control form-control-sm" @bind="customWork" placeholder="Новая работа"/>
+                    </div>
+                    <div class="col-3">
+                        <button class="btn btn-sm btn-info" @onclick="Create">Добавить</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Вид</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (customTypeWorkEntities != null)
+                        {
+                            @foreach (var item in customTypeWorkEntities)
+                            {
+                                <tr>
+                                    <td>@item.Name</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Inject]
+    public ILogger<CustomTypeWorkPage> Logger { get; set; }
+
+    [Inject]
+    public ITimeKeeperDbContextFactory dbContextFactory { get; set; }
+
+    private List<CustomTypeWorkEntity> customTypeWorkEntities { get; set; }
+
+    private string customWork { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UpdateTypeWork();
+    }
+
+    private async Task Create()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(customWork))
+            {
+                return;
+            }
+
+            var dbContext = await dbContextFactory.Create();
+            dbContext.CustomTypeWorks.Add(new CustomTypeWorkEntity()
+                {
+                    Name = customWork
+                });
+
+            await dbContext.SaveChangesAsync();
+
+            customWork = string.Empty;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error CustomTypeWorkPage::Create");
+        }
+
+        await UpdateTypeWork();
+    }
+
+    private async Task UpdateTypeWork()
+    {
+        try
+        {
+            var dbContext = await dbContextFactory.Create();
+            var customTypeWorks = await dbContext.CustomTypeWorks.OrderBy(x => x.Name).ToListAsync();
+            customTypeWorkEntities = customTypeWorks;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error CustomTypeWorkPage::UpdateTypeWork");
+        }
+    }
+}

@@ -14,7 +14,7 @@ public class PlanEntity : BaseEntity
     public Guid? CustomTypeWorkId { get; set; }
 
     [ForeignKey("CustomTypeWorkId")]
-    public virtual CustomTypeWorkEntity CustomTypeWork { get; set; }
+    public virtual CustomTypeWorkEntity? CustomTypeWork { get; set; }
 
     public Guid? TypeOverWorkId { get; set; }
 
