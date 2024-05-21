@@ -44,6 +44,17 @@ public  class TimeKeeperConverter
             employee.ScudInfos.Add(scudModel);
         }
 
+        foreach (var item in entity.ManualScuds)
+        {
+            var scudModel = new ScudInfoModel()
+            {
+                Begin = item.Input,
+                End = item.Output
+            };
+
+            employee.ScudInfos.Add(scudModel);
+        }
+
         if (entity.Schedule?.Dates != null)
         {
             foreach (var item in entity.Schedule.Dates)
