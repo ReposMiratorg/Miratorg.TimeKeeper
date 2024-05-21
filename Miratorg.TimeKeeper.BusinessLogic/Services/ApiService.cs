@@ -1,4 +1,6 @@
 ﻿using Miratorg.TimeKeeper.BusinessLogic.Models.api;
+using System.Numerics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Miratorg.TimeKeeper.BusinessLogic.Services;
 
@@ -71,33 +73,8 @@ public class ApiService : IApiService
 
                 foreach (var employee in employees) 
                 {
-                    foreach (var plan in employee.Plans)
-                    {
-                        if (plan.StoreId == store.Id && from.Date >= plan.Begin.Date && plan.End.Date <= to.Date)
-                        {
-                            var timesheet = new Timesheet()
-                            {
-                                employeeId = employee.Guid1C.ToString(),
-                                date = plan.Begin.ToString("yyyy-MM-dd"),
-                                dep = new Dep() { code = store1cId.ToString() },
-                                nvalue = 0,
-                                dvalue = CalcTimeMinutes(plan.Begin, plan.End),
-                                dovertime = 0,
-                                novertime = 0,
-                                worktype = "\u042F",
-                                worktime = new List<Worktime>()
-                            };
-
-                            timesheet.worktime.Add(new Worktime()
-                            {
-                                dvalue = CalcTimeMinutes(plan.Begin, plan.End),
-                                nvalue = 0,
-                                type = "regular"
-                            });
-
-                            response.timesheets.Add(timesheet);
-                        }
-                    }
+                    var times = Calc(employee.Plans, from, to, store1cId, employee.Guid1C.ToString());
+                    response.timesheets.AddRange(times);
                 }
 
                 return response;
@@ -111,6 +88,102 @@ public class ApiService : IApiService
         }
 
         return new ResponseDto();
+    }
+
+    private List<Timesheet> Calc(List<PlanEntity> plans, DateTime from, DateTime to, Guid storeId, string code1C)
+    {
+        List<Timesheet> timesheets = new List<Timesheet>();
+
+        for (DateTime currentDate = from; currentDate <= to; currentDate = currentDate.AddDays(1))
+        {
+            List<PlanEntity> currentPlans = plans
+                .Where(x => x.StoreId == storeId)
+                .Where(x => x.Begin >= currentDate && x.Begin <= currentDate.AddDays(1))
+                .ToList();
+
+            if (currentPlans.Count > 0)
+            {
+                int plan_minutesDay = 0;
+                int plan_minutesNight = 0;
+
+                int overwork_minutesDay = 0;
+                int overwork_minutesNight = 0;
+
+                Timesheet timesheet = new Timesheet()
+                {
+                    date = currentDate.ToString("yyyy-MM-dd"),
+                    dep = new Dep() { code = storeId.ToString() },
+                    nvalue = plan_minutesNight,
+                    dvalue = plan_minutesDay,
+                    employeeId = code1C,
+                    dovertime = overwork_minutesDay,
+                    novertime = overwork_minutesNight,
+                    worktype = @"\u042F",
+                    worktime = new List<Worktime>()
+                };
+
+                foreach (PlanEntity plan in currentPlans.Where(x => x.PlanType == PlanType.Plan).ToList())
+                {
+                    var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightHours(plan.Begin, plan.End);
+
+                    plan_minutesDay += (int)dayMinutes;
+                    plan_minutesNight += (int)nightMinutes;
+
+                    timesheet.worktime.Add(
+                        new Worktime()
+                        {
+                            type = "regular",
+                            dvalue = (int)dayMinutes,
+                            nvalue = (int)nightMinutes,
+                        });
+                }
+
+                timesheet.nvalue = plan_minutesNight;
+                timesheet.dvalue = plan_minutesDay;
+
+                foreach (PlanEntity plan in currentPlans.Where(x => x.PlanType == PlanType.Overwork).ToList())
+                {
+                    var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightHours(plan.Begin, plan.End);
+
+                    overwork_minutesDay += (int)dayMinutes;
+                    overwork_minutesNight += (int)nightMinutes;
+
+                    timesheet.worktime.Add(
+                        new Worktime()
+                        {
+                            dvalue = (int)dayMinutes,
+                            nvalue = (int)nightMinutes,
+                            type = "regular"
+                        });
+                }
+
+                timesheet.dovertime = overwork_minutesDay;
+                timesheet.novertime = overwork_minutesNight;
+
+                timesheets.Add(timesheet);
+            }
+            else
+            {
+                Timesheet timesheet = new Timesheet()
+                {
+                    date = currentDate.ToString("yyyy-MM-dd"),
+                    dep = new Dep() { code = storeId.ToString() },
+                    nvalue = 0,
+                    dvalue = 0,
+
+                    employeeId = code1C,
+                    
+                    dovertime = 0,
+                    novertime = 0,
+                    worktype = @"\u0412",
+                    worktime = new List<Worktime>()
+                };
+
+                timesheets.Add(timesheet);
+            }
+        }
+
+        return timesheets;
     }
 
     public async Task<ResponseDto> GetManual(RequestDto requestDto)
