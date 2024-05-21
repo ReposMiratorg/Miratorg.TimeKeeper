@@ -96,4 +96,46 @@ public  class TimeKeeperConverter
 
         return employee;
     }
+
+    public static (double dayHours, double nightHours) CalculateDayAndNightHours(DateTime begin, DateTime end)
+    {
+        // Определение времени начала и конца дневного периода
+        DateTime dayStart = new DateTime(begin.Year, begin.Month, begin.Day, 6, 0, 0);
+        DateTime dayEnd = new DateTime(begin.Year, begin.Month, begin.Day, 20, 0, 0);
+
+        double dayHours = 0.0;
+        double nightHours = 0.0;
+
+        if (end < dayStart)
+        {
+            // Весь интервал ночной
+            nightHours = (end - begin).TotalMinutes;
+        }
+        else if (begin >= dayEnd)
+        {
+            // Весь интервал ночной
+            nightHours = (end - begin).TotalMinutes;
+        }
+        else
+        {
+            // Начало дневного времени после начала интервала
+            if (begin < dayStart)
+            {
+                nightHours += (dayStart - begin).TotalMinutes;
+            }
+
+            // Конец дневного времени перед концом интервала
+            if (end > dayEnd)
+            {
+                nightHours += (end - dayEnd).TotalMinutes;
+            }
+
+            // Пересечение дневного времени с интервалом
+            DateTime effectiveDayStart = begin > dayStart ? begin : dayStart;
+            DateTime effectiveDayEnd = end < dayEnd ? end : dayEnd;
+            dayHours += (effectiveDayEnd - effectiveDayStart).TotalMinutes;
+        }
+
+        return (dayHours, nightHours);
+    }
 }
