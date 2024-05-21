@@ -14,7 +14,7 @@
 
 @code {
     [Parameter]
-    public List<PlanDetailModel> PlanedIntervals { get; set; }
+    public List<PlanDetailModel> OverWorkPlanedIntervals { get; set; }
 
     [Parameter]
     public DateTime CurrentDate { get; set; }
@@ -32,7 +32,7 @@
     {
         plan = new bool[24];
         interval = string.Empty;
-        foreach (var planInterval in PlanedIntervals)
+        foreach (var planInterval in OverWorkPlanedIntervals)
         {
             if (CurrentDate.AddDays(1) >= planInterval.Begin && CurrentDate <= planInterval.End)
             {
