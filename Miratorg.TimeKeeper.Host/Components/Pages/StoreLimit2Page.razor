@@ -1,0 +1,64 @@
+﻿@attribute [RouteAttribute(RoutePages.STORE_LIMIT_2)]
+
+<div class="row">
+    <div class="col-12">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th class="col-2">Название магазина</th>
+                    <th class="col">Январь</th>
+                    <th class="col">Февраль</th>
+                    <th class="col">Март</th>
+                    <th class="col">Апрель</th>
+                    <th class="col">Май</th>
+                    <th class="col">Июнь</th>
+                    <th class="col">Июль</th>
+                    <th class="col">Август</th>
+                    <th class="col">Сентябрь</th>
+                    <th class="col">Октябрь</th>
+                    <th class="col">Ноябрь</th>
+                    <th class="col">Декабрь</th>
+                    <th class="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if(stores != null)
+                {
+                    foreach (var store in stores)
+                    {
+                        <StoreLimit2Component StoreId="store.Id" Action="UpdateStores"/>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+
+    [Inject]
+    public ITimeKeeperDbContextFactory contextFactory { get; set; }
+
+    [Inject]
+    public ILogger<StoreLimitPage> Logger { get; set; }
+
+    private List<StoreEntity> stores { get; set; } = new List<StoreEntity>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UpdateStores();
+    }
+
+    private async Task UpdateStores()
+    {
+        try
+        {
+            var dbContext = await contextFactory.Create();
+            stores = await dbContext.Stores.OrderBy(x => x.Name).AsNoTracking().ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Ошибка при загрузке магазинов");
+        }
+    }
+}
