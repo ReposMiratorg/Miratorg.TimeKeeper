@@ -40,8 +40,11 @@
         }
     </div>
     <div class="col-2">
-        <labe>Лимит часов на месяц</labe>
-        <input class="form-control form-control-sm @limitColor" @bind="totalMessage" disabled />
+        @if (_selectedStore != Guid.Empty)
+        {
+            <labe>Лимит часов на месяц</labe>
+            <input class="form-control form-control-sm @limitColor" @bind="totalMessage" disabled />
+        }
     </div>
 </div>
 
@@ -186,11 +189,11 @@
     private DateTime _selectedWeekBeginDay { get; set; }
     private List<DateTime> weekStarts { get; set; } = new List<DateTime>();
 
-    private bool _isShowPlan { get; set; }
-    private bool _isShowOverWork { get; set; }
+    private bool _isShowPlan { get; set; } = true;
+    private bool _isShowOverWork { get; set; } = true;
     private bool _isShow1C { get; set; }
-    private bool _isShowScud { get; set; }
-    private bool _isShowReasonAbcent { get; set; }
+    private bool _isShowScud { get; set; } = true;
+    private bool _isShowReasonAbcent { get; set; } = true;
 
     private PeriodMode periodMode { get; set; } = PeriodMode.Week;
 
