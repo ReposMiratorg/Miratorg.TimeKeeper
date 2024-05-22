@@ -1,22 +1,20 @@
-﻿<tr>
-    @if (Store != null)
-    {
-        <td>@Store.Name</td>
-        <td><input class="form-control from-control-sm" @bind="Store.HourLimit" /></td>
-        <td><input class="form-control from-control-sm" @bind="Store.HourLimit" /></td>
-        <td><input class="form-control from-control-sm" @bind="Store.HourLimit" /></td>
-        <td><input class="form-control from-control-sm" @bind="Store.HourLimit" /></td>
-        <td><input class="form-control from-control-sm" @bind="Store.HourLimit" /></td>
-        <td><input class="form-control from-control-sm" @bind="Store.HourLimit" /></td>
-        <td><input class="form-control from-control-sm" @bind="Store.HourLimit" /></td>
-        <td><input class="form-control from-control-sm" @bind="Store.HourLimit" /></td>
-        <td><input class="form-control from-control-sm" @bind="Store.HourLimit" /></td>
-        <td><input class="form-control from-control-sm" @bind="Store.HourLimit" /></td>
-        <td><input class="form-control from-control-sm" @bind="Store.HourLimit" /></td>
-        <td><input class="form-control from-control-sm" @bind="Store.HourLimit" /></td>
+﻿
+<tr>
+        <td>@StoreName</td>
+        <td><input class="form-control from-control-sm" @bind="limitYear[0]" /></td>
+        <td><input class="form-control from-control-sm" @bind="limitYear[1]" /></td>
+        <td><input class="form-control from-control-sm" @bind="limitYear[2]" /></td>
+        <td><input class="form-control from-control-sm" @bind="limitYear[3]" /></td>
+        <td><input class="form-control from-control-sm" @bind="limitYear[4]" /></td>
+        <td><input class="form-control from-control-sm" @bind="limitYear[5]" /></td>
+        <td><input class="form-control from-control-sm" @bind="limitYear[6]" /></td>
+        <td><input class="form-control from-control-sm" @bind="limitYear[7]" /></td>
+        <td><input class="form-control from-control-sm" @bind="limitYear[8]" /></td>
+        <td><input class="form-control from-control-sm" @bind="limitYear[9]" /></td>
+        <td><input class="form-control from-control-sm" @bind="limitYear[10]" /></td>
+        <td><input class="form-control from-control-sm" @bind="limitYear[11]" /></td>
 
         <td><button class="btn btn-info btn-sm" @onclick="SetValue">Изменить</button></td>
-    }
 </tr>
 
 @code {
@@ -28,9 +26,15 @@
     public EventCallback Action { get; set; }
 
     [Parameter]
-    public DateTime Date { get; set; }
+    public List<StoreLimitEntity> StoreLimits { get; set; }
 
-    public StoreEntity Store { get; set; }
+    [Parameter]
+    public int Year { get; set; }
+
+    [Parameter]
+    public string StoreName { get; set; }
+
+    private int[] limitYear { get; set; } = new int[12];
 
     [Inject]
     public ITimeKeeperDbContextFactory contextFactory { get; set; }
@@ -38,17 +42,22 @@
     [Inject]
     public ILogger<StoreLimitComponent> Logger { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        try
+        if (StoreLimits != null)
         {
-            var context = await contextFactory.Create();
-            var store = await context.Stores.FirstOrDefaultAsync(x => x.Id == StoreId);
-            Store = store;
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, $"Error: {nameof(OnInitializedAsync)}, {nameof(StoreId)}: {StoreId}");
+            for (int i = 0; i < limitYear.Length; i++)
+            {
+                var limit = StoreLimits.FirstOrDefault(x => x.Year == Year && x.Mouth == i);
+                if (limit != null)
+                {
+                    limitYear[i] = limit.Limit;
+                }
+                else
+                {
+                    limitYear[i] = 0;
+                }
+            }
         }
     }
 
@@ -56,10 +65,31 @@
     {
         try
         {
-            var context = await contextFactory.Create();
-            var store = await context.Stores.FirstOrDefaultAsync(x => x.Id == StoreId);
-            store.HourLimit = Store.HourLimit;
-            await context.SaveChangesAsync();
+            var dbContext = await contextFactory.Create();
+            var store = await dbContext.Stores.Include(x => x.Limits).FirstOrDefaultAsync(x => x.Id == StoreId);
+
+            for (int i = 0; i < limitYear.Length; i++)
+            {
+                var limit = store.Limits.FirstOrDefault(x => x.Year == Year && x.Mouth == i);
+                if (limit != null)
+                {
+                    limit.Limit = limitYear[i];
+                }
+                else
+                {
+                    store.Limits.Add(new StoreLimitEntity()
+                        {
+                            Limit = limitYear[i],
+                            Mouth = i,
+                            StoreId = StoreId,
+                            Year = Year
+                        });
+                }
+
+                await dbContext.SaveChangesAsync();
+            }
+            // store.HourLimit = Store.HourLimit;
+            // await context.SaveChangesAsync();
 
             if (Action.HasDelegate)
             {

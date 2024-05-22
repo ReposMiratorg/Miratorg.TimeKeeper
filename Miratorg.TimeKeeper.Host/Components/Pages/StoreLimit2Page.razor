@@ -1,6 +1,18 @@
 ﻿@attribute [RouteAttribute(RoutePages.STORE_LIMIT_2)]
 
 <div class="row">
+    <div class="col">
+        <label></label>
+        <select class="form-control form-control-sm" @bind="year" disabled >
+            @foreach (var item in years)
+            {
+                <option value="@item">@item</option>
+            }
+        </select>
+    </div>
+</div>
+
+<div class="row mt-3">
     <div class="col-12">
         <table class="table table-sm">
             <thead>
@@ -26,7 +38,7 @@
                 {
                     foreach (var store in stores)
                     {
-                        <StoreLimit2Component StoreId="store.Id" Action="UpdateStores"/>
+                        <StoreLimit2Component StoreId="store.Id" StoreName="@store.Name" Year="year" StoreLimits="store.Limits" Action="UpdateStores"/>
                     }
                 }
             </tbody>
@@ -44,6 +56,13 @@
 
     private List<StoreEntity> stores { get; set; } = new List<StoreEntity>();
 
+    private int year { get; set; } = 2024;
+
+    private List<int> years { get; set; } = new List<int>()
+    {
+        2024
+    };
+
     protected override async Task OnInitializedAsync()
     {
         await UpdateStores();
@@ -54,7 +73,7 @@
         try
         {
             var dbContext = await contextFactory.Create();
-            stores = await dbContext.Stores.OrderBy(x => x.Name).AsNoTracking().ToListAsync();
+            stores = await dbContext.Stores.Include(x => x.Limits).OrderBy(x => x.Name).AsNoTracking().ToListAsync();
         }
         catch (Exception ex)
         {
