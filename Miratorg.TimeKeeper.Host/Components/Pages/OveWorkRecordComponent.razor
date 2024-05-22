@@ -7,7 +7,7 @@
         }
     </div>
     <div style="display: flex; position: absolute; flex-direction:row; flex-flow: row nowrap; justify-content: center; align-items: center;height:25px; width: 100%; z-index: 2">
-        <a>@interval</a>
+        <a>@details</a>
     </div>
 
 </div>
@@ -16,7 +16,7 @@
     [Parameter]
     public List<PlanDetailModel> OverWorkPlanedIntervals { get; set; }
 
-    [Parameter]
+    [CascadingParameter(Name = "CurrentDate")]
     public DateTime CurrentDate { get; set; }
 
     bool[] plan { get; set; } = new bool[24];
@@ -26,12 +26,14 @@
         SetHourValue();
     }
 
-    private string interval { get; set; }
+    private TimeSpan interval { get; set; }
+    private string details { get; set; }
 
     private void SetHourValue()
     {
         plan = new bool[24];
-        interval = string.Empty;
+        interval = new TimeSpan();
+
         foreach (var planInterval in OverWorkPlanedIntervals)
         {
             if (CurrentDate.AddDays(1) >= planInterval.Begin && CurrentDate <= planInterval.End)
@@ -42,7 +44,7 @@
                     time = time - 1;
                 }
 
-                interval = $"{planInterval.Begin.ToString("HH:mm")} - {planInterval.End.ToString("HH:mm")} ({time})";
+                interval += TimeSpan.FromMinutes((planInterval.End - planInterval.Begin).TotalMinutes);
                 var date = CurrentDate;
                 for (int i = 0; i < 24; i++)
                 {
@@ -50,13 +52,15 @@
                     {
                         plan[i] = true;
                     }
-                    else
-                    {
-                        plan[i] = false;
-                    }
+
                     date = date.AddHours(1);
                 }
             }
+        }
+
+        if (interval.TotalMinutes > 0)
+        {
+            details = $"{interval.ToString(@"hh\:mm")}";
         }
     }
 }
