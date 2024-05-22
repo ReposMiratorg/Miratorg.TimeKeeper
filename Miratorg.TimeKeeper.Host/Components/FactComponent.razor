@@ -18,7 +18,7 @@
     [Parameter]
     public List<Schedule1CPlanModel> Schedule1CPlans { get; set; }
 
-    [Parameter]
+    [CascadingParameter(Name = "CurrentDate")]
     public DateTime CurrentDate { get; set; }
 
     bool[] plan { get; set; } = new bool[24];

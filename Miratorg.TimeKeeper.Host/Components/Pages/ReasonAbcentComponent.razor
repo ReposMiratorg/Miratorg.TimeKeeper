@@ -20,6 +20,7 @@
     [Parameter]
     public string ReasonAbsent { get; set; }
 
+    [CascadingParameter(Name = "CurrentDate")]
     [Parameter]
     public DateTime CurrentDate { get; set; }
 

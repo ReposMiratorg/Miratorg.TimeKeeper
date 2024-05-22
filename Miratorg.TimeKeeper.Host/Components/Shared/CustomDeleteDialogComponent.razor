@@ -31,18 +31,18 @@
 
     private async Task Delete()
     {
-        if (!Action.HasDelegate)
-        {
-            return;
-        }
-
         try
         {
-            await Action.InvokeAsync();
+            if (Action.HasDelegate)
+            {
+                await Action.InvokeAsync();
+            }
         }
         catch (Exception)
         {
             //ToDo - записать лог и отобразить сообщение
         }
+
+        await Close();
     }
 }
