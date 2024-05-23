@@ -39,11 +39,18 @@
             </div>
         }
     </div>
-    <div class="col-2">
+    <div class="col-1">
         @if (_selectedStore != Guid.Empty)
         {
-            <labe>Лимит часов на месяц</labe>
-            <input class="form-control form-control-sm @limitColor" @bind="totalMessage" disabled />
+            <labe>Лимит на месяц</labe>
+            <input class="form-control form-control-sm @limitColor" @bind="totalPlanMessage" disabled />
+        }
+    </div>
+    <div class="col-1">
+        @if (_selectedStore != Guid.Empty)
+        {
+            <labe>Факт</labe>
+            <input class="form-control form-control-sm @limitColor" @bind="totalPlanMessage" disabled />
         }
     </div>
 </div>
@@ -160,7 +167,7 @@
                 @if (_selectedStore != Guid.Empty)
                 {
                     <tr>
-                        <td><b>Итого часов: @totalMessage</b></td>
+                        <td><b>Итого часов: @totalPlanMessage</b></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -197,7 +204,8 @@
 
     private PeriodMode periodMode { get; set; } = PeriodMode.Week;
 
-    private string totalMessage { get; set; }
+    private string totalPlanMessage { get; set; }
+    private string totalFactMessage { get; set; }
 
     private bool isShowList { get; set; } = false;
     private string filterText { get; set; } = string.Empty;
@@ -377,7 +385,7 @@
         }
         var limit = store?.Limits?.FirstOrDefault(x => x.Year == date.Year && x.Mouth == (date.Month - 1))?.Limit ?? 0;
 
-        totalMessage = $"{hours.ToString("0")} из {(limit.ToString("0") ?? "0")}";
+        totalPlanMessage = $"{hours.ToString("0")} из {(limit.ToString("0") ?? "0")}";
         limitColor = (hours * 1.1) >= limit ? "text-danger" : "";
     }
 
