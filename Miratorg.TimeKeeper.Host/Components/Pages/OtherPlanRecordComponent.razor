@@ -1,0 +1,234 @@
+﻿
+<CustomModalDialog DialogSize="ModalDialogSize.Standard" @ref="modalDialog">
+
+    <FrontObject>
+        <CascadingValue Name="CurrentDate" Value="currentDate">
+            <div style="display:flex; flex-direction:column; align-items: flex-start; width: 190px; height: 70px; background-color: #ced4da" >
+
+               @*  @if(IsShowPlan)
+                {
+                    <PlanRecordComponent PlanedIntervals="planedIntervals" />
+                } *@
+
+                @if (IsShowOverWork)
+                {
+                    <OveWorkRecordComponent OverWorkPlanedIntervals="overworkIntervals" />
+                }
+
+                @if (IsShow1C)
+                {
+                    <FactComponent Schedule1CPlans="schedule1CPlanModels" />
+                }
+
+                @if (IsShowScud)
+                {
+                    <ScudComponent ScudInfoModels="scudInfoModels" PlanedIntervals="planedIntervals" OverWorkPlanedIntervals="overworkIntervals" />
+                }
+
+                @if (IsShowReasonAbsent)
+                {
+                    <ReasonAbcentComponent ReasonAbsent="@risonAbsent" />
+                }
+
+            </div>
+        </CascadingValue>
+    </FrontObject>
+
+    <Body>
+        <div class="row mb-2">
+            <div class="col">
+                <CreatePlanDialogComponent Action="UdateUIAction" CurrentDate="currentDate" EmployeeId="EmployeeId" StoreId="StoreId" />
+            </div>
+            <div class="col">
+                <EditCreatePlanDialog Action="UdateUIAction" CurrentDate="currentDate" EmoloyeeId="EmployeeId"  />
+            </div>
+        </div>
+
+        @if (planedIntervals != null)
+        {
+            foreach (var plan in planedIntervals)
+            {
+                var message = $"{plan.Begin.ToShortTimeString()} - {plan.End.ToShortTimeString()} План";
+
+                <div class="row">
+                    <div class="col-9">
+                        <input class="form-control form-control-sm" value="@message" disabled />
+                    </div>
+                    <div class="col-3">
+                        <CustomDeleteDialogComponent Message="@message" Action="@(() => RemovePaln(plan.Id))" />
+                    </div>
+                </div>
+            }
+        }
+
+        @if (overworkIntervals != null)
+        {
+            foreach (var plan in overworkIntervals)
+            {
+                var message = $"{plan.Begin.ToShortTimeString()} - {plan.End.ToShortTimeString()} Подработка: {plan.TypeOverWorkName}";
+
+                <div class="row mt-2">
+                    <div class="col-9">
+                        <input class="form-control form-control-sm" value="@message" disabled />
+                    </div>
+                    <div class="col-3">
+                        <CustomDeleteDialogComponent Message="@message" Action="@(() => RemovePaln(plan.Id))" />
+                    </div>
+                </div>
+            }
+        }
+
+        <div class="row">
+            <div class="col">
+                
+            </div>
+        </div>
+    </Body>
+
+    <Footer>
+        <button class="btn btn-primary btn-sm" @onclick="Close">Закрыть</button>
+    </Footer>
+
+</CustomModalDialog>
+
+
+@code {
+
+    [Parameter]
+    public EventCallback Action { get; set; }
+
+    [Inject]
+    public IPlanService PlanService { get; set; }
+
+    private CustomModalDialog modalDialog { get; set; } = new();
+
+    public ILogger<PlanDayComponent> Logger { get; set; }
+
+    [Parameter]
+    public Guid StoreId { get; set; }
+
+    [Parameter]
+    public DateTime Day { get; set; }
+
+    private DayEnum weekDay { get; set; }
+
+    [Parameter]
+    public Guid EmployeeId { get; set; }
+
+    [Parameter]
+    public List<EmployeeModel> AdditionalEmployeeModels { get; set; }
+
+    // [Parameter]
+    // public bool IsShowPlan { get; set; }
+
+    [Parameter]
+    public bool IsShowOverWork { get; set; }
+
+    [Parameter]
+    public bool IsShow1C { get; set; }
+
+    [Parameter]
+    public bool IsShowScud { get; set; }
+
+    [Parameter]
+    public bool IsShowReasonAbsent { get; set; }
+
+    // [Parameter]
+    // public int LimitPlanHours { get; set; }
+
+    // [Parameter]
+    // public TimeSpan PlanHours { get; set; }
+
+    private DateTime currentDate { get; set; }
+
+    private List<PlanDetailModel> planedIntervals { get; set; }
+    private List<PlanDetailModel> overworkIntervals { get; set; }
+    private List<Schedule1CPlanModel> schedule1CPlanModels { get; set; }
+    private List<ScudInfoModel> scudInfoModels { get; set; }
+    private string risonAbsent { get; set; }
+
+    protected override async void OnParametersSet()
+    {
+        await UpdateUI();
+    }
+
+    private async Task UpdateUI()
+    {
+        try
+        {
+            currentDate = Day;
+            weekDay = Helpers.WeekConverter.Convert(currentDate);
+
+            var dates = AdditionalEmployeeModels.Where(x => x.Id == EmployeeId).SelectMany(x => x.Plans).ToList();
+            planedIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate.AddDays(1) && x.PlanType == PlanType.Plan).ToList();
+            overworkIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate.AddDays(1) && x.PlanType == PlanType.Overwork).ToList();
+
+            var schedules = AdditionalEmployeeModels.Where(x => x.Id == EmployeeId).SelectMany(x => x.WorkDates);
+            schedule1CPlanModels = schedules.Where(x => x.Begin.Date == currentDate).ToList();
+
+            var scudInfos = AdditionalEmployeeModels.Where(x => x.Id == EmployeeId).SelectMany(x => x.ScudInfos).ToList();
+            scudInfoModels = scudInfos.Where(x => x.Begin.Date == currentDate).ToList();
+
+            var reasonAbsentInfos = AdditionalEmployeeModels.Where(x => x.Id == EmployeeId).SelectMany(x => x.Absences).ToList();
+            var currentReason = reasonAbsentInfos.FirstOrDefault(x => x.RepDate == currentDate);
+            risonAbsent = currentReason?.Description;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, $"Error {nameof(UpdateUI)}: EmployeeId: '{EmployeeId}'. Day: '{Day}'. '{ex.Message}'");
+        }
+    }
+
+    private async Task RemovePaln(Guid id)
+    {
+        await PlanService.Remove(id);
+        await SyncEmployeeService.UpdateUser(EmployeeId);
+        await UpdateUI();
+    }
+
+    private async Task UdateUIAction()
+    {
+        try
+        {
+            if (Action.HasDelegate)
+            {
+                await Action.InvokeAsync();
+            }
+
+            await UpdateUI();
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Ошибка при обновлении текущего диалога");
+        }
+    }
+
+    private async Task Open()
+    {
+        await modalDialog.Open();
+    }
+
+    private async Task Close()
+    {
+        await modalDialog.Close();
+    }
+
+    private async Task Delete()
+    {
+        if (!Action.HasDelegate)
+        {
+            return;
+        }
+
+        try
+        {
+            await Action.InvokeAsync();
+        }
+        catch (Exception)
+        {
+            //ToDo - записать лог и отобразить сообщение
+        }
+    }
+}
