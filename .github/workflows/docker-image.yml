@@ -24,4 +24,4 @@ jobs:
         context: .
         file: ./Miratorg.TimeKeeper.Host/Dockerfile
         push: true
-        tags: kluchnikov/time-keeper:0.2.1
+        tags: kluchnikov/time-keeper:0.2.2
