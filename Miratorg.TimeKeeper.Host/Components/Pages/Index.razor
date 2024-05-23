@@ -149,7 +149,7 @@
                             for (int i = 0; i < 7; i++)
                             {
                                 var currentDate = _selectedWeekBeginDay.AddDays(i);
-                                <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" IsShowReasonAbsent="_isShowReasonAbcent" Day="currentDate" EmployeeId="employee.Id" /></td>
+                                <td><PlanDayComponent LimitPlanHours="limitPlanHours" PlanHours="planHours" StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" IsShowReasonAbsent="_isShowReasonAbcent" Day="currentDate" EmployeeId="employee.Id" /></td>
                             }
                         }
                         else
@@ -158,9 +158,10 @@
 
                             for (var i = s; i < s.AddMonths(1); i = i.AddDays(1))
                             {
-                                <td><PlanDayComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" IsShowReasonAbsent="_isShowReasonAbcent" Day="i" EmployeeId="employee.Id" /></td>
+                                <td><PlanDayComponent LimitPlanHours="limitPlanHours" PlanHours="planHours" StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" IsShowReasonAbsent="_isShowReasonAbcent" Day="i" EmployeeId="employee.Id" /></td>
                             }
                         }
+
                     </tr>
                 }
 
@@ -327,6 +328,11 @@
 
     private void SelectStory(Guid storeId)
     {
+        planHours = new TimeSpan();
+        factHours = new TimeSpan();
+        limitPlanHours = 0;
+        limitColor = string.Empty;
+
         var store = allStories.FirstOrDefault(x => x.Id == storeId);
         employees = SyncEmployeeService.Employees.Where(x => x.StoreId == storeId).ToList();
 
@@ -370,8 +376,6 @@
         }
 
         additionalEmployees = additionals;
-        double planHours = 0;
-        TimeSpan factHours = new TimeSpan();
 
         if (store != null)
         {
@@ -379,7 +383,7 @@
             {
                 if (empl.MountHours.TryGetValue(date, out var time))
                 {
-                    planHours += time;
+                    planHours += TimeSpan.FromHours(time);
                 }
 
                 if(empl.ScudInfos != null)
@@ -392,14 +396,18 @@
             }
         }
 
-        var limit = store?.Limits?.FirstOrDefault(x => x.Year == date.Year && x.Mouth == (date.Month - 1))?.Limit ?? 0;
+        limitPlanHours = store?.Limits?.FirstOrDefault(x => x.Year == date.Year && x.Mouth == (date.Month - 1))?.Limit ?? 0;
 
-        totalPlanMessage = $"{planHours.ToString("0")} из {(limit.ToString("0") ?? "0")}";
+        totalPlanMessage = $"{planHours.TotalHours.ToString("0")} из {(limitPlanHours.ToString("0") ?? "0")}";
         totalFactMessage = $"{factHours.ToString(@"hh\:mm")}";
-        limitColor = (planHours * 1.1) >= limit ? "text-danger" : "";
+        var checkPlan = planHours.TotalHours * 1.1;
+        limitColor = checkPlan >= limitPlanHours ? "text-danger" : "";
     }
 
-    private string limitColor { get; set; }
+    private TimeSpan planHours { get; set; } = new TimeSpan();
+    private TimeSpan factHours { get; set; } = new TimeSpan();
+    private int limitPlanHours { get; set; } = 0;
+    private string limitColor { get; set; } = string.Empty;
 
     private void HandleSelectionTypeChange(ChangeEventArgs e)
     {

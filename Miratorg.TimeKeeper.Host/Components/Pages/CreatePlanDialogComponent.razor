@@ -5,6 +5,7 @@
     </FrontObject>
 
     <Body>
+
         <div class="row">
             <div class="col-4">
                 <label>Начало</label>
@@ -77,8 +78,24 @@
     </Body>
 
     <Footer>
-        <button class="btn btn-primary btn-sm" @onclick="Create">Добавить</button>
-        <button class="btn btn-info btn-sm" @onclick="Close">Отмена</button>
+        <div class="row">
+            <div class="col-6">
+                @* if ((LimitPlanHours + (end - begin).TotalHours) <= PlanHours.TotalHours) *@
+                @if (LimitPlanHours <= PlanHours.TotalHours)
+                {
+                    <a class="text-danger">Превышен лимит часов на месяц</a>
+                }
+            </div>
+            <div class="col-6">
+
+                @* if ((LimitPlanHours + (end - begin).TotalHours) > PlanHours.TotalHours) *@
+                @if (LimitPlanHours > PlanHours.TotalHours)
+                {
+                    <button class="btn btn-primary btn-sm" @onclick="Create">Добавить</button>
+                }
+                <button class="btn btn-info btn-sm" @onclick="Close">Отмена</button>
+            </div>
+        </div>
     </Footer>
 
 </CustomModalDialog>
@@ -95,6 +112,12 @@
 
     [Parameter]
     public Guid StoreId { get; set; }
+
+    [Parameter]
+    public int LimitPlanHours { get; set; }
+
+    [Parameter]
+    public TimeSpan PlanHours { get; set; }
 
     [Inject]
     public ITimeKeeperDbContextFactory contextFactory { get; set; }
@@ -116,6 +139,13 @@
     private Guid customOverwork { get; set; }
 
     private CustomModalDialog modalDialog { get; set; } = new ();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var x = PlanHours.TotalHours;
+        var y = LimitPlanHours;
+    }
+
 
     private async Task Open()
     {
