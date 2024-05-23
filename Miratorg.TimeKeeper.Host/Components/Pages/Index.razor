@@ -50,7 +50,7 @@
         @if (_selectedStore != Guid.Empty)
         {
             <labe>Факт</labe>
-            <input class="form-control form-control-sm @limitColor" @bind="totalPlanMessage" disabled />
+            <input class="form-control form-control-sm" @bind="totalFactMessage" disabled />
         }
     </div>
 </div>
@@ -370,23 +370,33 @@
         }
 
         additionalEmployees = additionals;
-        double hours = 0;
+        double planHours = 0;
+        TimeSpan factHours = new TimeSpan();
 
         if (store != null)
         {
-
             foreach (var empl in employees)
             {
                 if (empl.MountHours.TryGetValue(date, out var time))
                 {
-                    hours += time;
+                    planHours += time;
+                }
+
+                if(empl.ScudInfos != null)
+                {
+                    foreach(var scudInfo in empl.ScudInfos)
+                    {
+                        factHours += (scudInfo.End - scudInfo.Begin);
+                    }
                 }
             }
         }
+
         var limit = store?.Limits?.FirstOrDefault(x => x.Year == date.Year && x.Mouth == (date.Month - 1))?.Limit ?? 0;
 
-        totalPlanMessage = $"{hours.ToString("0")} из {(limit.ToString("0") ?? "0")}";
-        limitColor = (hours * 1.1) >= limit ? "text-danger" : "";
+        totalPlanMessage = $"{planHours.ToString("0")} из {(limit.ToString("0") ?? "0")}";
+        totalFactMessage = $"{factHours.ToString(@"hh\:mm")}";
+        limitColor = (planHours * 1.1) >= limit ? "text-danger" : "";
     }
 
     private string limitColor { get; set; }
