@@ -57,6 +57,7 @@ public class SyncEmployeeService : IHostedService
 
     private async Task UpdateUsers()
     {
+        _logger.LogInformation("SyncUser run");
         using var dbContext = await _timeKeeperDbContextFactory.Create();
 
         var employees = await dbContext.Employees
@@ -79,6 +80,7 @@ public class SyncEmployeeService : IHostedService
 
         Employees.Clear();
         Employees = models;
+        _logger.LogInformation("SyncUser completed");
     }
 
     private async Task SyncAbsence(Guid userId, DateTime begin, DateTime end)

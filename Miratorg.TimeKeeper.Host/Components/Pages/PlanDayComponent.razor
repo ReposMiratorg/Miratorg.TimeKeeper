@@ -37,7 +37,7 @@
     <Body>
         <div class="row mb-2">
             <div class="col">
-                <CreatePlanDialogComponent Action="UdateUIAction" CurrentDate="currentDate" EmployeeId="EmployeeId" StoreId="StoreId" />
+                <CreatePlanDialogComponent Action="UdateUIAction" LimitPlanHours="LimitPlanHours" PlanHours="PlanHours" CurrentDate="currentDate" EmployeeId="EmployeeId" StoreId="StoreId" />
             </div>
             <div class="col">
                 <EditCreatePlanDialog Action="UdateUIAction" CurrentDate="currentDate" EmoloyeeId="EmployeeId"  />
@@ -132,6 +132,12 @@
 
     [Parameter]
     public bool IsShowReasonAbsent { get; set; }
+
+    [Parameter]
+    public int LimitPlanHours { get; set; }
+
+    [Parameter]
+    public TimeSpan PlanHours { get; set; }
 
     private DateTime currentDate { get; set; }
 
