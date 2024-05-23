@@ -96,13 +96,13 @@
                 <td>Время</td>
                 @if (periodMode == PeriodMode.Week)
                 {
-                    <td><DayHeader WeekDay="DayEnum.Monday" WeekBeginDay="_selectedWeekBeginDay" /></td>
-                    <td><DayHeader WeekDay="DayEnum.Tuesday" WeekBeginDay="_selectedWeekBeginDay" /></td>
-                    <td><DayHeader WeekDay="DayEnum.Wednesday" WeekBeginDay="_selectedWeekBeginDay" /></td>
-                    <td><DayHeader WeekDay="DayEnum.Thursday" WeekBeginDay="_selectedWeekBeginDay" /></td>
-                    <td><DayHeader WeekDay="DayEnum.Friday" WeekBeginDay="_selectedWeekBeginDay" /></td>
-                    <td><DayHeader WeekDay="DayEnum.Saturday" WeekBeginDay="_selectedWeekBeginDay" /></td>
-                    <td><DayHeader WeekDay="DayEnum.Sunday" WeekBeginDay="_selectedWeekBeginDay" /></td>
+                    <td><DayHeader WeekDay="DayEnum.Monday" CurrentDate="_selectedWeekBeginDay" /></td>
+                    <td><DayHeader WeekDay="DayEnum.Tuesday" CurrentDate="_selectedWeekBeginDay.AddDays(1)" /></td>
+                    <td><DayHeader WeekDay="DayEnum.Wednesday" CurrentDate="_selectedWeekBeginDay.AddDays(2)" /></td>
+                    <td><DayHeader WeekDay="DayEnum.Thursday" CurrentDate="_selectedWeekBeginDay.AddDays(3)" /></td>
+                    <td><DayHeader WeekDay="DayEnum.Friday" CurrentDate="_selectedWeekBeginDay.AddDays(4)" /></td>
+                    <td><DayHeader WeekDay="DayEnum.Saturday" CurrentDate="_selectedWeekBeginDay.AddDays(5)" /></td>
+                    <td><DayHeader WeekDay="DayEnum.Sunday" CurrentDate="_selectedWeekBeginDay.AddDays(6)" /></td>
                 }
                 else
                 {
@@ -112,7 +112,7 @@
                     for (var i = s; i < s_max; i = i.AddDays(1))
                     {
                         var weekDay = Helpers.WeekConverter.Convert(i);
-                        <td><DayHeader WeekDay="weekDay" WeekBeginDay="i" /></td>
+                        <td><DayHeader WeekDay="weekDay" CurrentDate="i" /></td>
                     }
                 }
             </tr>
