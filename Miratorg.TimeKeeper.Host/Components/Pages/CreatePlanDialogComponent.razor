@@ -75,27 +75,20 @@
                 </div>
             }
         </div>
+
+        @if (Error)
+        {
+            <div class="row mt-3">
+                <div class="col">
+                    <a class="text-danger">Превышен лимит часов на месяц</a>
+                </div>
+            </div>
+        }
     </Body>
 
     <Footer>
-        <div class="row">
-            <div class="col-6">
-                @* if ((LimitPlanHours + (end - begin).TotalHours) <= PlanHours.TotalHours) *@
-                @if (LimitPlanHours <= PlanHours.TotalHours)
-                {
-                    <a class="text-danger">Превышен лимит часов на месяц</a>
-                }
-            </div>
-            <div class="col-6">
-
-                @* if ((LimitPlanHours + (end - begin).TotalHours) > PlanHours.TotalHours) *@
-                @if (LimitPlanHours > PlanHours.TotalHours)
-                {
-                    <button class="btn btn-primary btn-sm" @onclick="Create">Добавить</button>
-                }
-                <button class="btn btn-info btn-sm" @onclick="Close">Отмена</button>
-            </div>
-        </div>
+        <button class="btn btn-primary btn-sm" @onclick="Create">Добавить</button>
+        <button class="btn btn-info btn-sm" @onclick="Close">Отмена</button>
     </Footer>
 
 </CustomModalDialog>
@@ -146,9 +139,10 @@
         var y = LimitPlanHours;
     }
 
-
     private async Task Open()
     {
+        Error = false;
+
         storeId = StoreId;
         begin = CurrentDate.Date.AddHours(8);
         end = CurrentDate.Date.AddHours(20);
@@ -175,10 +169,21 @@
         await modalDialog.Close();
     }
 
+    private bool Error { get; set; }
+
     private async Task Create()
     {
         try
         {
+            var time = (end - begin).TotalHours;
+            if (LimitPlanHours < (PlanHours.TotalHours + time))
+            {
+                Error = true;
+                return;
+            }
+
+            Error = false;
+
             Guid? customOverworkId = customOverwork == Guid.Empty ? null : customOverwork;
             await PlanService.Create(EmployeeId, planType, begin, end, storeId, typeOverWork, customOverworkId);
             await SyncEmployeeService.UpdateUser(EmployeeId);
