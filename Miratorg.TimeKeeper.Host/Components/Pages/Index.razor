@@ -119,6 +119,53 @@
         </thead>
 
         <tbody>
+            @if (additionalEmployees != null)
+            {
+                @foreach (var employee in additionalEmployees)
+                {
+                    <tr>
+                        <td>
+                            <div style="display:flex; flex-direction:column">
+                                <b>
+                                    @employee.Name
+                                </b>
+                                <a>
+                                    @employee.Position
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            @{
+                                // var x = GetFirstDay(_date);
+                                // var time = employee.MountHours[x];
+                                // <div class="text-center">
+                                //     <a class="text-center">@time.ToString("0")</a>
+                                // </div>
+                            }
+                        </td>
+
+                        @if (periodMode == PeriodMode.Week)
+                        {
+                            for (int i = 0; i < 7; i++)
+                            {
+                                var currentDate = _selectedWeekBeginDay.AddDays(i);
+                                <td><OtherPlanRecordComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowOverWork="true" IsShow1C="_isShow1C" IsShowScud="true" IsShowReasonAbsent="true" Day="currentDate" EmployeeId="employee.Id" /></td>
+                            }
+                        }
+                        else
+                        {
+                            var s = GetFirstDay(_date);
+
+                            for (var i = s; i < s.AddMonths(1); i = i.AddDays(1))
+                            {
+                                <td><OtherPlanRecordComponent StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowOverWork="true" IsShow1C="_isShow1C" IsShowScud="true" IsShowReasonAbsent="true" Day="i" EmployeeId="employee.Id" /></td>
+                            }
+                        }
+
+                    </tr>
+                }
+            }
+
             @if (employees != null)
             {
                 @foreach (var employee in employees)
@@ -344,7 +391,7 @@
 
         foreach (var item in xxx)
         {
-            var testData = item.Plans.Where(x => x.PlanType == PlanType.Overwork && x.StoreId == storeId);
+            var testData = item.Plans.Where(x => x.PlanType == PlanType.Overwork && x.StoreId == storeId).ToList();
 
             if (testData.Count() == 0)
             {
@@ -354,21 +401,23 @@
             var empl = new EmployeeModel()
                 {
                     Id = item.Id,
+                    Name = item.Name,
                     StoreId = item.StoreId,
                     Plans = new List<PlanDetailModel>(),
                     ScudInfos = new List<ScudInfoModel>(),
-                    WorkDates = new List<Schedule1CPlanModel>()
+                    WorkDates = new List<Schedule1CPlanModel>(),
+                    MountHours = new Dictionary<DateTime, double>()
                 };
 
-            foreach (var plan in testData)
+            foreach (var planOverwork in testData)
             {
                 empl.Plans.Add(new PlanDetailModel()
                     {
-                        Begin = plan.Begin,
-                        End = plan.End,
-                        PlanType = plan.PlanType,
-                        Id = plan.Id,
-                        StoreId = plan.StoreId
+                        Begin = planOverwork.Begin,
+                        End = planOverwork.End,
+                        PlanType = planOverwork.PlanType,
+                        Id = planOverwork.Id,
+                        StoreId = planOverwork.StoreId
                     });
             }
 
@@ -377,24 +426,24 @@
 
         additionalEmployees = additionals;
 
-        if (store != null)
-        {
-            foreach (var empl in employees)
-            {
-                if (empl.MountHours.TryGetValue(date, out var time))
-                {
-                    planHours += TimeSpan.FromHours(time);
-                }
+        // if (store != null)
+        // {
+        //     foreach (var empl in employees)
+        //     {
+        //         if (empl.MountHours.TryGetValue(date, out var time))
+        //         {
+        //             planHours += TimeSpan.FromHours(time);
+        //         }
 
-                if(empl.ScudInfos != null)
-                {
-                    foreach(var scudInfo in empl.ScudInfos)
-                    {
-                        factHours += (scudInfo.End - scudInfo.Begin);
-                    }
-                }
-            }
-        }
+        //         if(empl.ScudInfos != null)
+        //         {
+        //             foreach(var scudInfo in empl.ScudInfos)
+        //             {
+        //                 factHours += (scudInfo.End - scudInfo.Begin);
+        //             }
+        //         }
+        //     }
+        // }
 
         limitPlanHours = store?.Limits?.FirstOrDefault(x => x.Year == date.Year && x.Mouth == (date.Month - 1))?.Limit ?? 0;
 
@@ -418,22 +467,12 @@
         }
     }
 
-    // private async void HandleSelectionTypeChange(ChangeEventArgs e)
-    // {
-    //     if (Guid.TryParse(e.Value.ToString(), out Guid id))
-    //     {
-    //         _selectedStore = id;
-    //         await SelectStory(id);
-    //     }
-    // }
-
     private async Task Load()
     {
         try
         {
             using var context = await contextFactory.Create();
 
-            // allEmployees = context.Employees.Include(x => x.Schedule).ThenInclude(x => x.Dates).ToList();
             allStories = context.Stores.Include(x => x.Limits).OrderBy(x => x.Name).ToList();
 
             SelectStory(Guid.Empty);
