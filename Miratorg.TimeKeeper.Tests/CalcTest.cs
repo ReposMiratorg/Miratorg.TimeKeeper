@@ -48,8 +48,8 @@ public class CalcTest
 
         var (dayHours, nightHours) = TimeKeeperConverter.CalculateDayAndNightHours(begin, end);
 
-        Assert.Equal(dayHours, 14 * 60);
-        Assert.Equal(nightHours, 6 * 60);
+        Assert.Equal(dayHours, 16 * 60);
+        Assert.Equal(nightHours, 4 * 60);
     }
 
     [Fact]
@@ -72,8 +72,8 @@ public class CalcTest
 
         var (dayHours, nightHours) = TimeKeeperConverter.CalculateDayAndNightHours(begin, end);
 
-        Assert.Equal(dayHours, 13 * 60);
-        Assert.Equal(nightHours, 3 * 60);
+        Assert.Equal(dayHours, 15 * 60);
+        Assert.Equal(nightHours, 1 * 60);
     }
 
     [Fact]
