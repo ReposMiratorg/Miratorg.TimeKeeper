@@ -32,6 +32,7 @@ public class Schedule1CPlanModel
 
 public class ScudInfoModel
 {
+    public Guid Id { get; set; }
     public DateTime Begin { get; set; }
     public DateTime End { get; set; }
     public ScudInfoType ScudInfoType { get; set; }
