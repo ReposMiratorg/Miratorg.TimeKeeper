@@ -426,24 +426,24 @@
 
         additionalEmployees = additionals;
 
-        // if (store != null)
-        // {
-        //     foreach (var empl in employees)
-        //     {
-        //         if (empl.MountHours.TryGetValue(date, out var time))
-        //         {
-        //             planHours += TimeSpan.FromHours(time);
-        //         }
+        if (employees != null)
+        {
+            foreach (var empl in employees)
+            {
+                if (empl.MountHours.TryGetValue(date, out var time))
+                {
+                    planHours += TimeSpan.FromHours(time);
+                }
 
-        //         if(empl.ScudInfos != null)
-        //         {
-        //             foreach(var scudInfo in empl.ScudInfos)
-        //             {
-        //                 factHours += (scudInfo.End - scudInfo.Begin);
-        //             }
-        //         }
-        //     }
-        // }
+                if(empl.ScudInfos != null)
+                {
+                    foreach(var scudInfo in empl.ScudInfos)
+                    {
+                        factHours += (scudInfo.End - scudInfo.Begin);
+                    }
+                }
+            }
+        }
 
         limitPlanHours = store?.Limits?.FirstOrDefault(x => x.Year == date.Year && x.Mouth == (date.Month - 1))?.Limit ?? 0;
 
