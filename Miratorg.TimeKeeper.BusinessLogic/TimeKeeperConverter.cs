@@ -129,7 +129,7 @@ public  class TimeKeeperConverter
     {
         // Определение времени начала и конца дневного периода
         DateTime dayStart = new DateTime(begin.Year, begin.Month, begin.Day, 6, 0, 0);
-        DateTime dayEnd = new DateTime(begin.Year, begin.Month, begin.Day, 20, 0, 0);
+        DateTime dayEnd = new DateTime(begin.Year, begin.Month, begin.Day, 22, 0, 0);
 
         double dayHours = 0.0;
         double nightHours = 0.0;
