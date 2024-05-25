@@ -120,12 +120,26 @@ public class ApiService : IApiService
                     worktime = new List<Worktime>()
                 };
 
+                bool isRemovePause = false; // признак что удалили час перерыва
+
                 foreach (PlanEntity plan in currentPlans.Where(x => x.PlanType == PlanType.Plan).ToList())
                 {
                     var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightHours(plan.Begin, plan.End);
 
-                    plan_minutesDay += (int)dayMinutes;
-                    plan_minutesNight += (int)nightMinutes;
+                    if (isRemovePause == false && (dayMinutes + nightMinutes) > 180)
+                    {
+                        if (isRemovePause == false && dayMinutes > 180)
+                        {
+                            isRemovePause = true;
+                            dayMinutes -= 60;
+                        }
+
+                        if (isRemovePause == false && nightMinutes > 180)
+                        {
+                            isRemovePause = true;
+                            nightMinutes -= 60;
+                        }
+                    }
 
                     timesheet.worktime.Add(
                         new Worktime()
@@ -134,6 +148,9 @@ public class ApiService : IApiService
                             dvalue = (int)dayMinutes,
                             nvalue = (int)nightMinutes,
                         });
+
+                    plan_minutesDay += (int)dayMinutes;
+                    plan_minutesNight += (int)nightMinutes;
                 }
 
                 timesheet.nvalue = plan_minutesNight;
@@ -143,16 +160,31 @@ public class ApiService : IApiService
                 {
                     var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightHours(plan.Begin, plan.End);
 
-                    overwork_minutesDay += (int)dayMinutes;
-                    overwork_minutesNight += (int)nightMinutes;
+                    if (isRemovePause == false && (timesheet.nvalue + timesheet.dvalue + dayMinutes + nightMinutes) > 180)
+                    {
+                        if (isRemovePause == false && dayMinutes > 180)
+                        {
+                            isRemovePause = true;
+                            dayMinutes -= 60;
+                        }
+
+                        if (isRemovePause == false && nightMinutes > 180)
+                        {
+                            isRemovePause = true;
+                            nightMinutes -= 60;
+                        }
+                    }
 
                     timesheet.worktime.Add(
                         new Worktime()
                         {
                             dvalue = (int)dayMinutes,
                             nvalue = (int)nightMinutes,
-                            type = "regular"
+                            type = "regular" //ToDo - Добавить корректный тип работы
                         });
+
+                    overwork_minutesDay += (int)dayMinutes;
+                    overwork_minutesNight += (int)nightMinutes;
                 }
 
                 timesheet.dovertime = overwork_minutesDay;
