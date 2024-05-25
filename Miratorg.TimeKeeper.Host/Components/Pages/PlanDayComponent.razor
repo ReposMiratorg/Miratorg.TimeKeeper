@@ -78,6 +78,28 @@
             }
         }
 
+        @if(scudInfoModels != null)
+        {
+            foreach (var scud in scudInfoModels)
+            {
+                var message = $"{scud.Begin.ToShortTimeString()} - {scud.End.ToShortTimeString()} СКУД";
+
+                message += scud.ScudInfoType == ScudInfoType.Scud ? "" : " (ручной ввод)";
+
+                <div class="row mt-2">
+                    <div class="col-9">
+                        <input class="form-control form-control-sm" value="@message" disabled />
+                    </div>
+                    <div class="col-3">
+                        @if (scud.ScudInfoType == ScudInfoType.Manual)
+                        {
+                            <CustomDeleteDialogComponent Message="@message" Action="@(() => RemoveManualScud(scud.Id))" />
+                        }
+                    </div>
+                </div>
+            }
+        }
+
         <div class="row">
             <div class="col">
                 
@@ -182,6 +204,13 @@
     private async Task RemovePaln(Guid id)
     {
         await PlanService.Remove(id);
+        await SyncEmployeeService.UpdateUser(EmployeeId);
+        await UpdateUI();
+    }
+
+    private async Task RemoveManualScud(Guid id)
+    {
+        await PlanService.RemoveScudManual(id);
         await SyncEmployeeService.UpdateUser(EmployeeId);
         await UpdateUI();
     }

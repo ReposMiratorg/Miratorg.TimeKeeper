@@ -52,6 +52,7 @@ public  class TimeKeeperConverter
         {
             var scudModel = new ScudInfoModel()
             {
+                Id = Guid.Empty,
                 Begin = scudInfoEntity.Input,
                 End = scudInfoEntity.Output,
                 ScudInfoType = ScudInfoType.Scud
@@ -64,6 +65,7 @@ public  class TimeKeeperConverter
         {
             var scudModel = new ScudInfoModel()
             {
+                Id = item.Id,
                 Begin = item.Input,
                 End = item.Output,
                 ScudInfoType = ScudInfoType.Manual

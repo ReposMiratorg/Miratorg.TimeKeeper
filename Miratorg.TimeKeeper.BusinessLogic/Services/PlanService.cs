@@ -6,6 +6,7 @@ public interface IPlanService
     //public Task<List<EmployeeModel>> GetPlanModel(DateTime beginDate, DateTime endDate);
     public Task Create(Guid employeeId, PlanType planType, DateTime beginWork, DateTime endWork, Guid storeId, Guid? typeOverwork, Guid? customOverwork);
     public Task Remove(Guid id);
+    public Task RemoveScudManual(Guid id);
 }
 
 public class PlanService : IPlanService
@@ -70,12 +71,34 @@ public class PlanService : IPlanService
         return plans;
     }
 
+    public async Task RemoveScudManual(Guid id)
+    {
+        try
+        {
+            using var dbContext = await _dbContextFactory.Create();
+            var  manualScudEntity = await dbContext.ManualScuds.FirstOrDefaultAsync(x => x.Id == id);
+            dbContext.ManualScuds.Remove(manualScudEntity);
+            await dbContext.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+
     public async Task Remove(Guid id)
     {
-        using var dbContext = await _dbContextFactory.Create();
-        var planEntity = await dbContext.Plans.FirstOrDefaultAsync(x => x.Id == id);
-        dbContext.Plans.Remove(planEntity);
-        await dbContext.SaveChangesAsync();
+        try
+        {
+            using var dbContext = await _dbContextFactory.Create();
+            var planEntity = await dbContext.Plans.FirstOrDefaultAsync(x => x.Id == id);
+            dbContext.Plans.Remove(planEntity);
+            await dbContext.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+
+        }
     }
 
     private static void ValidateDate(DateTime dateTime)
