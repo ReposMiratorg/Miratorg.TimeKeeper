@@ -124,7 +124,7 @@ public class ApiService : IApiService
 
                 foreach (PlanEntity plan in currentPlans.Where(x => x.PlanType == PlanType.Plan).ToList())
                 {
-                    var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightHours(plan.Begin, plan.End);
+                    var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightMinutes(plan.Begin, plan.End);
 
                     if (isRemovePause == false && (dayMinutes + nightMinutes) > 180)
                     {
@@ -158,7 +158,7 @@ public class ApiService : IApiService
 
                 foreach (PlanEntity plan in currentPlans.Where(x => x.PlanType == PlanType.Overwork).ToList())
                 {
-                    var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightHours(plan.Begin, plan.End);
+                    var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightMinutes(plan.Begin, plan.End);
 
                     if (isRemovePause == false && (timesheet.nvalue + timesheet.dvalue + dayMinutes + nightMinutes) > 180)
                     {

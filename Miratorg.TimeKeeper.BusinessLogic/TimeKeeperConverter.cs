@@ -127,7 +127,7 @@ public  class TimeKeeperConverter
         return employee;
     }
 
-    public static (double dayHours, double nightHours) CalculateDayAndNightHours(DateTime begin, DateTime end)
+    public static (double dayMinutes, double nightMinutes) CalculateDayAndNightMinutes(DateTime begin, DateTime end)
     {
         // Определение времени начала и конца дневного периода
         DateTime dayStart = new DateTime(begin.Year, begin.Month, begin.Day, 6, 0, 0);
