@@ -184,7 +184,7 @@
                         <td>
                             @{
                                 var x = GetFirstDay(_date);
-                                var time = employee.MountHours[x];
+                                var time = employee.MountPlanUseHours[x];
                                 <div class="text-center">
                                     <a class="text-center">@time.ToString("0")</a>
                                 </div>
@@ -406,7 +406,7 @@
                     Plans = new List<PlanDetailModel>(),
                     ScudInfos = new List<ScudInfoModel>(),
                     WorkDates = new List<Schedule1CPlanModel>(),
-                    MountHours = new Dictionary<DateTime, double>()
+                    MountPlanUseHours = new Dictionary<DateTime, double>()
                 };
 
             foreach (var planOverwork in testData)
@@ -430,7 +430,7 @@
         {
             foreach (var empl in employees)
             {
-                if (empl.MountHours.TryGetValue(date, out var time))
+                if (empl.MountPlanUseHours.TryGetValue(date, out var time))
                 {
                     planHours += TimeSpan.FromHours(time);
                 }
