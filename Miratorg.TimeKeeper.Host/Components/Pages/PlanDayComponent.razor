@@ -205,14 +205,16 @@
     {
         await PlanService.Remove(id);
         await SyncEmployeeService.UpdateUser(EmployeeId);
-        await UpdateUI();
+        await UdateUIAction();
+
     }
 
     private async Task RemoveManualScud(Guid id)
     {
         await PlanService.RemoveScudManual(id);
         await SyncEmployeeService.UpdateUser(EmployeeId);
-        await UpdateUI();
+        await UdateUIAction();
+
     }
 
     private async Task UdateUIAction()

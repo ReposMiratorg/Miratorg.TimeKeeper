@@ -1,5 +1,5 @@
 ﻿@attribute [RouteAttribute(RoutePages.HOME)]
-@rendermode InteractiveServer
+@* @rendermode InteractiveServer *@
 
 <div class="row mt-4 mb-3 align-items-end">
     <div class="col-3">
@@ -435,12 +435,9 @@
                     planHours += TimeSpan.FromHours(time);
                 }
 
-                if(empl.ScudInfos != null)
+                if (empl.MountScudUseHours.TryGetValue(date, out var time1))
                 {
-                    foreach(var scudInfo in empl.ScudInfos)
-                    {
-                        factHours += (scudInfo.End - scudInfo.Begin);
-                    }
+                    factHours += TimeSpan.FromHours(time1);
                 }
             }
         }
@@ -448,7 +445,7 @@
         limitPlanHours = store?.Limits?.FirstOrDefault(x => x.Year == date.Year && x.Mouth == (date.Month - 1))?.Limit ?? 0;
 
         totalPlanMessage = $"{planHours.TotalHours.ToString("0")} из {(limitPlanHours.ToString("0") ?? "0")}";
-        totalFactMessage = $"{factHours.ToString(@"hh\:mm")}";
+        totalFactMessage = $"{factHours.TotalHours.ToString("0")}";
         var checkPlan = planHours.TotalHours * 1.1;
         limitColor = checkPlan >= limitPlanHours ? "text-danger" : "";
     }

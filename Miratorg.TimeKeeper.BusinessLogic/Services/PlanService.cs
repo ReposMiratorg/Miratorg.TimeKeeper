@@ -7,6 +7,7 @@ public interface IPlanService
     public Task Create(Guid employeeId, PlanType planType, DateTime beginWork, DateTime endWork, Guid storeId, Guid? typeOverwork, Guid? customOverwork);
     public Task Remove(Guid id);
     public Task RemoveScudManual(Guid id);
+    public Task CreateManualScud(Guid employeeId, DateTime beginWork, DateTime endWork);
 }
 
 public class PlanService : IPlanService
@@ -193,6 +194,22 @@ public class PlanService : IPlanService
         }
 
         return models;
+    }
+
+    public async Task CreateManualScud(Guid employeeId, DateTime begin, DateTime end)
+    {
+        using var dbContext = await _dbContextFactory.Create();
+        ManualScudEntity manualScudEntity = new ManualScudEntity()
+        {
+            CreateAt = DateTime.Now,
+            EmployeeId = employeeId,
+            Input = begin,
+            Output = end,
+            UserAutorName = "n/d"
+        };
+
+        dbContext.ManualScuds.Add(manualScudEntity);
+        await dbContext.SaveChangesAsync();
     }
 }
 

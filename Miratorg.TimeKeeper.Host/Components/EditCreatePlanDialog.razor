@@ -1,7 +1,7 @@
 ﻿<CustomModalDialog DialogSize="ModalDialogSize.Standard" @ref="modalDialog">
 
     <FrontObject>
-        <button class="btn btn-info btn-sm" @onclick="modalDialog.Open">Добавить факт SCUD</button>
+        <button class="btn btn-info btn-sm" @onclick="Open">Добавить факт SCUD</button>
     </FrontObject>
 
     <Body>
@@ -35,8 +35,11 @@
     [Parameter]
     public EventCallback Action { get; set; }
 
+    // [Inject]
+    // public ITimeKeeperDbContextFactory dbContextFactory { get; set; }
+
     [Inject]
-    public ITimeKeeperDbContextFactory dbContextFactory { get; set; }
+    public IPlanService PlanService { get; set; }
 
     private DateTime begin { get; set; } = DateTime.Now.Date.AddHours(8);
     private DateTime end { get; set; } = DateTime.Now.Date.AddHours(20);
@@ -48,10 +51,11 @@
         await modalDialog.Close();
     }
 
-    private void Open()
+    private async Task Open()
     {
         begin = CurrentDate.Date.AddHours(8);
         end = CurrentDate.Date.AddHours(20);
+        await modalDialog.Open();
     }
 
     private async Task Save()
@@ -63,18 +67,21 @@
 
         try
         {
-            var context = await dbContextFactory.Create();
-            ManualScudEntity manualScudEntity = new ManualScudEntity()
-                {
-                    CreateAt = DateTime.Now,
-                    EmployeeId = EmoloyeeId,
-                    Input = begin,
-                    Output = end,
-                    UserAutorName = "n/d"
-                };
+            await PlanService.CreateManualScud(EmoloyeeId, begin, end);
+            await SyncEmployeeService.UpdateUser(EmoloyeeId);
 
-            context.ManualScuds.Add(manualScudEntity);
-            await context.SaveChangesAsync();
+            // var context = await dbContextFactory.Create();
+            // ManualScudEntity manualScudEntity = new ManualScudEntity()
+            //     {
+            //         CreateAt = DateTime.Now,
+            //         EmployeeId = EmoloyeeId,
+            //         Input = begin,
+            //         Output = end,
+            //         UserAutorName = "n/d"
+            //     };
+
+            // context.ManualScuds.Add(manualScudEntity);
+            // await context.SaveChangesAsync();
         }
         catch (Exception ex)
         {
