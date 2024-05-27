@@ -33,6 +33,7 @@ public class ApiServiceTests
         Assert.Equal("2024-01-01", results[0].date);
         Assert.Equal("storeCode1C", results[0].employeeId);
         Assert.NotEqual("N/D", results[0].worktime[0].type);
+        Assert.NotEqual("rr", results[0].worktime[0].type);
         Assert.Equal(60, results[0].worktime[0].dvalue);
         //Assert.Equal(1, results[0].date == begin.ToString("yyyy-MM-dd"));
     }

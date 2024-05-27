@@ -42,7 +42,7 @@ public  class TimeKeeperConverter
                 Begin = plan.Begin,
                 End = plan.End,
                 PlanType = plan.PlanType,
-                TypeOverWorkName = plan.TypeOverWork?.Name ?? "N/D"
+                TypeOverWorkName = plan.TypeOverWork?.Code ?? "N/D"
             };
 
             employee.Plans.Add(planDetail);

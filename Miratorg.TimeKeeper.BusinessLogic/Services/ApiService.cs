@@ -106,7 +106,7 @@ public class ApiService : IApiService
                 .Where(x => x.Begin >= currentDate && x.Begin <= currentDate.AddDays(1))
                 .ToList();
 
-            if (employee.Plans.Count > 0)
+            if (currentPlans.Count > 0)
             {
                 int plan_minutesDay = 0;
                 int plan_minutesNight = 0;
@@ -188,7 +188,7 @@ public class ApiService : IApiService
                         {
                             dvalue = (int)dayMinutes,
                             nvalue = (int)nightMinutes,
-                            type = "regular" //ToDo - Добавить корректный тип работы
+                            type = plan.TypeOverWorkName
                         });
 
                     overwork_minutesDay += (int)dayMinutes;
