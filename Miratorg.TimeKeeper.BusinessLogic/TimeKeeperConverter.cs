@@ -117,7 +117,7 @@ public  class TimeKeeperConverter
                     dayPlan += time;
                 }
 
-                if (dayPlan.TotalMinutes >= 180)
+                if (dayPlan.TotalMinutes >= 240)
                 {
                     dayPlan = dayPlan.Add(TimeSpan.FromHours(-1));
                 }
@@ -143,7 +143,7 @@ public  class TimeKeeperConverter
                     dayScud += time;
                 }
 
-                if (dayScud.TotalMinutes >= 180)
+                if (dayScud.TotalMinutes >= 240)
                 {
                     dayScud = dayScud.Add(TimeSpan.FromHours(-1));
                 }

@@ -55,7 +55,7 @@ public class EmployeeConverterTests
         var employeeModel = BusinessLogic.TimeKeeperConverter.Convert(employeeEntity);
 
         Assert.NotNull(employeeModel);
-        Assert.Equal(employeeModel.DayPlanUseMinutes[new DateTime(2024, 1, 1)], 120);
+        Assert.Equal(employeeModel.DayPlanUseMinutes[new DateTime(2024, 1, 1)], 180);
     }
 
     [Fact]

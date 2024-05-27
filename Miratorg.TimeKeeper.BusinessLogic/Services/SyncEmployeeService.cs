@@ -134,20 +134,29 @@ public class SyncEmployeeService : IHostedService
         }
     }
 
-    public static async Task UpdateUser(Guid userId)
+    public static async Task<EmployeeEntity> GetUserById(Guid userId)
+    {
+        using var dbContext = await _timeKeeperDbContextFactory.Create();
+
+        var employee = await dbContext.Employees
+            .Include(x => x.Schedule).ThenInclude(x => x.Dates)
+            .Include(x => x.ScudInfos)
+            .Include(x => x.Plans).ThenInclude(x => x.TypeOverWork)
+            .Include(x => x.Absences)
+            .Include(x => x.ManualScuds)
+            .AsNoTrackingWithIdentityResolution()
+            .FirstOrDefaultAsync(x => x.Id == userId);
+
+        return employee;
+    }
+
+    public static async Task<EmployeeModel> UpdateUser(Guid userId)
     {
         try
         {
-            using var dbContext = await _timeKeeperDbContextFactory.Create();
+            var entity = await GetUserById(userId);
 
-            var employee = await dbContext.Employees
-                .Include(x => x.Schedule).ThenInclude(x => x.Dates)
-                .Include(x => x.ScudInfos)
-                .Include(x => x.Plans).ThenInclude(x => x.TypeOverWork)
-                .Include(x => x.Absences)
-                .Include(x => x.ManualScuds)
-                .AsNoTrackingWithIdentityResolution()
-                .FirstOrDefaultAsync(x => x.Id == userId);
+            var model = TimeKeeperConverter.Convert(entity);
 
             var existUser = Employees.FirstOrDefault(x => x.Id == userId);
 
@@ -157,19 +166,23 @@ public class SyncEmployeeService : IHostedService
                 {
                     if(Employees[i].Id == userId)
                     {
-                        Employees[i] = TimeKeeperConverter.Convert(employee);
+                        Employees[i] = model;
                     }
                 }
             }
             else
             {
-                Employees.Add(TimeKeeperConverter.Convert(employee));
+                Employees.Add(model);
             }
+
+            return model;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при обновлении");
         }
+
+        return null;
     }
 
     private async Task Process()
