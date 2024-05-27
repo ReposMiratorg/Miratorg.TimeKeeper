@@ -25,7 +25,39 @@ public class ApiService : IApiService
     {
         try
         {
-            return new ResponseDto();
+            var to = DateTime.Parse(requestDto.getTimesheets.to);
+            var from = DateTime.Parse(requestDto.getTimesheets.from);
+
+            var response = new ResponseDto()
+            {
+                timesheets = new List<Timesheet>()
+            };
+
+            if (Guid.TryParse(requestDto?.getTimesheets?.dep?.code, out var store1cId))
+            {
+                var store = await _dbContext.Stores.FirstOrDefaultAsync(x => x.StoreId1C == store1cId);
+
+                if (store == null)
+                {
+                    throw new Exception($"Store not found {requestDto?.getTimesheets?.dep?.code}");
+                }
+
+                var employees = await _dbContext.Employees.Where(x => x.StoreId == store.Id).ToListAsync();
+
+                foreach (var employee in employees)
+                {
+                    var entity = await SyncEmployeeService.GetUserById(employee.Id);
+                    var model = TimeKeeperConverter.Convert(entity);
+
+                    var timeSchist = ConverScudToTimesheet(model, from, to, store1cId, employee.Guid1C.ToString());
+
+                    response.timesheets.AddRange(timeSchist);
+                }
+
+                return response;
+            }
+
+            throw new Exception($"Employee not found by id: '{requestDto?.getTimesheets?.dep?.code}'");
         }
         catch (Exception ex)
         {
@@ -33,18 +65,6 @@ public class ApiService : IApiService
         }
 
         return new ResponseDto();
-    }
-
-    private static int CalcTimeMinutes(DateTime begin, DateTime end)
-    {
-        var timeMinutes = (end - begin).TotalMinutes;
-
-        if (timeMinutes > 180)
-        {
-            return (int)timeMinutes - 60;
-        }
-
-        return (int) timeMinutes;
     }
 
     public async Task<ResponseDto> GetFiscal(RequestDto requestDto)
@@ -92,6 +112,102 @@ public class ApiService : IApiService
         }
 
         return new ResponseDto();
+    }
+
+    public static List<Timesheet> ConverScudToTimesheet(EmployeeModel employee, DateTime from, DateTime to, Guid storeId, string code1C)
+    {
+        var timesheets = new List<Timesheet>();
+
+        // формируем данные на каждый день
+        for (DateTime currentDate = from; currentDate <= to; currentDate = currentDate.AddDays(1))
+        {
+            var currentScuds = employee.ScudInfos
+                //.Where(x => x.StoreId == storeId)
+                .Where(x => x.Begin >= currentDate && x.Begin <= currentDate.AddDays(1))
+                .ToList();
+
+            if (currentScuds.Count > 0)
+            {
+                int plan_minutesDay = 0;
+                int plan_minutesNight = 0;
+
+                int overwork_minutesDay = 0;
+                int overwork_minutesNight = 0;
+
+                Timesheet timesheet = new Timesheet()
+                {
+                    date = currentDate.ToString("yyyy-MM-dd"),
+                    dep = new Dep() { code = storeId.ToString() },
+                    nvalue = plan_minutesNight,
+                    dvalue = plan_minutesDay,
+                    employeeId = code1C,
+                    dovertime = overwork_minutesDay,
+                    novertime = overwork_minutesNight,
+                    worktype = "Я",
+                    worktime = new List<Worktime>()
+                };
+
+                bool isRemovePause = false; // признак что удалили час перерыва
+                int longTime = 240;
+
+                foreach (var scud in currentScuds)
+                {
+                    var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightMinutes(scud.Begin, scud.End);
+
+                    if (isRemovePause == false && (plan_minutesDay + plan_minutesNight + dayMinutes + nightMinutes) >= longTime)
+                    {
+                        if (isRemovePause == false && dayMinutes >= longTime)
+                        {
+                            isRemovePause = true;
+                            dayMinutes -= 60;
+                        }
+
+                        if (isRemovePause == false && nightMinutes >= longTime)
+                        {
+                            isRemovePause = true;
+                            nightMinutes -= 60;
+                        }
+                    }
+
+                    timesheet.worktime.Add(
+                        new Worktime()
+                        {
+                            type = "regular",
+                            dvalue = (int)dayMinutes,
+                            nvalue = (int)nightMinutes,
+                        });
+
+                    plan_minutesDay += (int)dayMinutes;
+                    plan_minutesNight += (int)nightMinutes;
+                }
+
+                timesheet.nvalue = plan_minutesNight;
+                timesheet.dvalue = plan_minutesDay;
+
+                timesheets.Add(timesheet);
+            }
+            else
+            {
+                Timesheet timesheet = new Timesheet()
+                {
+                    date = currentDate.ToString("yyyy-MM-dd"),
+                    dep = new Dep() { code = storeId.ToString() },
+                    nvalue = 0,
+                    dvalue = 0,
+
+                    employeeId = code1C,
+
+                    dovertime = 0,
+                    novertime = 0,
+                    worktype = "я",
+                    worktime = new List<Worktime>()
+                };
+
+                timesheets.Add(timesheet);
+            }
+        }
+
+        return timesheets;
     }
 
     public static List<Timesheet> ConverToTimesheet(EmployeeModel employee, DateTime from, DateTime to, Guid storeId, string code1C)

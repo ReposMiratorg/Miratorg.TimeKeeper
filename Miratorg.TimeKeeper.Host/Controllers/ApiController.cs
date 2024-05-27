@@ -49,7 +49,7 @@ public class ApiController : ControllerBase
         {
             case "biometry":
                 //var responseBoimetry = await _apiService.GetBoimetry(dto);
-                var responseBoimetry = await _apiService.GetFiscal(dto);
+                var responseBoimetry = await _apiService.GetBoimetry(dto);
                 return responseBoimetry;
 
             case "fiscal":
