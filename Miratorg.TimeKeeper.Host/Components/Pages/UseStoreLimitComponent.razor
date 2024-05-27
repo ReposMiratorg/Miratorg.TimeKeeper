@@ -1,0 +1,61 @@
+﻿
+<tr>
+    <td>@StoreName</td>
+    <td><input class="form-control from-control-sm" value="@limitYear[0]" disabled/></td>
+    <td><input class="form-control from-control-sm" value="@limitYear[1]" disabled /></td>
+    <td><input class="form-control from-control-sm" value="@limitYear[2]" disabled /></td>
+    <td><input class="form-control from-control-sm" value="@limitYear[3]" disabled /></td>
+    <td><input class="form-control from-control-sm" value="@limitYear[4]" disabled /></td>
+    <td><input class="form-control from-control-sm" value="@limitYear[5]" disabled /></td>
+    <td><input class="form-control from-control-sm" value="@limitYear[6]" disabled /></td>
+    <td><input class="form-control from-control-sm" value="@limitYear[7]" disabled /></td>
+    <td><input class="form-control from-control-sm" value="@limitYear[8]" disabled /></td>
+    <td><input class="form-control from-control-sm" value="@limitYear[9]" disabled /></td>
+    <td><input class="form-control from-control-sm" value="@limitYear[10]" disabled /></td>
+    <td><input class="form-control from-control-sm" value="@limitYear[11]" disabled /></td>
+</tr>
+
+@code {
+
+    [Parameter]
+    public Guid StoreId { get; set; }
+
+    // [Parameter]
+    // public EventCallback Action { get; set; }
+
+    [Parameter]
+    public List<StoreLimitEntity> StoreLimits { get; set; }
+
+    [Parameter]
+    public int Year { get; set; }
+
+    [Parameter]
+    public string StoreName { get; set; }
+
+    private int[] limitYear { get; set; } = new int[12];
+
+    [Inject]
+    public ITimeKeeperDbContextFactory contextFactory { get; set; }
+
+    [Inject]
+    public ILogger<StoreLimitComponent> Logger { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (StoreLimits != null)
+        {
+            for (int i = 0; i < limitYear.Length; i++)
+            {
+                var limit = StoreLimits.FirstOrDefault(x => x.Year == Year && x.Mouth == i);
+                if (limit != null)
+                {
+                    limitYear[i] = limit.Limit;
+                }
+                else
+                {
+                    limitYear[i] = 0;
+                }
+            }
+        }
+    }
+}

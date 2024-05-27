@@ -1,4 +1,4 @@
-﻿@attribute [RouteAttribute(RoutePages.STORE_LIMIT_2)]
+﻿@attribute [RouteAttribute(RoutePages.REPORT_USE_STORE_LIMIT)]
 
 <div class="row">
     <div class="col">
@@ -30,7 +30,6 @@
                     <th class="col">Октябрь</th>
                     <th class="col">Ноябрь</th>
                     <th class="col">Декабрь</th>
-                    <th class="col"></th>
                 </tr>
             </thead>
             <tbody>
@@ -38,7 +37,7 @@
                 {
                     foreach (var store in stores)
                     {
-                        <StoreLimit2Component StoreId="store.Id" StoreName="@store.Name" Year="year" StoreLimits="store.Limits" Action="UpdateStores"/>
+                        <UseStoreLimitComponent StoreId="store.Id" StoreName="@store.Name" Year="year" StoreLimits="@store.Limits" />
                     }
                 }
             </tbody>
@@ -52,7 +51,7 @@
     public ITimeKeeperDbContextFactory contextFactory { get; set; }
 
     [Inject]
-    public ILogger<StoreLimit2Page> Logger { get; set; }
+    public ILogger<ReportUserStoreLimitPage> Logger { get; set; }
 
     private List<StoreEntity> stores { get; set; } = new List<StoreEntity>();
 

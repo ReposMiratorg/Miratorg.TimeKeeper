@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miratorg.TimeKeeper.Busines
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miratorg.TimeKeeper.DataAccess", "Miratorg.TimeKeeper.DataAccess\Miratorg.TimeKeeper.DataAccess.csproj", "{C4B876CC-C6E8-4893-8983-1C482ADD0BB1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miratorg.TimeKeeper.Tests", "Miratorg.TimeKeeper.Tests\Miratorg.TimeKeeper.Tests.csproj", "{BCBD118B-73D4-417D-946B-75C32298B87F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miratorg.TimeKeeper.Tests", "Miratorg.TimeKeeper.Tests\Miratorg.TimeKeeper.Tests.csproj", "{BCBD118B-73D4-417D-946B-75C32298B87F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

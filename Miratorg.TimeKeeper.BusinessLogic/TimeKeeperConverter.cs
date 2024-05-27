@@ -17,23 +17,23 @@ public  class TimeKeeperConverter
         return false;
     }
 
-    public static EmployeeModel Convert(EmployeeEntity entity)
+    public static EmployeeModel Convert(EmployeeEntity employeeEntity)
     {
         EmployeeModel employee = new EmployeeModel()
         {
-            Id = entity.Id,
-            StoreId = entity.StoreId,
-            Name = entity.Name,
-            Position = entity.Position,
-            CodeNav = entity.CodeNav,
+            Id = employeeEntity.Id,
+            StoreId = employeeEntity.StoreId,
+            Name = employeeEntity.Name,
+            Position = employeeEntity.Position,
+            CodeNav = employeeEntity.CodeNav,
 
             Plans = new List<PlanDetailModel>(),
             ScudInfos = new List<ScudInfoModel>(),
             WorkDates = new List<Schedule1CPlanModel>(),
-            MountHours = new Dictionary<DateTime, double>()
+            MountPlanUseHours = new Dictionary<DateTime, double>()
         };
 
-        foreach (var plan in entity.Plans)
+        foreach (var plan in employeeEntity.Plans)
         {
             var planDetail = new PlanDetailModel()
             {
@@ -48,7 +48,7 @@ public  class TimeKeeperConverter
             employee.Plans.Add(planDetail);
         }
 
-        foreach (var scudInfoEntity in entity.ScudInfos)
+        foreach (var scudInfoEntity in employeeEntity.ScudInfos)
         {
             var scudModel = new ScudInfoModel()
             {
@@ -61,7 +61,7 @@ public  class TimeKeeperConverter
             employee.ScudInfos.Add(scudModel);
         }
 
-        foreach (var item in entity.ManualScuds)
+        foreach (var item in employeeEntity.ManualScuds)
         {
             var scudModel = new ScudInfoModel()
             {
@@ -74,9 +74,9 @@ public  class TimeKeeperConverter
             employee.ScudInfos.Add(scudModel);
         }
 
-        if (entity.Schedule?.Dates != null)
+        if (employeeEntity.Schedule?.Dates != null)
         {
-            foreach (var item in entity.Schedule.Dates)
+            foreach (var item in employeeEntity.Schedule.Dates)
             {
                 employee.WorkDates.Add(new Schedule1CPlanModel()
                 {
@@ -86,9 +86,9 @@ public  class TimeKeeperConverter
             }
         }
 
-        if (entity.Absences != null)
+        if (employeeEntity.Absences != null)
         {
-            foreach (var item in entity.Absences)
+            foreach (var item in employeeEntity.Absences)
             {
                 employee.Absences.Add(new AbsenceModel()
                 {
@@ -98,36 +98,68 @@ public  class TimeKeeperConverter
             }
         }
 
-
         // Подсчет часов в магазине за месяц //ToDo -  необходимо учитывать по магазинам
         DateTime start = new DateTime(2024, 1, 1);
-
-        for (int i = 0; i < 100; i++)
+        for (DateTime currentMonth = start; currentMonth < start.AddMonths(100); currentMonth = currentMonth.AddMonths(1))
         {
-            TimeSpan t = TimeSpan.FromSeconds(0);
-            var end = start.AddMonths(1);
-            var plans = entity.Plans.Where(x => x.Begin >= start &&  x.End < end).ToList();
+            TimeSpan monthPlan = new TimeSpan();
+            TimeSpan monthScud = new TimeSpan();
 
-            foreach (var item in plans)
+            for (DateTime currentDate = currentMonth; currentDate < currentMonth.AddMonths(1); currentDate = currentDate.AddDays(1))
             {
-                var time = item.End - item.Begin;
-                t += time;
+                // План + переработки
+                var plans = employeeEntity.Plans.Where(x => x.Begin >= currentDate && x.End < currentDate.AddDays(1)).ToList();
+                TimeSpan dayPlan = new TimeSpan();
+
+                foreach (var item in plans)
+                {
+                    var time = item.End - item.Begin;
+                    dayPlan += time;
+                }
+
+                if (dayPlan.TotalMinutes >= 180)
+                {
+                    dayPlan = dayPlan.Add(TimeSpan.FromHours(-1));
+                }
+
+                monthPlan += dayPlan;
+                employee.DayPlanUseMinutes.Add(currentDate, dayPlan.TotalMinutes);
+
+                // факт скуд + ручной скуд
+                var scuds = employeeEntity.ScudInfos.Where(x => x.Input >= currentDate && x.Output < currentDate.AddDays(1)).ToList();
+                var scudManuals = employeeEntity.ManualScuds.Where(x => x.Input >= currentDate && x.Output < currentDate.AddDays(1)).ToList();
+
+                TimeSpan dayScud = new TimeSpan();
+
+                foreach (var item in scuds)
+                {
+                    var time = item.Output - item.Input;
+                    dayScud += time;
+                }
+
+                foreach (var item in scudManuals)
+                {
+                    var time = item.Output - item.Input;
+                    dayScud += time;
+                }
+
+                if (dayScud.TotalMinutes >= 180)
+                {
+                    dayScud = dayScud.Add(TimeSpan.FromHours(-1));
+                }
+
+                monthScud += dayScud;
+                employee.DayScudUseMinutes.Add(currentDate, dayScud.TotalMinutes);
             }
 
-            var workHours = t.TotalHours;
-            if (workHours > 3)
-            {
-                workHours = workHours - 1;
-            }
-
-            employee.MountHours.Add(start, workHours);
-            start = start.AddMonths(1);
+            employee.MountPlanUseHours.Add(currentMonth, monthPlan.TotalHours);
+            employee.MountScudUseHours.Add(currentMonth, monthScud.TotalHours);
         }
 
         return employee;
     }
 
-    public static (double dayHours, double nightHours) CalculateDayAndNightHours(DateTime begin, DateTime end)
+    public static (double dayMinutes, double nightMinutes) CalculateDayAndNightMinutes(DateTime begin, DateTime end)
     {
         // Определение времени начала и конца дневного периода
         DateTime dayStart = new DateTime(begin.Year, begin.Month, begin.Day, 6, 0, 0);
