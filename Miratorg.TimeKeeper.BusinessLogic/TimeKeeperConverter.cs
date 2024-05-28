@@ -1,4 +1,6 @@
-﻿namespace Miratorg.TimeKeeper.BusinessLogic;
+﻿using Microsoft.Extensions.Logging;
+
+namespace Miratorg.TimeKeeper.BusinessLogic;
 
 public  class TimeKeeperConverter
 {
@@ -120,6 +122,13 @@ public  class TimeKeeperConverter
                 if (dayPlan.TotalMinutes >= 240)
                 {
                     dayPlan = dayPlan.Add(TimeSpan.FromHours(-1));
+                }
+
+                int overtime = plans.Sum(e => (int)(e.End - e.Begin).TotalMinutes);
+
+                if (overtime > 8 * 60)
+                {
+                    dayPlan = dayPlan.Add(TimeSpan.FromMinutes(60));
                 }
 
                 monthPlan += dayPlan;
