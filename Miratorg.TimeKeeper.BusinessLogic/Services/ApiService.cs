@@ -314,6 +314,28 @@ public class ApiService : IApiService
                 timesheet.dovertime = overwork_minutesDay;
                 timesheet.novertime = overwork_minutesNight;
 
+                if ((timesheet.dovertime + timesheet.novertime) >= 8 * 60)
+                {
+                    if(timesheet.dovertime > 8 * 60)
+                    {
+                        var time = timesheet.worktime.FirstOrDefault(x => x.type != "regular" && x.dvalue >= 60);
+                        if (time != null)
+                        {
+                            time.dvalue -= 60;
+                            timesheet.dovertime -= 60;
+                        }
+                    }
+                    else
+                    {
+                        var time = timesheet.worktime.FirstOrDefault(x => x.type != "regular" && x.nvalue >= 60);
+                        if (time != null)
+                        {
+                            time.nvalue -= 60;
+                            timesheet.novertime -= 60;
+                        }
+                    }
+                }
+
                 timesheets.Add(timesheet);
             }
             else
