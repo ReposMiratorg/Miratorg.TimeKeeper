@@ -19,6 +19,7 @@ public class TimeKeeperDbContext : DbContext
     public virtual DbSet<AbsenceEntity> Absences { get; set; }
     public virtual DbSet<ManualScudEntity> ManualScuds { get; set; }
     public virtual DbSet<StoreLimitEntity> StoreLimits { get; set; }
+    public virtual DbSet<PositionOverworkEntity> PositionOverworks { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
