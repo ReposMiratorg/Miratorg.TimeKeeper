@@ -47,6 +47,17 @@ public class ApiController : ControllerBase
 
         switch (dto.getTimesheets.source)
         {
+
+            case "graphic":
+                var responseFiscal = await _apiService.GetFiscal(dto);
+                return responseFiscal;
+
+            case "table":
+                var responseBoimetry = await _apiService.GetBoimetry(dto);
+                return responseBoimetry;
+
+
+
             case "biometry":
                 var responseBoimetry = await _apiService.GetBoimetry(dto);
                 return responseBoimetry;
