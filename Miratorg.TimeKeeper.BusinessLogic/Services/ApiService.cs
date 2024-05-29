@@ -199,7 +199,7 @@ public class ApiService : IApiService
 
                     dovertime = 0,
                     novertime = 0,
-                    worktype = "я",
+                    worktype = "Я",
                     worktime = new List<Worktime>()
                 };
 
@@ -351,7 +351,7 @@ public class ApiService : IApiService
 
                     dovertime = 0,
                     novertime = 0,
-                    worktype = "я",
+                    worktype = "Я",
                     worktime = new List<Worktime>()
                 };
 
@@ -479,7 +479,7 @@ public class ApiService : IApiService
                     
                     dovertime = 0,
                     novertime = 0,
-                    worktype = "я",
+                    worktype = "Я",
                     worktime = new List<Worktime>()
                 };
 
