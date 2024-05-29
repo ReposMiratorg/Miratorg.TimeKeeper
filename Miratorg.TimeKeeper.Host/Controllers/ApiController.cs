@@ -58,6 +58,7 @@ public class ApiController : ControllerBase
 
 
 
+
             case "biometry":
                 var responseBoimetry = await _apiService.GetBoimetry(dto);
                 return responseBoimetry;
