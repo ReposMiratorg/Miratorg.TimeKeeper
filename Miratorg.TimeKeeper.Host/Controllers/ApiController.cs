@@ -49,12 +49,12 @@ public class ApiController : ControllerBase
         {
 
             case "graphic":
-                var responseFiscal = await _apiService.GetFiscal(dto);
-                return responseFiscal;
+                var responseFiscal1 = await _apiService.GetFiscal(dto);
+                return responseFiscal1;
 
             case "table":
-                var responseBoimetry = await _apiService.GetBoimetry(dto);
-                return responseBoimetry;
+                var responseBoimetry2 = await _apiService.GetBoimetry(dto);
+                return responseBoimetry2;
 
 
 
