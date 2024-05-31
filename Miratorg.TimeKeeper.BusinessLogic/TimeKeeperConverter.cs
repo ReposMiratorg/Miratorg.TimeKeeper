@@ -1,4 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
+using Miratorg.TimeKeeper.BusinessLogic.Models;
+using System;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Miratorg.TimeKeeper.BusinessLogic;
 
@@ -167,6 +170,7 @@ public  class TimeKeeperConverter
 
         return employee;
     }
+
     public static EmployeeModel ConvertV2(EmployeeEntity employeeEntity)
     {
         EmployeeModel employee = new EmployeeModel()
@@ -264,15 +268,100 @@ public  class TimeKeeperConverter
                 var scuds = employeeEntity.ScudInfos.Where(x => x.Input >= currentDate && x.Output < currentDate.AddDays(1)).OrderBy(x => x.Input).ToList();
                 var scudManuals = employeeEntity.ManualScuds.Where(x => x.Input >= currentDate && x.Output < currentDate.AddDays(1)).OrderBy(x => x.Input).ToList();
 
-                //Время полного дня
-                TimeSpan dayPlan = new TimeSpan();
+                //Время полного дня (все запланированное время без перерыва)
+                TimeSpan dayPlanFill = new TimeSpan();
+
+                //Чистое время работы без перерывов
+                TimeSpan dayPlanClear = new TimeSpan();
+
+                // Обед 30 минут между 4м и 8м часом работы
+                bool obed30min = false;
+                int timeObed30min = 30;
+
+                // Обед 60 минут после 8го часа работы
+                bool obed60min = false;
+                int timeObed60min = 60;
+
+                for (int i = 0; i < plans.Count; i++)
+                {
+                    var plan = plans[i];
+                    var time = plan.End - plan.Begin;
+
+                    dayPlanFill += time;
+
+                    int usedLunch = 0;
+
+                    if (obed30min == false && dayPlanFill > TimeSpan.FromHours(4))
+                    {
+                        var t0 = dayPlanFill - TimeSpan.FromHours(4) - TimeSpan.FromMinutes(timeObed30min);
+                        if (t0.TotalMinutes >= 0) // если время больше чем 4 часа - убираем обед
+                        {
+                            time -= TimeSpan.FromMinutes(timeObed30min);
+                            usedLunch += timeObed30min;
+                            obed30min = true;
+                            timeObed30min = 0;
+                        }
+                        else
+                        {
+                            int lunch = ((int)t0.TotalMinutes) * -1;
+                            timeObed30min -= lunch;
+                            time -= TimeSpan.FromMinutes(lunch);
+                            usedLunch += lunch;
+                        }
+                    }
+
+                    if (obed60min == false && dayPlanFill > TimeSpan.FromHours(8))
+                    {
+                        var t0 = dayPlanFill - TimeSpan.FromHours(8) - TimeSpan.FromMinutes(timeObed60min);
+                        if (t0.TotalMinutes >= 0) // если время больше чем 8 часа- убираем обед
+                        {
+                            time -= TimeSpan.FromMinutes(timeObed60min);
+                            usedLunch += timeObed60min;
+                            obed60min = true;
+                            timeObed60min = 0;
+                        }
+                        else
+                        {
+                            int lunch = ((int)t0.TotalMinutes) * -1;
+                            timeObed60min -= lunch;
+                            time -= TimeSpan.FromMinutes(lunch); ;
+                            usedLunch += lunch;
+                        }
+                    }
+
+                    var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightMinutes(plan.Begin, plan.End);
+                    dayMinutes -= usedLunch;
+
+                    ExportTime exportTime = new ExportTime()
+                    {
+                        Date = new DateOnly(plan.Begin.Year, plan.Begin.Month, plan.Begin.Day),
+                        Begin = plan.Begin,
+                        End = plan.End,
+                        DayMinutes = dayMinutes,
+                        NightMinutes = nightMinutes
+                    };
+
+                    if (plan.PlanType == PlanType.Plan)
+                    {
+                        exportTime.WorkTime = "regular";
+                    }
+                    else
+                    {
+                        exportTime.WorkTime = plan.TypeOverWork?.Code ?? "N/D";
+                    }
+
+                    employee.ExportPlanTimes.Add(exportTime);
+
+                    dayPlanClear += time;
+                }
 
                 // факт скуд + ручной скуд
                 TimeSpan dayScud = new TimeSpan();
 
-                monthPlan += dayPlan;
+                monthPlan += dayPlanClear;
                 monthScud += dayScud;
-                employee.DayPlanUseMinutes.Add(currentDate, dayPlan.TotalMinutes);
+
+                employee.DayPlanUseMinutes.Add(currentDate, dayPlanClear.TotalMinutes);
                 employee.DayScudUseMinutes.Add(currentDate, dayScud.TotalMinutes);
             }
 
@@ -283,7 +372,7 @@ public  class TimeKeeperConverter
         return employee;
     }
 
-    public static (double dayMinutes, double nightMinutes) CalculateDayAndNightMinutes(DateTime begin, DateTime end)
+    public static (int dayMinutes, int nightMinutes) CalculateDayAndNightMinutes(DateTime begin, DateTime end)
     {
         // Определение времени начала и конца дневного периода
         DateTime dayStart = new DateTime(begin.Year, begin.Month, begin.Day, 6, 0, 0);
@@ -322,6 +411,6 @@ public  class TimeKeeperConverter
             dayHours += (effectiveDayEnd - effectiveDayStart).TotalMinutes;
         }
 
-        return (dayHours, nightHours);
+        return ((int)dayHours, (int)nightHours);
     }
 }
