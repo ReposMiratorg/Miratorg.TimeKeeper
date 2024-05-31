@@ -26,9 +26,18 @@
                     </thead>
                     <tbody>
                         <tr>
-                            @foreach (var item in typeOverWorkEntities)
+                            @if(typeOverWorkEntities != null)
                             {
-                                <td></td>
+                                @foreach (var item in typeOverWorkEntities)
+                                {
+                                    <td>
+                                        <div>@item.Name</div>
+                                        <button class="btn btn-sm btn-info">Добавить</button>
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                }
                             }
                         </tr>
                     </tbody>
