@@ -181,7 +181,8 @@ public  class TimeKeeperConverter
             ScudInfos = new List<ScudInfoModel>(),
             WorkDates = new List<Schedule1CPlanModel>(),
             MountPlanUseHours = new Dictionary<DateTime, double>(),
-            ExportTimes = new List<ExportTime>()
+            ExportPlanTimes = new List<ExportTime>(),
+            ExportFactTimes = new List<ExportTime>()
         };
 
         foreach (var plan in employeeEntity.Plans)
