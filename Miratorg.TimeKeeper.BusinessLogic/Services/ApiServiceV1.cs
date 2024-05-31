@@ -1,21 +1,13 @@
 ﻿using Miratorg.TimeKeeper.BusinessLogic.Models.api;
-using System.Numerics;
 
 namespace Miratorg.TimeKeeper.BusinessLogic.Services;
 
-public interface IApiService
-{
-    Task<ResponseDto> GetBoimetry(RequestDto requestDto);
-    Task<ResponseDto> GetFiscal(RequestDto dto);
-    Task<ResponseDto> GetManual(RequestDto dto);
-}
-
-public class ApiService : IApiService
+public class ApiServiceV1 : IApiService
 {
     private readonly TimeKeeperDbContext _dbContext;
-    private readonly ILogger<ApiService> _logger;
+    private readonly ILogger<ApiServiceV1> _logger;
 
-    public ApiService(TimeKeeperDbContext dbContext, ILogger<ApiService> logger)
+    public ApiServiceV1(TimeKeeperDbContext dbContext, ILogger<ApiServiceV1> logger)
     {
         _dbContext = dbContext;
         _logger = logger;
