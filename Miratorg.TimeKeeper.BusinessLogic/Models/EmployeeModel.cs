@@ -18,7 +18,8 @@ public class EmployeeModel
     public List<ScudInfoModel> ScudInfos { get; set; } = new List<ScudInfoModel>();
     public List<AbsenceModel> Absences { get; set; } = new List<AbsenceModel>();
 
-    public List<ExportTime> ExportTimes { get; set; } = new List<ExportTime>();
+    public List<ExportTime> ExportPlanTimes { get; set; } = new List<ExportTime>();
+    public List<ExportTime> ExportFactTimes { get; set; } = new List<ExportTime>();
 }
 
 public class ExportTime
