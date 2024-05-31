@@ -260,54 +260,19 @@ public  class TimeKeeperConverter
             for (DateTime currentDate = currentMonth; currentDate < currentMonth.AddMonths(1); currentDate = currentDate.AddDays(1))
             {
                 // План + переработки
-                var plans = employeeEntity.Plans.Where(x => x.Begin >= currentDate && x.End < currentDate.AddDays(1)).ToList();
+                var plans = employeeEntity.Plans.Where(x => x.Begin >= currentDate && x.End < currentDate.AddDays(1)).OrderBy(x => x.Begin).ToList();
+                var scuds = employeeEntity.ScudInfos.Where(x => x.Input >= currentDate && x.Output < currentDate.AddDays(1)).OrderBy(x => x.Input).ToList();
+                var scudManuals = employeeEntity.ManualScuds.Where(x => x.Input >= currentDate && x.Output < currentDate.AddDays(1)).OrderBy(x => x.Input).ToList();
+
+                //Время полного дня
                 TimeSpan dayPlan = new TimeSpan();
 
-                foreach (var item in plans)
-                {
-                    var time = item.End - item.Begin;
-                    dayPlan += time;
-                }
-
-                if (dayPlan.TotalMinutes >= 240)
-                {
-                    dayPlan = dayPlan.Add(TimeSpan.FromHours(-1));
-                }
-
-                int overtime = plans.Sum(e => (int)(e.End - e.Begin).TotalMinutes);
-
-                if (overtime > 8 * 60)
-                {
-                    dayPlan = dayPlan.Add(TimeSpan.FromMinutes(60));
-                }
-
-                monthPlan += dayPlan;
-                employee.DayPlanUseMinutes.Add(currentDate, dayPlan.TotalMinutes);
-
                 // факт скуд + ручной скуд
-                var scuds = employeeEntity.ScudInfos.Where(x => x.Input >= currentDate && x.Output < currentDate.AddDays(1)).ToList();
-                var scudManuals = employeeEntity.ManualScuds.Where(x => x.Input >= currentDate && x.Output < currentDate.AddDays(1)).ToList();
-
                 TimeSpan dayScud = new TimeSpan();
 
-                foreach (var item in scuds)
-                {
-                    var time = item.Output - item.Input;
-                    dayScud += time;
-                }
-
-                foreach (var item in scudManuals)
-                {
-                    var time = item.Output - item.Input;
-                    dayScud += time;
-                }
-
-                if (dayScud.TotalMinutes >= 240)
-                {
-                    dayScud = dayScud.Add(TimeSpan.FromHours(-1));
-                }
-
+                monthPlan += dayPlan;
                 monthScud += dayScud;
+                employee.DayPlanUseMinutes.Add(currentDate, dayPlan.TotalMinutes);
                 employee.DayScudUseMinutes.Add(currentDate, dayScud.TotalMinutes);
             }
 
