@@ -30,5 +30,5 @@ INSERT INTO [dbo].[TypeOverWorks] ([Id], [Name], [Code]) VALUES
 (NEWID(),'Подр-Уборщица', 'clean'),
 (NEWID(),'cavist', 'cavist'),
 (NEWID(),'administratorproductaccep', 'administratorproductacceptancespecialist'),
-(NEWID(),'cavist', 'atz'),
+-- (NEWID(),'cavist', 'atz'),
 (NEWID(),'Подр-Эксперт по мясу-кассир', 'butcher-cashier')

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Miratorg.TimeKeeper.DataAccess.Contexts;
 
@@ -11,9 +12,11 @@ using Miratorg.TimeKeeper.DataAccess.Contexts;
 namespace Miratorg.TimeKeeper.DataAccess.Migrations
 {
     [DbContext(typeof(TimeKeeperDbContext))]
-    partial class TimeKeeperDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240529183212_Update025")]
+    partial class Update025
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -93,9 +96,6 @@ namespace Miratorg.TimeKeeper.DataAccess.Migrations
                     b.Property<Guid?>("StoreId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("Id");
 
                     b.HasIndex("BossId");
@@ -172,6 +172,26 @@ namespace Miratorg.TimeKeeper.DataAccess.Migrations
                     b.HasIndex("TypeOverWorkId");
 
                     b.ToTable("Plans");
+                });
+
+            modelBuilder.Entity("Miratorg.TimeKeeper.DataAccess.Entities.PositionOverworkEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("TypeOverWorkEntityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TypeOverWorkEntityId");
+
+                    b.ToTable("PositionOverworks");
                 });
 
             modelBuilder.Entity("Miratorg.TimeKeeper.DataAccess.Entities.ScheduleDateEntity", b =>
@@ -386,6 +406,17 @@ namespace Miratorg.TimeKeeper.DataAccess.Migrations
                     b.Navigation("TypeOverWork");
                 });
 
+            modelBuilder.Entity("Miratorg.TimeKeeper.DataAccess.Entities.PositionOverworkEntity", b =>
+                {
+                    b.HasOne("Miratorg.TimeKeeper.DataAccess.Entities.TypeOverWorkEntity", "TypeOverWorkEntity")
+                        .WithMany("PositionOverworks")
+                        .HasForeignKey("TypeOverWorkEntityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TypeOverWorkEntity");
+                });
+
             modelBuilder.Entity("Miratorg.TimeKeeper.DataAccess.Entities.ScheduleDateEntity", b =>
                 {
                     b.HasOne("Miratorg.TimeKeeper.DataAccess.Entities.ScheduleEntity", "Schedule")
@@ -440,6 +471,11 @@ namespace Miratorg.TimeKeeper.DataAccess.Migrations
             modelBuilder.Entity("Miratorg.TimeKeeper.DataAccess.Entities.StoreEntity", b =>
                 {
                     b.Navigation("Limits");
+                });
+
+            modelBuilder.Entity("Miratorg.TimeKeeper.DataAccess.Entities.TypeOverWorkEntity", b =>
+                {
+                    b.Navigation("PositionOverworks");
                 });
 #pragma warning restore 612, 618
         }
