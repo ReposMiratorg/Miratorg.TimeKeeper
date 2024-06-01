@@ -48,10 +48,10 @@ public class ApiController : ControllerBase
         switch (dto.getTimesheets.source)
         {
             case "graphic":
-                return await _apiService.GetFiscal(dto);
+                return await _apiService.GetFiscal(dto); // Что запланировали
 
             case "table":
-                return await _apiService.GetBoimetry(dto);
+                return await _apiService.GetBoimetry(dto); // Фактически согластно скуда (проверяем план)
 
 
             case "biometry":
