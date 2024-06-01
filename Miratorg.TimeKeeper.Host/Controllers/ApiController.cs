@@ -53,14 +53,14 @@ public class ApiController : ControllerBase
                 return responseFiscal1;
 
             case "table":
-                var responseBoimetry2 = await _apiService.GetBoimetryODepricated(dto);
+                var responseBoimetry2 = await _apiService.GetBoimetry(dto);
                 return responseBoimetry2;
 
 
 
 
             case "biometry":
-                var responseBoimetry = await _apiService.GetBoimetryODepricated(dto);
+                var responseBoimetry = await _apiService.GetBoimetry(dto);
                 return responseBoimetry;
 
             case "fiscal":
