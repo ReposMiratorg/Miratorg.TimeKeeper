@@ -5,4 +5,4 @@ services:
     build:
       context: .
       dockerfile: Miratorg.TimeKeeper.Host/Dockerfile
-    image: TimeKeeper:0.3.10
+    image: time-teeper:0.3.10
