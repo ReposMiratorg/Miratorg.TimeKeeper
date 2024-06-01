@@ -341,6 +341,7 @@ public  class TimeKeeperConverter
                         DayMinutes = dayMinutes,
                         NightMinutes = nightMinutes
                     };
+                    // ToDo - перенести логику проверки в скуде сюда
 
                     if (plan.PlanType == PlanType.Plan)
                     {

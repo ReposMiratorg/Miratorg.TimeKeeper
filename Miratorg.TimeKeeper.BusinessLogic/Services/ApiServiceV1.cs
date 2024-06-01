@@ -13,7 +13,55 @@ public class ApiServiceV1 : IApiService
         _logger = logger;
     }
 
+
     public async Task<ResponseDto> GetBoimetry(RequestDto requestDto)
+    {
+        try
+        {
+            var to = DateTime.Parse(requestDto.getTimesheets.to);
+            var from = DateTime.Parse(requestDto.getTimesheets.from);
+
+            var response = new ResponseDto()
+            {
+                timesheets = new List<Timesheet>()
+            };
+
+            if (Guid.TryParse(requestDto?.getTimesheets?.dep?.code, out var store1cId))
+            {
+                var store = await _dbContext.Stores.FirstOrDefaultAsync(x => x.StoreId1C == store1cId);
+
+                if (store == null)
+                {
+                    throw new Exception($"Store not found {requestDto?.getTimesheets?.dep?.code}");
+                }
+
+                var employees = await _dbContext.Employees.Where(x => x.StoreId == store.Id).ToListAsync();
+
+                foreach (var employee in employees)
+                {
+                    var entity = await SyncEmployeeService.GetUserById(employee.Id);
+                    //var model = TimeKeeperConverter.Convert(entity);
+                    var model = TimeKeeperConverter.ConvertV2(entity);
+
+                    var timeSchist = ConverScudToTimesheet(model, from, to, store1cId, employee.Guid1C.ToString());
+
+                    response.timesheets.AddRange(timeSchist);
+                }
+
+                return response;
+            }
+
+            throw new Exception($"Employee not found by id: '{requestDto?.getTimesheets?.dep?.code}'");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "");
+        }
+
+        return new ResponseDto();
+    }
+
+    public async Task<ResponseDto> GetBoimetryODepricated(RequestDto requestDto)
     {
         try
         {
@@ -41,7 +89,7 @@ public class ApiServiceV1 : IApiService
                     var entity = await SyncEmployeeService.GetUserById(employee.Id);
                     var model = TimeKeeperConverter.Convert(entity);
 
-                    var timeSchist = ConverScudToTimesheet(model, from, to, store1cId, employee.Guid1C.ToString());
+                    var timeSchist = ConverScudToTimesheetBiomentry(model, from, to, store1cId, employee.Guid1C.ToString());
 
                     response.timesheets.AddRange(timeSchist);
                 }
@@ -57,6 +105,87 @@ public class ApiServiceV1 : IApiService
         }
 
         return new ResponseDto();
+    }
+
+    private static IEnumerable<Timesheet> ConverScudToTimesheetBiomentry(EmployeeModel model, DateTime from, DateTime to, Guid storeId, string code1C)
+    {
+        var timesheets = new List<Timesheet>();
+
+        // формируем данные на каждый день
+        for (DateTime currentDate = from; currentDate <= to; currentDate = currentDate.AddDays(1))
+        {
+            var facts = model.ExportFactTimes
+                .Where(x => x.Begin >= currentDate && x.Begin <= currentDate.AddDays(1))
+                .ToList();
+
+            if (facts.Count > 0)
+            {
+                int plan_minutesDay = 0;
+                int plan_minutesNight = 0;
+
+                int overwork_minutesDay = 0;
+                int overwork_minutesNight = 0;
+
+                Timesheet timesheet = new Timesheet()
+                {
+                    date = currentDate.ToString("yyyy-MM-dd"),
+                    dep = new Dep() { code = storeId.ToString() },
+                    nvalue = 0,
+                    dvalue = 0,
+                    employeeId = code1C,
+                    dovertime = 0,
+                    novertime = 0,
+                    worktype = "Я",
+                    worktime = new List<Worktime>()
+                };
+
+                foreach (var fact in facts)
+                {
+                    Worktime worktime = new()
+                    {
+                        type = fact.WorkTime,
+                        dvalue = fact.DayMinutes,
+                        nvalue = fact.NightMinutes
+                    };
+
+                    timesheet.worktime.Add(worktime);
+
+                    if (fact.WorkTime == "regular")
+                    {
+                        timesheet.nvalue += fact.DayMinutes;
+                        timesheet.dvalue += plan_minutesDay;
+                    }
+                    else
+                    {
+                        timesheet.dovertime += fact.DayMinutes;
+                        timesheet.novertime += fact.NightMinutes;
+                    }
+                }
+
+                timesheets.Add(timesheet);
+            }
+            else
+            {
+                Timesheet timesheet = new Timesheet()
+                {
+                    date = currentDate.ToString("yyyy-MM-dd"),
+                    dep = new Dep() { code = storeId.ToString() },
+                    nvalue = 0,
+                    dvalue = 0,
+
+                    employeeId = code1C,
+
+                    dovertime = 0,
+                    novertime = 0,
+                    worktype = "Я",
+                    worktime = new List<Worktime>()
+                };
+
+                timesheets.Add(timesheet);
+            }
+        }
+
+        return timesheets;
     }
 
     public async Task<ResponseDto> GetFiscal(RequestDto requestDto)
