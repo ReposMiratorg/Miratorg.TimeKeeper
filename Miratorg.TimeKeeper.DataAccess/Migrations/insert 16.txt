@@ -6,8 +6,7 @@ update-database
 
 
 
-INSERT INTO [dbo].[TypeOverWork] ([Id], [Name], [Code]) VALUES
-
+INSERT INTO [dbo].[TypeOverWorks] ([Id], [Name], [Code]) VALUES
 
 (NEWID(), 'Подр-Администратор', 'administrator'),
 (NEWID(),'Подр-ЗУ', 'deputymanager'),
@@ -29,4 +28,7 @@ INSERT INTO [dbo].[TypeOverWork] ([Id], [Name], [Code]) VALUES
 (NEWID(),'Подр-Офис', 'podroffice'),
 (NEWID(),'Подр-Кассир', 'cashier'),
 (NEWID(),'Подр-Уборщица', 'clean'),
+(NEWID(),'cavist', 'cavist'),
+(NEWID(),'administratorproductaccep', 'administratorproductacceptancespecialist'),
+-- (NEWID(),'cavist', 'atz'),
 (NEWID(),'Подр-Эксперт по мясу-кассир', 'butcher-cashier')

@@ -9,3 +9,4 @@ global using Miratorg.DataService.Interfaces;
 global using Miratorg.TimeKeeper.DataAccess.Contexts;
 global using Miratorg.TimeKeeper.DataAccess.Entities;
 global using Miratorg.TimeKeeper.BusinessLogic.Models;
+global using Miratorg.TimeKeeper.BusinessLogic.Interfaces;

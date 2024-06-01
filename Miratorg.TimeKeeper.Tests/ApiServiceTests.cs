@@ -3,7 +3,7 @@ using Miratorg.TimeKeeper.BusinessLogic.Services;
 
 namespace Miratorg.TimeKeeper.Tests;
 
-public class ApiServiceTests
+public class ApiServiceV1Tests
 {
     [Fact]
     public void Day1Test()
@@ -27,7 +27,7 @@ public class ApiServiceTests
             }
         };
 
-        var results = ApiService.ConverToTimesheet(model, begin, end, storeId, "storeCode1C");
+        var results = ApiServiceV1.ConverToTimesheet(model, begin, end, storeId, "storeCode1C");
 
         Assert.Equal(1, results.Count);
         Assert.Equal("2024-01-01", results[0].date);
@@ -61,7 +61,7 @@ public class ApiServiceTests
             }
         };
 
-        var results = ApiService.ConverToTimesheet(model, begin, end, storeId, "storeCode1C");
+        var results = ApiServiceV1.ConverToTimesheet(model, begin, end, storeId, "storeCode1C");
 
         Assert.Equal(1, results.Count);
         Assert.Equal("2024-01-01", results[0].date);
@@ -94,7 +94,7 @@ public class ApiServiceTests
             }
         };
 
-        var results = ApiService.ConverToTimesheet(model, begin, end, storeId, "storeCode1C");
+        var results = ApiServiceV1.ConverToTimesheet(model, begin, end, storeId, "storeCode1C");
 
         Assert.Equal(1, results.Count);
         Assert.Equal("2024-01-01", results[0].date);

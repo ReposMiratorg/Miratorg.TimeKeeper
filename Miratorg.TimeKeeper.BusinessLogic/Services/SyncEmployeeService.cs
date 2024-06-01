@@ -189,10 +189,10 @@ public class SyncEmployeeService : IHostedService
     {
         try
         {
+            await UpdateUsers();
+
             var staffDbContext = await _staffControlDbContextFactory.Create();
             using var dbContext = await _timeKeeperDbContextFactory.Create();
-
-            await UpdateUsers();
 
             var employees = await staffDbContext.Staff
                 .Where(x => x.LegalEntity == "ООО \"ПродМир\"" || x.LegalEntity == "ООО «Стейк и Бургер»")
@@ -207,11 +207,20 @@ public class SyncEmployeeService : IHostedService
                 return;
             }
 
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            int date = environment == "Development" ? -7 : 1;
+
             foreach (var employee in employees)
             {
                 _logger.LogInformation($"Process: '{employee.Code}'");
 
                 var currentEmployee = dbContext.Employees.FirstOrDefault(x => x.CodeNav == employee.Code);
+
+                if (currentEmployee != null && currentEmployee.UpdateAt > DateTime.Now.AddDays(date))
+                {
+                    continue;
+                }
+
                 var position = positions.FirstOrDefault(x => x.Code.ToLower() == employee.CodePosition);
 
                 var store = dbContext.Stores.FirstOrDefault(x => x.Name == employee.RoutineDivision);
@@ -247,6 +256,8 @@ public class SyncEmployeeService : IHostedService
                         Guid1C = employee.Guid ?? Guid.Empty
                     };
 
+                    currentEmployee.UpdateAt = DateTime.Now;
+
                     dbContext.Employees.Add(currentEmployee);
                     await dbContext.SaveChangesAsync();
                 }
@@ -258,6 +269,8 @@ public class SyncEmployeeService : IHostedService
                     currentEmployee.Position = position?.Description ?? "n/d";
                     currentEmployee.Guid1C = employee.Guid ?? Guid.Empty;
 
+                    currentEmployee.UpdateAt = DateTime.Now;
+                    
                     await dbContext.SaveChangesAsync();
                 }
 

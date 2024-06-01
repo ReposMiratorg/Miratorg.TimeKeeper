@@ -60,7 +60,7 @@ public static class ServiceHostExtensions
         services.AddHostedService<SyncEmployeeService>();
 
         services.AddScoped<IPlanService, PlanService>();
-        services.AddScoped<IApiService, ApiService>();
+        services.AddScoped<IApiService, ApiServiceV1>();
 
         var connectionString = configuration.GetConnectionString("DefaultConnection");
         services.AddDbContextPool<TimeKeeperDbContext>(options =>
