@@ -118,7 +118,7 @@ public class Login : PageModel
         {   
             try
             {
-                var ldapResult = LdapService.CheckAuthentication(UserLogin.Email, UserLogin.Password);
+                var ldapResult = LdapService.CheckAuthenticationWithSearch(UserLogin.Email, UserLogin.Password);
 
                 //ldapResult = true;
                 if (!ldapResult)
@@ -127,11 +127,11 @@ public class Login : PageModel
                     return Page();
                 }
 
-                var codeNav = LdapService.GetAttribute(UserLogin.Email, "PostalCode");
+                //var codeNav = LdapService.GetAttribute(UserLogin.Email, "PostalCode"); //not work for "Mag321" accounts
                 var groups = LdapService.GetGroups(UserLogin.Email);
 
                 //codeNav = "ÊÐ×ÑÎÒÐ_00092";
-                Console.WriteLine($"Code nav: '{codeNav}'");
+                //Console.WriteLine($"Code nav: '{codeNav}'");
 
                 var isUser = groups.FirstOrDefault(x => x.Contains("WG_USERS")) != null;
                 var isAdmin = groups.FirstOrDefault(x => x.Contains("WG_ADMINS")) != null;
@@ -147,7 +147,7 @@ public class Login : PageModel
 
                 Dictionary<string, string> userData = new Dictionary<string, string>
                 {
-                    { "CodeNav", codeNav }
+                    //{ "CodeNav", codeNav }
                 };
 
                 if (isAdmin)
