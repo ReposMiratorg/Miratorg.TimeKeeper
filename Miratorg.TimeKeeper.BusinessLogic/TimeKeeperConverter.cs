@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Miratorg.TimeKeeper.BusinessLogic.Models;
 using System;
+using System.Numerics;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Miratorg.TimeKeeper.BusinessLogic;
@@ -363,6 +364,59 @@ public  class TimeKeeperConverter
 
                 employee.DayPlanUseMinutes.Add(currentDate, dayPlanClear.TotalMinutes);
                 employee.DayScudUseMinutes.Add(currentDate, dayScud.TotalMinutes);
+
+                foreach (var planTime in employee.ExportPlanTimes)
+                {
+                    var fact = new ExportTimeFact()
+                    {
+                        Begin = planTime.Begin,
+                        End = planTime.End,
+                        Date = planTime.Date,
+                        WorkTime = planTime.WorkTime
+                    };
+
+                    var day = new DateTime(fact.Date.Year, fact.Date.Month, fact.Date.Day);
+                    var scud = employee.ScudInfos.Where(x => x.Begin.Date == day).ToList();
+
+                    if (scud.Count == 0)
+                    {
+                        // нет фактоы явки
+                        fact.DayMinutes = 0;
+                        fact.NightMinutes = 0;
+                    }
+                    else
+                    {
+                        /*
+                        workStart – начало рабочего дня
+                        workEnd – конец рабочего дня
+                        arrival – фактическое время прихода на работу
+                        departure – фактическое время ухода с работы
+                         */
+                        var scudBegin = scud.Min(x => x.Begin);
+                        var scudEnd = scud.Max(x => x.End);
+
+                        DateTime actualStart = scudBegin < fact.Begin ? fact.Begin : scudBegin;
+                        DateTime actualEnd = scudEnd > fact.End ? fact.End : scudEnd;
+
+                        if (actualStart >= fact.End || actualEnd <= fact.Begin)
+                        {
+                            //Console.WriteLine("Время пребывания на работе: 0 минут");
+                            fact.DayMinutes = 0;
+                            fact.NightMinutes = 0;
+                        }
+                        else
+                        {
+                            var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightMinutes(actualStart, actualEnd);
+                            // Вычисляем длительность пребывания на работе в минутах
+                            //TimeSpan duration = actualEnd - actualStart;
+                            //Console.WriteLine($"Время пребывания на работе: {duration.TotalMinutes} минут");
+                            fact.DayMinutes = planTime.DayMinutes < dayMinutes ? planTime.DayMinutes : dayMinutes;
+                            fact.NightMinutes = planTime.NightMinutes < nightMinutes ? planTime.NightMinutes : nightMinutes;
+                        }
+                    }
+
+                    employee.ExportFactTimes.Add(fact);
+                }
             }
 
             employee.MountPlanUseHours.Add(currentMonth, monthPlan.TotalHours);
@@ -412,5 +466,18 @@ public  class TimeKeeperConverter
         }
 
         return ((int)dayHours, (int)nightHours);
+    }
+}
+
+public static class EnumerableExtensions
+{
+    public static T? MinByOrDefault<T, TKey>(this IEnumerable<T> source, Func<T, TKey> selector) where T : class
+    {
+        if (source == null || !source.Any())
+        {
+            return null;
+        }
+
+        return source.MinBy(selector);
     }
 }
