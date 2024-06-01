@@ -120,12 +120,6 @@ public class ApiServiceV1 : IApiService
 
             if (facts.Count > 0)
             {
-                int plan_minutesDay = 0;
-                int plan_minutesNight = 0;
-
-                int overwork_minutesDay = 0;
-                int overwork_minutesNight = 0;
-
                 Timesheet timesheet = new Timesheet()
                 {
                     date = currentDate.ToString("yyyy-MM-dd"),
@@ -152,8 +146,8 @@ public class ApiServiceV1 : IApiService
 
                     if (fact.WorkTime == "regular")
                     {
-                        timesheet.nvalue += fact.DayMinutes;
-                        timesheet.dvalue += plan_minutesDay;
+                        timesheet.dvalue += fact.DayMinutes;
+                        timesheet.nvalue += fact.NightMinutes;
                     }
                     else
                     {
@@ -233,8 +227,8 @@ public class ApiServiceV1 : IApiService
 
                     if (fact.WorkTime == "regular")
                     {
-                        timesheet.nvalue += fact.DayMinutes;
-                        timesheet.dvalue += fact.NightMinutes;
+                        timesheet.dvalue += fact.DayMinutes;
+                        timesheet.nvalue += fact.NightMinutes;
                     }
                     else
                     {

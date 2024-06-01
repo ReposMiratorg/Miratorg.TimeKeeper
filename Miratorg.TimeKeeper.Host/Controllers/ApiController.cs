@@ -47,7 +47,6 @@ public class ApiController : ControllerBase
 
         switch (dto.getTimesheets.source)
         {
-
             case "graphic":
                 return await _apiService.GetFiscal(dto);
 
@@ -55,14 +54,14 @@ public class ApiController : ControllerBase
                 return await _apiService.GetBoimetry(dto);
 
 
-            //case "biometry":
-            //    return await _apiService.GetBoimetry(dto);
+            case "biometry":
+                return await _apiService.GetBoimetry(dto);
 
-            //case "fiscal":
-            //    return await _apiService.GetFiscal(dto);
+            case "fiscal":
+                return await _apiService.GetFiscal(dto);
 
-            //case "manual":
-            //    return await _apiService.GetFiscal(dto);
+            case "manual":
+                return await _apiService.GetFiscal(dto);
 
             default:
                 throw new Exception("incorrect source");
