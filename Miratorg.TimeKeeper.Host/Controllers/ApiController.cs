@@ -49,27 +49,20 @@ public class ApiController : ControllerBase
         {
 
             case "graphic":
-                var responseFiscal1 = await _apiService.GetFiscal(dto);
-                return responseFiscal1;
+                return await _apiService.GetFiscal(dto);
 
             case "table":
-                var responseBoimetry2 = await _apiService.GetBoimetry(dto);
-                return responseBoimetry2;
+                return await _apiService.GetBoimetry(dto);
 
 
+            //case "biometry":
+            //    return await _apiService.GetBoimetry(dto);
 
+            //case "fiscal":
+            //    return await _apiService.GetFiscal(dto);
 
-            case "biometry":
-                var responseBoimetry = await _apiService.GetBoimetry(dto);
-                return responseBoimetry;
-
-            case "fiscal":
-                var responseFiscal = await _apiService.GetFiscal(dto);
-                return responseFiscal;
-
-            case "manual":
-                var responseManual = await _apiService.GetFiscal(dto);
-                return responseManual;
+            //case "manual":
+            //    return await _apiService.GetFiscal(dto);
 
             default:
                 throw new Exception("incorrect source");
