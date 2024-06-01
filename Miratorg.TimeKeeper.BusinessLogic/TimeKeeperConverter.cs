@@ -198,9 +198,17 @@ public  class TimeKeeperConverter
                 StoreId = plan.StoreId,
                 Begin = plan.Begin,
                 End = plan.End,
-                PlanType = plan.PlanType,
-                TypeOverWorkName = plan.TypeOverWork?.Code ?? "N/D"
+                PlanType = plan.PlanType
             };
+
+            if (planDetail.PlanType == PlanType.Plan)
+            {
+                planDetail.TypeOverWorkName = "regular";
+            }
+            else
+            {
+                planDetail.TypeOverWorkName = plan.TypeOverWork?.Code ?? "N/D";
+            }
 
             employee.Plans.Add(planDetail);
         }
@@ -282,6 +290,8 @@ public  class TimeKeeperConverter
                 // Обед 60 минут после 8го часа работы
                 bool obed60min = false;
                 int timeObed60min = 60;
+               
+                List<ExportTime> exportTimes = new List<ExportTime>();
 
                 for (int i = 0; i < plans.Count; i++)
                 {
@@ -341,7 +351,6 @@ public  class TimeKeeperConverter
                         DayMinutes = dayMinutes,
                         NightMinutes = nightMinutes
                     };
-                    // ToDo - перенести логику проверки в скуде сюда
 
                     if (plan.PlanType == PlanType.Plan)
                     {
@@ -352,7 +361,7 @@ public  class TimeKeeperConverter
                         exportTime.WorkTime = plan.TypeOverWork?.Code ?? "N/D";
                     }
 
-                    employee.ExportPlanTimes.Add(exportTime);
+                    exportTimes.Add(exportTime);
 
                     dayPlanClear += time;
                 }
@@ -366,7 +375,7 @@ public  class TimeKeeperConverter
                 employee.DayPlanUseMinutes.Add(currentDate, dayPlanClear.TotalMinutes);
                 employee.DayScudUseMinutes.Add(currentDate, dayScud.TotalMinutes);
 
-                foreach (var planTime in employee.ExportPlanTimes)
+                foreach (var planTime in exportTimes)
                 {
                     var fact = new ExportTimeFact()
                     {
@@ -418,6 +427,8 @@ public  class TimeKeeperConverter
 
                     employee.ExportFactTimes.Add(fact);
                 }
+
+                employee.ExportPlanTimes.AddRange(exportTimes);
             }
 
             employee.MountPlanUseHours.Add(currentMonth, monthPlan.TotalHours);
