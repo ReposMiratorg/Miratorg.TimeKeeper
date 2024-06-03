@@ -11,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Miratorg.TimeKeeper.BusinessLogic.Models;
 
 namespace Miratorg.TimeKeeper.Host.Pages;
 
@@ -39,7 +40,7 @@ public class Login : PageModel
         return LocalRedirect(Url.Content("~/Register"));
     }
 
-    private string GenerateToken(string login, Dictionary<string, string> dictionary)
+    private string GenerateToken(string login, List<KeyValuePair<string, string>> dictionary)
     {
         List<Claim> userClaims =
         [
@@ -52,7 +53,7 @@ public class Login : PageModel
         {
             foreach (var userKey in dictionary)
             {
-                userClaims.Add(new Claim(JwtRegisteredClaimNames.Nonce, userKey.Value));
+                userClaims.Add(new Claim(userKey.Key, userKey.Value));
             }
         }
 
@@ -133,30 +134,38 @@ public class Login : PageModel
                 //codeNav = "ÊÐ×ÑÎÒÐ_00092";
                 //Console.WriteLine($"Code nav: '{codeNav}'");
 
-                var isUser = groups.FirstOrDefault(x => x.Contains("WG_USERS")) != null;
-                var isAdmin = groups.FirstOrDefault(x => x.Contains("WG_ADMINS")) != null;
+                var isHr = groups.FirstOrDefault(x => x.Contains(ActiveDirectoryGroups.HR)) != null;
+                var isRy = groups.FirstOrDefault(x => x.Contains(ActiveDirectoryGroups.RY)) != null;
+                var isSupermarkets = groups.FirstOrDefault(x => x.Contains(ActiveDirectoryGroups.Supermarkets)) != null;
 
-                isUser = true;
-                isAdmin = false;
+                //isHr = false;
+                //isRy = false;
+                //isSupermarkets = false;
 
-                if (isUser == false)
+                if (isHr == false && isRy == false && isSupermarkets == false)
                 {
                     Message = "You do not have permission to enter";
                     return Page();
                 }
 
-                Dictionary<string, string> userData = new Dictionary<string, string>
+                List<KeyValuePair<string, string>> userData = new List<KeyValuePair<string, string>>()
                 {
                     //{ "CodeNav", codeNav }
                 };
 
-                if (isAdmin)
+                if (isHr)
                 {
-                    userData.Add(ClaimTypes.Role, "Admin");
+                    userData.Add(new KeyValuePair<string, string>(ClaimTypes.Role, "UserHr"));
                 }
-                else
+
+                if (isRy)
                 {
-                    userData.Add(ClaimTypes.Role, "User");
+                    userData.Add(new KeyValuePair<string, string>(ClaimTypes.Role, "UserRy"));
+                }
+
+                if (isSupermarkets)
+                {
+                    userData.Add(new KeyValuePair<string, string>(ClaimTypes.Role, "Supermarkets"));
                 }
 
                 var accessToken = GenerateToken(UserLogin.Email, userData);

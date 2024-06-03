@@ -4,31 +4,22 @@
 
     <div class="h-100 mt-5" id="leftside-menu-container" data-simplebar>
 
-        <AuthorizeView Roles="Admin">
-            <Authorized>
-                <ul class="side-nav">
-                    <NavTitle Title="general" />
-                    <SideNavItem Badge="" ClassIcon="ri-contacts-fill" Title="Планирование" Href="@RoutePages.HOME" />
-                    @* <SideNavItem Badge="" ClassIcon="ri-contacts-fill" Title="Лимиты" Href="@RoutePages.STORE_LIMIT" /> *@
-                    <SideNavItem Badge="" ClassIcon="ri-contacts-fill" Title="Виды работ" Href="@RoutePages.WORK_CUSTOM" />
-                    <NavTitle Title="REPORTS" />
-                    <SideNavItem Badge="" ClassIcon="ri-contacts-fill" Title="Использование лимитов" Href="@RoutePages.REPORT_USE_STORE_LIMIT" />
-                </ul>
-            </Authorized>
-        </AuthorizeView>
+        <ul class="side-nav">
+            <NavTitle Title="general" />
+            <SideNavItem Badge="" ClassIcon="ri-contacts-fill" Title="Планирование" Href="@RoutePages.HOME" />
 
-        <AuthorizeView Roles="User">
-            <Authorized>
-                <ul class="side-nav">
-                    <NavTitle Title="general" />
-                    <SideNavItem Badge="" ClassIcon="ri-contacts-fill" Title="Планирование" Href="@RoutePages.HOME" />
-                    @* <SideNavItem Badge="" ClassIcon="ri-contacts-fill" Title="Лимиты" Href="@RoutePages.STORE_LIMIT" /> *@
-                    <SideNavItem Badge="" ClassIcon="ri-contacts-fill" Title="Виды работ" Href="@RoutePages.WORK_CUSTOM" />
-                    <NavTitle Title="REPORTS" />
-                    <SideNavItem Badge="" ClassIcon="ri-contacts-fill" Title="Использование лимитов" Href="@RoutePages.REPORT_USE_STORE_LIMIT" />
-                </ul>
-            </Authorized>
-        </AuthorizeView>
+            <AuthorizeView Roles="UserHr">
+                <Authorized>
+
+                    <SideNavItem Badge="" ClassIcon="ri-contacts-fill" Title="Лимиты" Href="@RoutePages.STORE_LIMIT" />
+
+                </Authorized>
+            </AuthorizeView>
+                    
+            <SideNavItem Badge="" ClassIcon="ri-contacts-fill" Title="Виды работ" Href="@RoutePages.WORK_CUSTOM" />
+            <NavTitle Title="REPORTS" />
+            <SideNavItem Badge="" ClassIcon="ri-contacts-fill" Title="Использование лимитов" Href="@RoutePages.REPORT_USE_STORE_LIMIT" />
+        </ul>
 
     </div>
 
