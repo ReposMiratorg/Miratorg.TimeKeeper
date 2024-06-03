@@ -4,7 +4,7 @@ namespace Miratorg.TimeKeeper.BusinessLogic.Interfaces;
 
 public interface IApiService
 {
-    Task<ResponseDto> GetBoimetry(RequestDto requestDto);
-    Task<ResponseDto> GetFiscal(RequestDto dto);
+    Task<ResponseDto> GetFacts(RequestDto requestDto);
+    Task<ResponseDto> GetPlans(RequestDto dto);
     Task<ResponseDto> GetManual(RequestDto dto);
 }
