@@ -48,20 +48,20 @@ public class ApiController : ControllerBase
         switch (dto.getTimesheets.source)
         {
             case "graphic":
-                return await _apiService.GetFiscal(dto); // Что запланировали
+                return await _apiService.GetPlans(dto); // Plan
 
             case "table":
-                return await _apiService.GetBoimetry(dto); // Фактически согластно скуда (проверяем план)
+                return await _apiService.GetFacts(dto); // Fact
 
 
             case "biometry":
-                return await _apiService.GetBoimetry(dto);
+                return await _apiService.GetPlans(dto);
 
             case "fiscal":
-                return await _apiService.GetFiscal(dto);
+                return await _apiService.GetFacts(dto);
 
             case "manual":
-                return await _apiService.GetFiscal(dto);
+                return await _apiService.GetPlans(dto);
 
             default:
                 throw new Exception("incorrect source");

@@ -14,7 +14,7 @@ public class ApiServiceV1 : IApiService
     }
 
 
-    public async Task<ResponseDto> GetBoimetry(RequestDto requestDto)
+    public async Task<ResponseDto> GetFacts(RequestDto requestDto)
     {
         try
         {
@@ -263,7 +263,7 @@ public class ApiServiceV1 : IApiService
         return timesheets;
     }
 
-    public async Task<ResponseDto> GetFiscal(RequestDto requestDto)
+    public async Task<ResponseDto> GetPlans(RequestDto requestDto)
     {
         try
         {
