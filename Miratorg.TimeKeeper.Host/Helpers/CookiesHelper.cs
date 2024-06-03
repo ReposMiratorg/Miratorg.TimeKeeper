@@ -7,7 +7,7 @@ namespace Miratorg.TimeKeeper.Host.Helpers;
 
 public class CookiesHelper
 {
-    public static async Task WriteAuth(HttpContext httpContext, string accsessToken, string refreshToken, Dictionary<string, string> userData)
+    public static async Task WriteAuth(HttpContext httpContext, string accsessToken, string refreshToken, List<KeyValuePair<string, string>> userData)
     {
         var jwtHandler = new JwtSecurityTokenHandler();
         var jwtSecurityToken = jwtHandler.ReadJwtToken(accsessToken);

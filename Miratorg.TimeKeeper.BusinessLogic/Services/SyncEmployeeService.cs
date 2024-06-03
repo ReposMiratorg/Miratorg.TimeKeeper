@@ -274,7 +274,7 @@ public class SyncEmployeeService : IHostedService
                     await dbContext.SaveChangesAsync();
                 }
 
-                var (start, end) = GetFirstAndLastDayOfMonth(DateTime.Now);
+                var (start, end) = GetSyncDays(DateTime.Now);
 
                 var tempDate = start.Date;
                 for (int i = 0; tempDate <= end; i++)
@@ -421,10 +421,10 @@ public class SyncEmployeeService : IHostedService
         }
     }
 
-    public static (DateTime FirstDayOfMonth, DateTime LastDayOfMonth) GetFirstAndLastDayOfMonth(DateTime date)
+    public static (DateTime FirstDayOfMonth, DateTime LastDayOfMonth) GetSyncDays(DateTime date)
     {
-        DateTime firstDayOfMonth = date.AddMonths(-1);
-        DateTime lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+        DateTime firstDayOfMonth = date.AddDays(-7);
+        DateTime lastDayOfMonth = date.AddDays(3);
 
         return (firstDayOfMonth, lastDayOfMonth);
     }
