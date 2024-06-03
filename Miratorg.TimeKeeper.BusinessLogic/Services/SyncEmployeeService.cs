@@ -209,6 +209,7 @@ public class SyncEmployeeService : IHostedService
 
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
             int date = environment == "Development" ? -7 : 1;
+            _logger.LogInformation($"environment: {environment}");
 
             foreach (var employee in employees)
             {
