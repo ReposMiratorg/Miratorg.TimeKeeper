@@ -2,8 +2,7 @@
 
 public interface IPlanService
 {
-    //public Task<List<PlanEntity>> GetPlan(DateTime beginDate, DateTime endDate);
-    //public Task<List<EmployeeModel>> GetPlanModel(DateTime beginDate, DateTime endDate);
+    public Task<bool> CheckPlan(Guid employeeId, DateTime beginWork, DateTime endWork);
     public Task Create(Guid employeeId, PlanType planType, DateTime beginWork, DateTime endWork, Guid storeId, Guid? typeOverwork, Guid? customOverwork);
     public Task Remove(Guid id);
     public Task RemoveScudManual(Guid id);
@@ -59,19 +58,6 @@ public class PlanService : IPlanService
         await  dbContext.SaveChangesAsync();
     }
 
-    public async Task<List<PlanEntity>> GetPlan(DateTime startDate, DateTime endDate)
-    {
-        ValidateDate(startDate);
-        ValidateDate(endDate);
-
-        using var dbContext = await _dbContextFactory.Create();
-        var plans = await dbContext.Plans
-            .Where(x => (x.Begin >= startDate && x.Begin <= endDate) || (x.End >= startDate && x.End <= endDate))
-            .ToListAsync();
-        
-        return plans;
-    }
-
     public async Task RemoveScudManual(Guid id)
     {
         try
@@ -102,98 +88,12 @@ public class PlanService : IPlanService
         }
     }
 
-    private static void ValidateDate(DateTime dateTime)
-    {
-        var date = dateTime.Date;
-
-        if (dateTime != date)
-        {
-            throw new InvalidParameterPlanServiceException(dateTime.ToString());
-        }
-    }
-
     private static void ValidateDates(DateTime begin, DateTime end)
     {
         if (begin >= end)
         {
             throw new InvalidParameterPlanServiceException($"Incorrect interval {begin} - {begin}");
         }
-    }
-
-    public async Task<List<EmployeeModel>> GetPlanModel(DateTime startDate, DateTime endDate)
-    {
-        ValidateDate(startDate);
-        ValidateDate(endDate);
-
-        using var dbContext = await _dbContextFactory.Create();
-        var plans = await dbContext.Plans.Where(x => x.Begin >= startDate && x.End <= endDate).ToListAsync();
-
-        var employees = await dbContext.Employees.Include(x => x.Store).Include(x => x.Schedule).ThenInclude(x => x.Dates).ToListAsync();
-
-        var models = new List<EmployeeModel>();
-
-        var groups = plans
-            .GroupBy(x => x.EmployeeId)
-            .Select(x => new { key = x.Key, Data = x.ToList()});
-
-        foreach (var item in employees)
-        {
-            var model = new EmployeeModel
-            {
-                Id = item.Id,
-                StoreId = item.StoreId
-            };
-
-            var plan = groups.FirstOrDefault(x => x.key == item.Id);
-
-            if (plan != null)
-            {
-                foreach (var d in plan.Data)
-                {
-                    model.Plans.Add(new PlanDetailModel()
-                    {
-                        Id = d.Id,
-                        Begin = d.Begin,
-                        End = d.End,
-                        PlanType = d.PlanType,
-                        StoreId = d.StoreId
-                    });
-                }
-            }
-
-            var employee = SyncEmployeeService.Employees.FirstOrDefault(x => x.Id == item.Id);
-            if (employee?.WorkDates != null)
-            {
-                var dates = employee?.WorkDates
-                    .Where(x => x.Begin >= startDate && x.Begin <= endDate.AddDays(1))
-                    .ToList();
-
-                foreach (var date in dates)
-                {
-                    model.WorkDates.Add(new Schedule1CPlanModel()
-                    {
-                         Begin = date.Begin,
-                         End = date.End,
-                    });
-                }
-
-                var scudInfos = employee?.ScudInfos?.Where(x => x.Begin >= startDate && x.End <= endDate)
-                    .ToList();
-
-                foreach (var scudFact in scudInfos)
-                {
-                    model.ScudInfos.Add(new ScudInfoModel()
-                    {
-                        Begin = scudFact.Begin,
-                        End = scudFact.End
-                    });
-                }
-            }
-
-            models.Add(model);
-        }
-
-        return models;
     }
 
     public async Task CreateManualScud(Guid employeeId, DateTime begin, DateTime end)
@@ -210,6 +110,24 @@ public class PlanService : IPlanService
 
         dbContext.ManualScuds.Add(manualScudEntity);
         await dbContext.SaveChangesAsync();
+    }
+
+    public async Task<bool> CheckPlan(Guid employeeId, DateTime begin, DateTime end)
+    {
+        try
+        {
+            using var dbContext = await _dbContextFactory.Create();
+            var result = dbContext.Plans.Any(ti => ti.EmployeeId == employeeId && begin < ti.End && end > ti.Begin);
+
+            return false;
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
+            return false;
+        }
     }
 }
 
