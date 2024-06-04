@@ -40,7 +40,13 @@
                 <CreatePlanDialogComponent Action="UdateUIAction" LimitPlanHours="LimitPlanHours" PlanHours="PlanHours" CurrentDate="currentDate" EmployeeId="EmployeeId" StoreId="StoreId" />
             </div>
             <div class="col">
-                <EditCreatePlanDialog Action="UdateUIAction" CurrentDate="currentDate" EmoloyeeId="EmployeeId"  />
+
+                <AuthorizeView Roles="UserHr,UserRy,Supermarkets">
+                    <Authorized>
+                        <EditCreatePlanDialog Action="UdateUIAction" CurrentDate="currentDate" EmoloyeeId="EmployeeId" />
+                    </Authorized>
+                </AuthorizeView>
+
             </div>
         </div>
 
