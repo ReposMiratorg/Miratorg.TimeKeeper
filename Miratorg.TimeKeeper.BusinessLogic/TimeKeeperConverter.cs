@@ -1,10 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Miratorg.TimeKeeper.BusinessLogic.Models;
-using System;
-using System.Numerics;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace Miratorg.TimeKeeper.BusinessLogic;
+﻿namespace Miratorg.TimeKeeper.BusinessLogic;
 
 public  class TimeKeeperConverter
 {
@@ -289,7 +283,7 @@ public  class TimeKeeperConverter
 
                 // Обед 60 минут после 8го часа работы
                 bool obed60min = false;
-                int timeObed60min = 60;
+                int time2Obed30min = 30;
                
                 List<ExportTime> exportTimes = new List<ExportTime>();
 
@@ -323,18 +317,18 @@ public  class TimeKeeperConverter
 
                     if (obed60min == false && dayPlanFill > TimeSpan.FromHours(8))
                     {
-                        var t0 = dayPlanFill - TimeSpan.FromHours(8) - TimeSpan.FromMinutes(timeObed60min);
+                        var t0 = dayPlanFill - TimeSpan.FromHours(8) - TimeSpan.FromMinutes(time2Obed30min);
                         if (t0.TotalMinutes >= 0) // если время больше чем 8 часа- убираем обед
                         {
-                            time -= TimeSpan.FromMinutes(timeObed60min);
-                            usedLunch += timeObed60min;
+                            time -= TimeSpan.FromMinutes(time2Obed30min);
+                            usedLunch += time2Obed30min;
                             obed60min = true;
-                            timeObed60min = 0;
+                            time2Obed30min = 0;
                         }
                         else
                         {
                             int lunch = ((int)t0.TotalMinutes) * -1;
-                            timeObed60min -= lunch;
+                            time2Obed30min -= lunch;
                             time -= TimeSpan.FromMinutes(lunch); ;
                             usedLunch += lunch;
                         }
@@ -368,6 +362,7 @@ public  class TimeKeeperConverter
 
                 // факт скуд + ручной скуд
                 TimeSpan dayScud = new TimeSpan();
+                //ToDo - need release
 
                 monthPlan += dayPlanClear;
                 monthScud += dayScud;
@@ -478,18 +473,5 @@ public  class TimeKeeperConverter
         }
 
         return ((int)dayHours, (int)nightHours);
-    }
-}
-
-public static class EnumerableExtensions
-{
-    public static T? MinByOrDefault<T, TKey>(this IEnumerable<T> source, Func<T, TKey> selector) where T : class
-    {
-        if (source == null || !source.Any())
-        {
-            return null;
-        }
-
-        return source.MinBy(selector);
     }
 }

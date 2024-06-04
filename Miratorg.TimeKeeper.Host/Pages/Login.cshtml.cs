@@ -137,12 +137,13 @@ public class Login : PageModel
                 var isHr = groups.FirstOrDefault(x => x.Contains(ActiveDirectoryGroups.HR)) != null;
                 var isRy = groups.FirstOrDefault(x => x.Contains(ActiveDirectoryGroups.RY)) != null;
                 var isSupermarkets = groups.FirstOrDefault(x => x.Contains(ActiveDirectoryGroups.Supermarkets)) != null;
+                var isBurgers = groups.FirstOrDefault(x => x.Contains(ActiveDirectoryGroups.Burger)) != null;
 
                 //isHr = false;
                 //isRy = false;
                 //isSupermarkets = false;
 
-                if (isHr == false && isRy == false && isSupermarkets == false)
+                if (isHr == false && isRy == false && isSupermarkets == false && isBurgers == false)
                 {
                     Message = "You do not have permission to enter";
                     return Page();
@@ -166,6 +167,11 @@ public class Login : PageModel
                 if (isSupermarkets)
                 {
                     userData.Add(new KeyValuePair<string, string>(ClaimTypes.Role, "Supermarkets"));
+                }
+
+                if (isBurgers)
+                {
+                    userData.Add(new KeyValuePair<string, string>(ClaimTypes.Role, "Burgers"));
                 }
 
                 var accessToken = GenerateToken(UserLogin.Email, userData);
