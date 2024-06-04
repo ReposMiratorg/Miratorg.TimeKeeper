@@ -316,7 +316,7 @@ public class SyncEmployeeService : IHostedService
                 return;
             }
 
-            var scudStaff = await stuffContext.SkudStaffs.FirstOrDefaultAsync(x => x.Code != null && x.Code.ToLower() == codeNav.ToLower());
+            var scudStaff = await stuffContext.SkudStaffs.FirstOrDefaultAsync(x => x.CodeDataCenter == "mhb-sql" && x.Code != null && x.Code.ToLower() == codeNav.ToLower());
             if (scudStaff == null)
             {
                 //_logger.LogInformation($"ScudStaff :'{codeNav}' - not found.");
