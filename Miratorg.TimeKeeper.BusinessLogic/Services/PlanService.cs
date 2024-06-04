@@ -117,11 +117,17 @@ public class PlanService : IPlanService
         try
         {
             using var dbContext = await _dbContextFactory.Create();
-            var result = dbContext.Plans.Any(ti => ti.EmployeeId == employeeId && begin < ti.End && end > ti.Begin);
 
-            return false;
+            var result = dbContext.Plans.Any(x => x.EmployeeId == employeeId && begin < x.End && end > x.Begin);
 
-            return result;
+            if (result == true)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
         catch (Exception ex)
         {
