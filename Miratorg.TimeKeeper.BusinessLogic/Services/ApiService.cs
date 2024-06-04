@@ -2,12 +2,12 @@
 
 namespace Miratorg.TimeKeeper.BusinessLogic.Services;
 
-public class ApiServiceV1 : IApiService
+public class ApiService : IApiService
 {
     private readonly TimeKeeperDbContext _dbContext;
-    private readonly ILogger<ApiServiceV1> _logger;
+    private readonly ILogger<ApiService> _logger;
 
-    public ApiServiceV1(TimeKeeperDbContext dbContext, ILogger<ApiServiceV1> logger)
+    public ApiService(TimeKeeperDbContext dbContext, ILogger<ApiService> logger)
     {
         _dbContext = dbContext;
         _logger = logger;
