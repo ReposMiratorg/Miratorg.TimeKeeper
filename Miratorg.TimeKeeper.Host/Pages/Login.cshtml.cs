@@ -154,15 +154,15 @@ public class Login : PageModel
                     //{ "CodeNav", codeNav }
                 };
 
-                //if (isHr)
-                //{
-                //    userData.Add(new KeyValuePair<string, string>(ClaimTypes.Role, "UserHr"));
-                //}
+                if (isHr)
+                {
+                    userData.Add(new KeyValuePair<string, string>(ClaimTypes.Role, "UserHr"));
+                }
 
-                //if (isRy)
-                //{
-                //    userData.Add(new KeyValuePair<string, string>(ClaimTypes.Role, "UserRy"));
-                //}
+                if (isRy)
+                {
+                    userData.Add(new KeyValuePair<string, string>(ClaimTypes.Role, "UserRy"));
+                }
 
                 if (isSupermarkets)
                 {
