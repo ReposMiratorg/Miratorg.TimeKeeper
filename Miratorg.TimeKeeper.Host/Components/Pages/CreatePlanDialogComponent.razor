@@ -9,11 +9,17 @@
         <div class="row">
             <div class="col-4">
                 <label>Начало</label>
-                <input class="form-control form-control-sm" type="datetime-local" name="name" @bind="begin" />
+                <input class="form-control form-control-sm @invalidClass" type="datetime-local" name="name" @bind="begin" />
+                <div class="invalid-feedback">
+                    Выберете другое время
+                </div>
             </div>
             <div class="col-4">
                 <label>Завершение</label>
-                <input class="form-control form-control-sm" type="datetime-local" name="name" @bind="end" />
+                <input class="form-control form-control-sm @invalidClass" type="datetime-local" name="name" @bind="end" />
+                <div class="invalid-feedback">
+                    Выберете другое время
+                </div>
             </div>
             <div class="col-4">
                 <label>Тип</label>
@@ -121,6 +127,8 @@
     [Inject]
     public ILogger<CreatePlanDialogComponent> Logger { get; set; }
 
+    private string invalidClass { get; set; } = string.Empty;
+
     private List<StoreEntity> allStories { get; set; }
     private List<TypeOverWorkEntity> typeWorks { get; set; } = new List<TypeOverWorkEntity>();
     private List<CustomTypeWorkEntity> customTypeWorks { get; set; } = new List<CustomTypeWorkEntity>();
@@ -142,6 +150,8 @@
     private async Task Open()
     {
         Error = false;
+
+        invalidClass = string.Empty;
 
         storeId = StoreId;
         begin = CurrentDate.Date.AddHours(8);
@@ -183,6 +193,16 @@
             }
 
             Error = false;
+
+            var resultCheckInterval = await PlanService.CheckPlan(EmployeeId, begin, end);
+
+            if(resultCheckInterval == false)
+            {
+                invalidClass = "is-invalid";
+                return;
+            }
+
+            invalidClass = string.Empty;
 
             Guid? customOverworkId = customOverwork == Guid.Empty ? null : customOverwork;
             await PlanService.Create(EmployeeId, planType, begin, end, storeId, typeOverWork, customOverworkId);
