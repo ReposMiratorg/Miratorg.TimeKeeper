@@ -197,6 +197,7 @@ public class SyncEmployeeService : IHostedService
             var employees = await staffDbContext.Staff
                 .Where(x => x.LegalEntity == "ООО \"ПродМир\"" || x.LegalEntity == "ООО «Стейк и Бургер»")
                 .Where(x => x.DismissalDate == null)
+                .Where(x => x.Guid != null)
                 .ToListAsync();
 
             var divisions = await staffDbContext.StaffDivisions.ToListAsync();
@@ -215,7 +216,7 @@ public class SyncEmployeeService : IHostedService
             {
                 _logger.LogInformation($"Process: '{employee.Code}'");
 
-                var currentEmployee = dbContext.Employees.FirstOrDefault(x => x.CodeNav == employee.Code);
+                var currentEmployee = dbContext.Employees.FirstOrDefault(x => x.Guid1C == employee.Guid);
 
                 if (currentEmployee != null && currentEmployee.UpdateAt > DateTime.Now.AddDays(date))
                 {
@@ -424,7 +425,7 @@ public class SyncEmployeeService : IHostedService
 
     public static (DateTime FirstDayOfMonth, DateTime LastDayOfMonth) GetSyncDays(DateTime date)
     {
-        DateTime firstDayOfMonth = date.AddDays(-7);
+        DateTime firstDayOfMonth = date.AddDays(-20);
         DateTime lastDayOfMonth = date.AddDays(3);
 
         return (firstDayOfMonth, lastDayOfMonth);
