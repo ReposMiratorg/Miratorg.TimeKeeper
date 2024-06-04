@@ -1,10 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Miratorg.TimeKeeper.BusinessLogic.Models;
-using System;
-using System.Numerics;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace Miratorg.TimeKeeper.BusinessLogic;
+﻿namespace Miratorg.TimeKeeper.BusinessLogic;
 
 public  class TimeKeeperConverter
 {
@@ -478,18 +472,5 @@ public  class TimeKeeperConverter
         }
 
         return ((int)dayHours, (int)nightHours);
-    }
-}
-
-public static class EnumerableExtensions
-{
-    public static T? MinByOrDefault<T, TKey>(this IEnumerable<T> source, Func<T, TKey> selector) where T : class
-    {
-        if (source == null || !source.Any())
-        {
-            return null;
-        }
-
-        return source.MinBy(selector);
     }
 }
