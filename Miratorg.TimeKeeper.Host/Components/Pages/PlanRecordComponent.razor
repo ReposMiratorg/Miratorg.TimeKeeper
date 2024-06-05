@@ -42,7 +42,7 @@
                     time = time - 1;
                 }
 
-                interval = $"{planInterval.Begin.ToString("HH:mm")} - {planInterval.End.ToString("HH:mm")} ({time})";
+                interval = $"{planInterval.Begin.ToString("HH:mm")} - {planInterval.End.ToString("HH:mm")} ({time.ToString("0.0")})";
                 var date = CurrentDate;
                 for (int i = 0; i < 24; i++)
                 {
