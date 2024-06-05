@@ -425,8 +425,8 @@ public class SyncEmployeeService : IHostedService
 
     public static (DateTime FirstDayOfMonth, DateTime LastDayOfMonth) GetSyncDays(DateTime date)
     {
-        DateTime firstDayOfMonth = date.AddDays(-20);
-        DateTime lastDayOfMonth = date.AddDays(3);
+        DateTime firstDayOfMonth = date.AddDays(-40);
+        DateTime lastDayOfMonth = date.AddDays(50);
 
         return (firstDayOfMonth, lastDayOfMonth);
     }
