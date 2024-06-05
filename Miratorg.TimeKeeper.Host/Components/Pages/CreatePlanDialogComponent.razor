@@ -10,16 +10,12 @@
             <div class="col-4">
                 <label>Начало</label>
                 <input class="form-control form-control-sm @invalidClass" type="datetime-local" name="name" @bind="begin" />
-                <div class="invalid-feedback">
-                    Выберете другое время
-                </div>
+                <div class="invalid-feedback">@errorMessage</div>
             </div>
             <div class="col-4">
                 <label>Завершение</label>
                 <input class="form-control form-control-sm @invalidClass" type="datetime-local" name="name" @bind="end" />
-                <div class="invalid-feedback">
-                    Выберете другое время
-                </div>
+                <div class="invalid-feedback">@errorMessage</div>
             </div>
             <div class="col-4">
                 <label>Тип</label>
@@ -128,6 +124,9 @@
     public ILogger<CreatePlanDialogComponent> Logger { get; set; }
 
     private string invalidClass { get; set; } = string.Empty;
+    private string errorMessage { get; set; } = string.Empty;
+
+    private const string ErrorMaxInterval = "Выбран интервал более 24 часов";
 
     private List<StoreEntity> allStories { get; set; }
     private List<TypeOverWorkEntity> typeWorks { get; set; } = new List<TypeOverWorkEntity>();
@@ -192,6 +191,14 @@
                 return;
             }
 
+            if (time > 24)
+            {
+                invalidClass = "is-invalid";
+                errorMessage = "Выбрано более 24 часов";
+
+                return;
+            }
+
             Error = false;
 
             var resultCheckInterval = await PlanService.CheckPlan(EmployeeId, begin, end);
@@ -199,9 +206,11 @@
             if(resultCheckInterval == false)
             {
                 invalidClass = "is-invalid";
+                errorMessage = "Проверьте выбранную дату";
                 return;
             }
 
+            errorMessage = string.Empty;
             invalidClass = string.Empty;
 
             Guid? customOverworkId = customOverwork == Guid.Empty ? null : customOverwork;

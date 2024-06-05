@@ -42,18 +42,48 @@ public class PlanService : IPlanService
             }
         }
 
-        var plan = new PlanEntity()
+        if (begin.Date != end.Date)
         {
-            EmployeeId = employeeId,
-            Begin = begin,
-            End = end,
-            PlanType = planType,
-            StoreId = storeId,
-            TypeOverWorkId = typeOverwork,
-            CustomTypeWorkId = customOverwork
-        };
+            var plan0 = new PlanEntity()
+            {
+                EmployeeId = employeeId,
+                Begin = begin,
+                End = begin.Date.AddHours(23).AddMinutes(59).AddSeconds(59),
+                PlanType = planType,
+                StoreId = storeId,
+                TypeOverWorkId = typeOverwork,
+                CustomTypeWorkId = customOverwork
+            };
 
-        dbContext.Plans.Add(plan);
+            var plan1 = new PlanEntity()
+            {
+                EmployeeId = employeeId,
+                Begin = end.Date,
+                End = end,
+                PlanType = planType,
+                StoreId = storeId,
+                TypeOverWorkId = typeOverwork,
+                CustomTypeWorkId = customOverwork
+            };
+
+            dbContext.Plans.Add(plan0);
+            dbContext.Plans.Add(plan1);
+        }
+        else
+        {
+            var plan = new PlanEntity()
+            {
+                EmployeeId = employeeId,
+                Begin = begin,
+                End = end,
+                PlanType = planType,
+                StoreId = storeId,
+                TypeOverWorkId = typeOverwork,
+                CustomTypeWorkId = customOverwork
+            };
+
+            dbContext.Plans.Add(plan);
+        }
 
         await  dbContext.SaveChangesAsync();
     }
@@ -99,16 +129,44 @@ public class PlanService : IPlanService
     public async Task CreateManualScud(Guid employeeId, DateTime begin, DateTime end)
     {
         using var dbContext = await _dbContextFactory.Create();
-        ManualScudEntity manualScudEntity = new ManualScudEntity()
-        {
-            CreateAt = DateTime.Now,
-            EmployeeId = employeeId,
-            Input = begin,
-            Output = end,
-            UserAutorName = "n/d"
-        };
 
-        dbContext.ManualScuds.Add(manualScudEntity);
+        if (begin.Date != end.Date)
+        {
+            ManualScudEntity manualScudEntity0 = new ManualScudEntity()
+            {
+                CreateAt = DateTime.Now,
+                EmployeeId = employeeId,
+                Input = begin,
+                Output = begin.AddHours(23).AddMinutes(59).AddSeconds(59),
+                UserAutorName = "n/d"
+            };
+
+            ManualScudEntity manualScudEntity1 = new ManualScudEntity()
+            {
+                CreateAt = DateTime.Now,
+                EmployeeId = employeeId,
+                Input = end.Date,
+                Output = end,
+                UserAutorName = "n/d"
+            };
+
+            dbContext.ManualScuds.Add(manualScudEntity0);
+            dbContext.ManualScuds.Add(manualScudEntity1);
+        }
+        else
+        {
+            ManualScudEntity manualScudEntity = new ManualScudEntity()
+            {
+                CreateAt = DateTime.Now,
+                EmployeeId = employeeId,
+                Input = begin,
+                Output = end,
+                UserAutorName = "n/d"
+            };
+
+            dbContext.ManualScuds.Add(manualScudEntity);
+        }
+
         await dbContext.SaveChangesAsync();
     }
 

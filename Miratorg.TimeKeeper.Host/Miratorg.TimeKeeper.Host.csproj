@@ -34,7 +34,7 @@
     <None Include="Components\Pages\ReasonAbcentComponent.razor" />
     <None Include="Components\Pages\ScudComponent.razor" />
     <None Include="Components\Pages\DayHeader.razor" />
-    <None Include="Components\EditCreatePlanDialog.razor" />
+    <None Include="Components\CreateManualScudDialog.razor" />
     <None Include="Components\FactComponent.razor" />
     <None Include="Components\Pages\WeekPanelComponent.razor" />
     <None Include="Components\Pages\PlanRecordComponent.razor" />
