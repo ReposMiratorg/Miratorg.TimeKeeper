@@ -288,7 +288,7 @@ public class SyncEmployeeService : IHostedService
                 }
 
                     // Обновляем причины отсутствия
-                await SyncAbsence(currentEmployee.Id, end, tempDate);
+                await SyncAbsence(currentEmployee.Id, start, end);
 
                 // обрабатываем данные из плана проходов 1С
                 await UpdateSchedule(currentEmployee.Id, employee.Code, start, end);
