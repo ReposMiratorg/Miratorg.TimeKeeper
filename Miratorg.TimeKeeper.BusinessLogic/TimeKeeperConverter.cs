@@ -304,6 +304,7 @@ public  class TimeKeeperConverter
                             time -= TimeSpan.FromMinutes(timeObed30min);
                             usedLunch += timeObed30min;
                             obed30min = true;
+                            plan.End = plan.End - TimeSpan.FromMinutes(timeObed30min);
                             timeObed30min = 0;
                         }
                         else
@@ -312,6 +313,7 @@ public  class TimeKeeperConverter
                             timeObed30min -= lunch;
                             time -= TimeSpan.FromMinutes(lunch);
                             usedLunch += lunch;
+                            plan.End = plan.End - TimeSpan.FromMinutes(lunch);
                         }
                     }
 
@@ -323,19 +325,21 @@ public  class TimeKeeperConverter
                             time -= TimeSpan.FromMinutes(time2Obed30min);
                             usedLunch += time2Obed30min;
                             obed60min = true;
+                            plan.End = plan.End - TimeSpan.FromMinutes(time2Obed30min);
                             time2Obed30min = 0;
                         }
                         else
                         {
                             int lunch = ((int)t0.TotalMinutes) * -1;
                             time2Obed30min -= lunch;
-                            time -= TimeSpan.FromMinutes(lunch); ;
+                            time -= TimeSpan.FromMinutes(lunch);
                             usedLunch += lunch;
+                            plan.End = plan.End - TimeSpan.FromMinutes(lunch);
                         }
                     }
 
                     var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightMinutes(plan.Begin, plan.End);
-                    dayMinutes -= usedLunch;
+                    //dayMinutes -= usedLunch;
 
                     ExportTime exportTime = new ExportTime()
                     {
@@ -381,9 +385,9 @@ public  class TimeKeeperConverter
                     };
 
                     var day = new DateTime(fact.Date.Year, fact.Date.Month, fact.Date.Day);
-                    var scud = employee.ScudInfos.Where(x => x.Begin.Date == day).ToList();
+                    var scudInfos = employee.ScudInfos.Where(x => x.Begin.Date == day).ToList();
 
-                    if (scud.Count == 0)
+                    if (scudInfos.Count == 0)
                     {
                         // нет фактоы явки
                         fact.DayMinutes = 0;
@@ -397,8 +401,8 @@ public  class TimeKeeperConverter
                         arrival – фактическое время прихода на работу
                         departure – фактическое время ухода с работы
                          */
-                        var scudBegin = scud.Min(x => x.Begin);
-                        var scudEnd = scud.Max(x => x.End);
+                        var scudBegin = scudInfos.Min(x => x.Begin);
+                        var scudEnd = scudInfos.Max(x => x.End);
 
                         DateTime actualStart = scudBegin < fact.Begin ? fact.Begin : scudBegin;
                         DateTime actualEnd = scudEnd > fact.End ? fact.End : scudEnd;
