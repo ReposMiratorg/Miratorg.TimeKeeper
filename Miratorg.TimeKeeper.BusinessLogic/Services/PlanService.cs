@@ -176,6 +176,7 @@ public class PlanService : IPlanService
         {
             using var dbContext = await _dbContextFactory.Create();
 
+            var debugTimes = dbContext.Plans.Include(x => x.TypeOverWork).Where(x => x.EmployeeId == employeeId && begin < x.End && end > x.Begin).ToArray();
             var result = dbContext.Plans.Any(x => x.EmployeeId == employeeId && begin < x.End && end > x.Begin);
 
             if (result == true)
