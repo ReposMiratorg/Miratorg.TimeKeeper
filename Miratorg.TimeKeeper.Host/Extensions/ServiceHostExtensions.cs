@@ -61,6 +61,7 @@ public static class ServiceHostExtensions
 
         services.AddScoped<IPlanService, PlanService>();
         services.AddScoped<IApiService, ApiService>();
+        services.AddScoped<ISigurService, SigurService>();
 
         var connectionString = configuration.GetConnectionString("DefaultConnection");
         services.AddDbContextPool<TimeKeeperDbContext>(options =>
