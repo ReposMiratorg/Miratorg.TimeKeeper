@@ -21,5 +21,6 @@ public class EmployeeEntity : BaseEntity
     public virtual List<ManualScudEntity> ManualScuds { get; set; }
     public virtual List<PlanEntity> Plans { get; set; }
     public virtual List<AbsenceEntity> Absences { get; set; }
+    public virtual List<SigurInfoEntity> SigurInfos { get; set; }
     public DateTime UpdateAt { get; set; }
 }
