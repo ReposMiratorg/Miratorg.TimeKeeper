@@ -233,4 +233,78 @@ public class EmployeeConverter3Tests
         Assert.Equal(380, deyExportFacts[0].DayMinutes);
         Assert.Equal(0, deyExportFacts[0].NightMinutes);
     }
+
+    [Fact]
+    public void PlanDay5HourTest()
+    {
+        // вход и выход опреелдляются через сигур (переходящее рабочее время на другое число)
+        var employeeEntity = new EmployeeEntity()
+        {
+            StoreId = StoreId,
+
+            Plans = new List<PlanEntity>()
+            {
+                new PlanEntity()
+                {
+                    Begin = new DateTime(2024, 6, 2, 8, 00, 0),
+                    End = new DateTime(2024, 6, 2, 23, 59, 0),
+                    StoreId = StoreId,
+                    PlanType = PlanType.Plan
+                },
+
+                new PlanEntity()
+                {
+                    Begin = new DateTime(2024, 6, 3, 0, 0, 0),
+                    End = new DateTime(2024, 6, 3, 7, 00, 0),
+                    StoreId = StoreId,
+                    PlanType = PlanType.Plan
+                }
+            },
+
+            ManualScuds = new List<ManualScudEntity>(),
+            ScudInfos = new List<ScudInfo>()
+        };
+
+        List<SigurEventModel> sigurEvents = new List<SigurEventModel>()
+        {
+            new SigurEventModel() { CodeNav = string.Empty, EventTime = new DateTime(2024, 6, 2, 8, 0, 0) },
+            new SigurEventModel() { CodeNav = string.Empty, EventTime = new DateTime(2024, 6, 3, 7, 0, 0) }
+        };
+
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
+
+        Assert.NotNull(employeeModel);
+        Assert.Equal(StoreId, employeeModel.StoreId);
+        Assert.Equal(899, employeeModel.DayPlanUseMinutes[new DateTime(2024, 6, 2)]); // должно быть (16 * 60) - 90 = 960 - 60 = 900 ~ 899
+        Assert.Equal(420, employeeModel.DayPlanUseMinutes[new DateTime(2024, 6, 3)]); // не верное время - проверить -> должно быть 420
+
+        var deyExportPlans2 = employeeModel.ExportPlanTimes.Where(x => x.Date == new DateOnly(2024, 6, 2)).ToList();
+        Assert.NotNull(deyExportPlans2);
+        Assert.Equal(1, deyExportPlans2.Count);
+        Assert.Equal("regular", deyExportPlans2[0].WorkTime);
+        Assert.Equal(840, deyExportPlans2[0].DayMinutes); // не верное время - проверить
+        Assert.Equal(119, deyExportPlans2[0].NightMinutes); // не верное время - проверить -> должно быть 119 минут ночью
+
+        var deyExportFacts2 = employeeModel.ExportFactTimes.Where(x => x.Date == new DateOnly(2024, 6, 2)).ToList();
+        Assert.NotNull(deyExportFacts2);
+        Assert.Equal(1, deyExportFacts2.Count);
+        Assert.Equal("regular", deyExportFacts2[0].WorkTime);
+        Assert.Equal(840, deyExportFacts2[0].DayMinutes);
+        Assert.Equal(119, deyExportFacts2[0].NightMinutes);
+
+
+        var deyExportPlans3 = employeeModel.ExportPlanTimes.Where(x => x.Date == new DateOnly(2024, 6, 3)).ToList();
+        Assert.NotNull(deyExportPlans3);
+        Assert.Equal(1, deyExportPlans3.Count);
+        Assert.Equal("regular", deyExportPlans3[0].WorkTime);
+        Assert.Equal(60, deyExportPlans3[0].DayMinutes); //
+        Assert.Equal(360, deyExportPlans3[0].NightMinutes);
+
+        var deyExportFacts3 = employeeModel.ExportFactTimes.Where(x => x.Date == new DateOnly(2024, 6, 3)).ToList();
+        Assert.NotNull(deyExportFacts3);
+        Assert.Equal(1, deyExportFacts3.Count);
+        Assert.Equal("regular", deyExportFacts3[0].WorkTime);
+        Assert.Equal(60, deyExportFacts3[0].DayMinutes);
+        Assert.Equal(360, deyExportFacts3[0].NightMinutes);
+    }
 }
