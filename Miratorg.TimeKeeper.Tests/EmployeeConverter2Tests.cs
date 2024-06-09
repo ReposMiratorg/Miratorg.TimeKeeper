@@ -36,7 +36,9 @@ public class EmployeeConverter2Tests
             ScudInfos = new List<ScudInfo>()
         };
 
-        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV2(employeeEntity);
+        List<BusinessLogic.Models.SigurEventModel> sigurEvents = new List<BusinessLogic.Models.SigurEventModel>();
+
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
 
         Assert.NotNull(employeeModel);
         Assert.Equal(StoreId, employeeModel.StoreId);
@@ -96,7 +98,9 @@ public class EmployeeConverter2Tests
             ScudInfos = new List<ScudInfo>()
         };
 
-        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV2(employeeEntity);
+        List<BusinessLogic.Models.SigurEventModel> sigurEvents = new List<BusinessLogic.Models.SigurEventModel>();
+
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
 
         Assert.NotNull(employeeModel);
         Assert.Equal(StoreId, employeeModel.StoreId);
@@ -154,7 +158,9 @@ public class EmployeeConverter2Tests
             ScudInfos = new List<ScudInfo>()
         };
 
-        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV2(employeeEntity);
+        List<BusinessLogic.Models.SigurEventModel> sigurEvents = new List<BusinessLogic.Models.SigurEventModel>();
+
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
 
         Assert.NotNull(employeeModel);
         Assert.Equal(StoreId, employeeModel.StoreId);

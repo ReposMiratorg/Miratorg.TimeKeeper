@@ -26,7 +26,9 @@ public class EmployeeConverterTests
             ScudInfos = new List<ScudInfo>()
         };
 
-        var employeeModel = BusinessLogic.TimeKeeperConverter.Convert(employeeEntity);
+        List<BusinessLogic.Models.SigurEventModel> sigurEvents = new List<BusinessLogic.Models.SigurEventModel>();
+
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
 
         Assert.NotNull(employeeModel);
         Assert.Equal(employeeModel.DayPlanUseMinutes[new DateTime(2024, 1, 3)], 120);
@@ -52,7 +54,9 @@ public class EmployeeConverterTests
             ScudInfos = new List<ScudInfo>()
         };
 
-        var employeeModel = BusinessLogic.TimeKeeperConverter.Convert(employeeEntity);
+        List<BusinessLogic.Models.SigurEventModel> sigurEvents = new List<BusinessLogic.Models.SigurEventModel>();
+
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
 
         Assert.NotNull(employeeModel);
         Assert.Equal(employeeModel.DayPlanUseMinutes[new DateTime(2024, 1, 1)], 180);
@@ -78,10 +82,12 @@ public class EmployeeConverterTests
             ScudInfos = new List<ScudInfo>()
         };
 
-        var employeeModel = BusinessLogic.TimeKeeperConverter.Convert(employeeEntity);
+        List<BusinessLogic.Models.SigurEventModel> sigurEvents = new List<BusinessLogic.Models.SigurEventModel>();
+
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
 
         Assert.NotNull(employeeModel);
-        Assert.Equal(employeeModel.DayPlanUseMinutes[new DateTime(2024, 3, 8)], 180);
+        Assert.Equal(240, employeeModel.DayPlanUseMinutes[new DateTime(2024, 3, 8)]);
     }
 
     [Fact]
@@ -101,11 +107,13 @@ public class EmployeeConverterTests
             }
         };
 
-        var employeeModel = BusinessLogic.TimeKeeperConverter.Convert(employeeEntity);
+        List<BusinessLogic.Models.SigurEventModel> sigurEvents = new List<BusinessLogic.Models.SigurEventModel>();
+
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
 
         Assert.NotNull(employeeModel);
-        Assert.Equal(employeeModel.DayPlanUseMinutes[new DateTime(2024, 3, 8)], 0);
-        Assert.Equal(employeeModel.DayScudUseMinutes[new DateTime(2024, 3, 8)], 60);
+        Assert.Equal(0, employeeModel.DayPlanUseMinutes[new DateTime(2024, 3, 8)]);
+        Assert.Equal(0, employeeModel.DayScudUseMinutes[new DateTime(2024, 3, 8)]);
     }
 
     [Fact]
@@ -125,10 +133,12 @@ public class EmployeeConverterTests
             ScudInfos = new List<ScudInfo>()
         };
 
-        var employeeModel = BusinessLogic.TimeKeeperConverter.Convert(employeeEntity);
+        List<BusinessLogic.Models.SigurEventModel> sigurEvents = new List<BusinessLogic.Models.SigurEventModel>();
+
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
 
         Assert.NotNull(employeeModel);
-        Assert.Equal(employeeModel.DayPlanUseMinutes[new DateTime(2024, 3, 8)], 0);
-        Assert.Equal(employeeModel.DayScudUseMinutes[new DateTime(2024, 3, 8)], 60);
+        Assert.Equal(0, employeeModel.DayPlanUseMinutes[new DateTime(2024, 3, 8)]);
+        Assert.Equal(0, employeeModel.DayScudUseMinutes[new DateTime(2024, 3, 8)]);
     }
 }
