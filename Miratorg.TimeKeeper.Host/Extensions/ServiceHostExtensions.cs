@@ -57,11 +57,11 @@ public static class ServiceHostExtensions
         services.AddStaffControlDbContext();
 
         services.AddSingleton<IStuffControlDbService, StuffControlDbService>();
+        services.AddSingleton<ISigurService, SigurService>();
         services.AddHostedService<SyncEmployeeService>();
 
         services.AddScoped<IPlanService, PlanService>();
         services.AddScoped<IApiService, ApiService>();
-        services.AddScoped<ISigurService, SigurService>();
 
         var connectionString = configuration.GetConnectionString("DefaultConnection");
         services.AddDbContextPool<TimeKeeperDbContext>(options =>
