@@ -1,4 +1,5 @@
-﻿using Miratorg.TimeKeeper.DataAccess.Entities;
+﻿using Miratorg.TimeKeeper.BusinessLogic.Models;
+using Miratorg.TimeKeeper.DataAccess.Entities;
 
 namespace Miratorg.TimeKeeper.Tests;
 
@@ -36,7 +37,7 @@ public class EmployeeConverter3Tests
             ScudInfos = new List<ScudInfo>()
         };
 
-        List<BusinessLogic.Models.SigurEventModel> sigurEvents = new List<BusinessLogic.Models.SigurEventModel>();
+        List<SigurEventModel> sigurEvents = new List<SigurEventModel>();
 
         var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
 
@@ -98,7 +99,7 @@ public class EmployeeConverter3Tests
             ScudInfos = new List<ScudInfo>()
         };
 
-        List<BusinessLogic.Models.SigurEventModel> sigurEvents = new List<BusinessLogic.Models.SigurEventModel>();
+        List<SigurEventModel> sigurEvents = new List<SigurEventModel>();
 
         var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
 
@@ -158,7 +159,7 @@ public class EmployeeConverter3Tests
             ScudInfos = new List<ScudInfo>()
         };
 
-        List<BusinessLogic.Models.SigurEventModel> sigurEvents = new List<BusinessLogic.Models.SigurEventModel>();
+        List<SigurEventModel> sigurEvents = new List<SigurEventModel>();
 
         var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
 
