@@ -182,4 +182,55 @@ public class EmployeeConverter3Tests
         Assert.Equal(380, deyExportFacts[0].DayMinutes);
         Assert.Equal(0, deyExportFacts[0].NightMinutes);
     }
+
+    [Fact]
+    public void PlanDay4HourTest()
+    {
+        // вход и выход опреелдляются через сигур
+        var employeeEntity = new EmployeeEntity()
+        {
+            StoreId = StoreId,
+
+            Plans = new List<PlanEntity>()
+            {
+                new PlanEntity()
+                {
+                    Begin = new DateTime(2024, 6, 2, 6, 47, 0),
+                    End = new DateTime(2024, 6, 2, 13, 50, 0),
+                    StoreId = StoreId,
+                    PlanType = PlanType.Plan
+                }
+            },
+
+            ManualScuds = new List<ManualScudEntity>(),
+            ScudInfos = new List<ScudInfo>()
+        };
+
+        List<SigurEventModel> sigurEvents = new List<SigurEventModel>()
+        {
+            new SigurEventModel() { CodeNav = string.Empty, EventTime = new DateTime(2024, 6, 2, 7, 0, 0) },
+            new SigurEventModel() { CodeNav = string.Empty, EventTime = new DateTime(2024, 6, 2, 13, 50, 0) }
+        };
+
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
+
+        Assert.NotNull(employeeModel);
+        Assert.Equal(StoreId, employeeModel.StoreId);
+        Assert.Equal(393, employeeModel.DayPlanUseMinutes[new DateTime(2024, 6, 2)]); // План 423 - 30 = 393
+        //Assert.(6.33, employeeModel.MountPlanUseHours[new DateTime(2024, 6, 2)]); // Только 1 день в тесте
+
+        var deyExportPlans = employeeModel.ExportPlanTimes.Where(x => x.Date == new DateOnly(2024, 6, 2)).ToList();
+        Assert.NotNull(deyExportPlans);
+        Assert.Equal(1, deyExportPlans.Count);
+        Assert.Equal("regular", deyExportPlans[0].WorkTime);
+        Assert.Equal(393, deyExportPlans[0].DayMinutes); //
+        Assert.Equal(0, deyExportPlans[0].NightMinutes);
+
+        var deyExportFacts = employeeModel.ExportFactTimes.Where(x => x.Date == new DateOnly(2024, 6, 2)).ToList();
+        Assert.NotNull(deyExportFacts);
+        Assert.Equal(1, deyExportFacts.Count);
+        Assert.Equal("regular", deyExportPlans[0].WorkTime);
+        Assert.Equal(380, deyExportFacts[0].DayMinutes);
+        Assert.Equal(0, deyExportFacts[0].NightMinutes);
+    }
 }

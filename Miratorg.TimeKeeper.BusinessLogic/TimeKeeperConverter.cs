@@ -477,24 +477,66 @@ public  class TimeKeeperConverter
 
             employee.Plans.Add(planDetail);
 
-            if (plan.Begin.Hour == 0 && plan.Begin.Minute == 0)
+            if (plan.Begin.Hour == 0 && plan.Begin.Minute == 0) // Время входа засчитывается если нет точного времени
             {
+                var sigurOutput = sigurEvents.Where(x => x.EventTime >= plan.End && x.EventTime <= plan.End.AddMinutes(180))
+                    .OrderByDescending(x => x.EventTime).FirstOrDefault()?.EventTime;
 
+                if (sigurOutput != null) //если сотрудник был на работе
+                {
+                    var scudInfo = new ScudInfoModel
+                    {
+                        ScudInfoType = ScudInfoType.Scud,
+                        Begin = plan.Begin,
+                        End = (DateTime)sigurOutput
+                    };
+
+                    employee.ScudInfos.Add(scudInfo);
+                }
             }
             else
             {
                 if (plan.End.Hour == 23 && plan.End.Minute == 59)
                 {
+                    var sigurInput = sigurEvents.Where(x => x.EventTime >= plan.Begin.AddMinutes(-180) && x.EventTime <= plan.Begin.AddMinutes(60))
+                        .OrderBy(x => x.EventTime).FirstOrDefault()?.EventTime;
 
+                    if (sigurInput != null) //Если есть вход
+                    {
+                        var scudInfo = new ScudInfoModel
+                        {
+                            ScudInfoType = ScudInfoType.Scud,
+                            Begin = (DateTime)sigurInput,
+                            End = plan.End
+                        };
+
+                        employee.ScudInfos.Add(scudInfo);
+                    }
                 }
                 else
                 {
+                    var sigurInput = sigurEvents.Where(x => x.EventTime >= plan.Begin.AddMinutes(-180) && x.EventTime <= plan.Begin.AddMinutes(60))
+                        .OrderBy(x => x.EventTime).FirstOrDefault()?.EventTime;
 
+                    var sigurOutput = sigurEvents.Where(x => x.EventTime >= plan.End.AddMinutes(-60) && x.EventTime <= plan.End.AddMinutes(180))
+                        .OrderByDescending(x => x.EventTime).FirstOrDefault()?.EventTime;
+
+                    if (sigurInput != null && sigurOutput != null)
+                    {
+                        var scudInfo = new ScudInfoModel()
+                        {
+                            Begin = (DateTime)sigurInput,
+                            End = plan.End,
+                            ScudInfoType = ScudInfoType.Scud
+                        };
+
+                        employee.ScudInfos.Add(scudInfo);
+                    }
                 }
             }
-
-            //employee.ScudInfos.Add(scudModel);
         }
+
+        // this logic not used more
 
         //foreach (var scudInfoEntity in employeeEntity.ScudInfos)
         //{
