@@ -18,8 +18,7 @@ public class SigurDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
- 
-        string connectionString = "Data Source=10.66.66.8;Initial Catalog=Sigur; User Id=sigur;Password=Security!; MultipleActiveResultSets=true;";
+        string connectionString = "Data Source=mhb-sql-2.agrohold.ru;Initial Catalog=Sigur; user id=UserServices; password=US#1#us; MultipleActiveResultSets=true;Encrypt=False;";
 
         optionsBuilder.UseSqlServer(connectionString);
         // optionsBuilder.UseLazyLoadingProxies();
