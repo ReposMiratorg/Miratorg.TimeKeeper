@@ -7,6 +7,7 @@ public class SyncEmployeeService : IHostedService
     private readonly IStuffControlDbService _stuffControlService;
     private static ITimeKeeperDbContextFactory _timeKeeperDbContextFactory;
     private readonly IStaffControlDbContextFactory _staffControlDbContextFactory;
+    private readonly ISigurService _sigurService;
     private static ILogger<SyncEmployeeService> _logger;
 
     private bool isWork { get; set; }
@@ -15,11 +16,13 @@ public class SyncEmployeeService : IHostedService
     public SyncEmployeeService(IStuffControlDbService stuffControlService,
         IStaffControlDbContextFactory staffControlDbContextFactory,
         ITimeKeeperDbContextFactory timeKeeperDbContextFactory,
+        ISigurService sigurService,
         ILogger<SyncEmployeeService> logger)
     {
         _stuffControlService = stuffControlService;
         _timeKeeperDbContextFactory = timeKeeperDbContextFactory;
         _staffControlDbContextFactory = staffControlDbContextFactory;
+        _sigurService = sigurService;
         _logger = logger;
     }
 
@@ -144,6 +147,7 @@ public class SyncEmployeeService : IHostedService
             .Include(x => x.Plans).ThenInclude(x => x.TypeOverWork)
             .Include(x => x.Absences)
             .Include(x => x.ManualScuds)
+            .Include(x => x.SigurInfos)
             .AsNoTrackingWithIdentityResolution()
             .FirstOrDefaultAsync(x => x.Id == userId);
 
@@ -156,7 +160,14 @@ public class SyncEmployeeService : IHostedService
         {
             var entity = await GetUserById(userId);
 
-            var model = TimeKeeperConverter.Convert(entity);
+            List<SigurEventModel> sigurEvents = new List<SigurEventModel>();
+
+            foreach (var item in entity.SigurInfos)
+            {
+                sigurEvents.Add(new SigurEventModel() { CodeNav = item.CodeNav, EventTime = item.EventTime });
+            }
+
+            var model = TimeKeeperConverter.ConvertV3(entity, sigurEvents);
 
             var existUser = Employees.FirstOrDefault(x => x.Id == userId);
 
@@ -278,14 +289,16 @@ public class SyncEmployeeService : IHostedService
 
                 var (start, end) = GetSyncDays(DateTime.Now);
 
-                var tempDate = start.Date;
-                for (int i = 0; tempDate <= end; i++)
-                {
-                    // обрабатываем данные из проховов СКУД
-                    await UpdateScudData(currentEmployee.Id, employee.Code, tempDate, tempDate.AddDays(1));
+                //var tempDate = start.Date;
+                //for (int i = 0; tempDate <= end; i++)
+                //{
+                //    // обрабатываем данные из проховов СКУД
+                //    await UpdateScudData(currentEmployee.Id, employee.Code, tempDate, tempDate.AddDays(1));
 
-                    tempDate = tempDate.AddDays(1);
-                }
+                //    tempDate = tempDate.AddDays(1);
+                //}
+
+                await UpdateSigurData(currentEmployee.Id, employee.Code, start, end);
 
                     // Обновляем причины отсутствия
                 await SyncAbsence(currentEmployee.Id, start, end);
@@ -300,6 +313,39 @@ public class SyncEmployeeService : IHostedService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error process");
+        }
+    }
+
+    private async Task UpdateSigurData(Guid userId, string codeNav, DateTime start, DateTime end)
+    {
+        try
+        {
+            var events = await _sigurService.GetSigurEventModelsAsync(start, end, codeNav);
+            var dbContext = await _timeKeeperDbContextFactory.Create();
+
+            var currentEvents = dbContext.SigurInfos.Where(x => x.EmployeeId == userId && start <= x.EventTime && x.EventTime <= end).ToList();
+            if (currentEvents.Count > 0)
+            {
+                dbContext.SigurInfos.RemoveRange(currentEvents);
+                dbContext.SaveChanges();
+            }
+
+            if (events.Count > 0)
+            {
+                List<SigurInfoEntity> entites = new List<SigurInfoEntity>();
+
+                foreach (var item in events)
+                {
+                    entites.Add(new SigurInfoEntity() { CodeNav = codeNav, EmployeeId = userId, EventTime = item.EventTime });
+                }
+
+                dbContext.SigurInfos.AddRange(entites);
+                dbContext.SaveChanges();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
         }
     }
 
