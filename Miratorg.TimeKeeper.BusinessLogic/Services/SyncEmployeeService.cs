@@ -69,6 +69,7 @@ public class SyncEmployeeService : IHostedService
             .Include(x => x.Plans).ThenInclude(x => x.TypeOverWork)
             .Include(x => x.Absences)
             .Include(x => x.ManualScuds)
+            .Include(x => x.SigurInfos)
             .OrderBy(x => x.Name)
             .AsNoTrackingWithIdentityResolution()
             .ToListAsync();
@@ -77,7 +78,14 @@ public class SyncEmployeeService : IHostedService
 
         foreach (var employee in employees)
         {
-            var model = TimeKeeperConverter.Convert(employee);
+            List<SigurEventModel> sigurEvents = new List<SigurEventModel>();
+
+            foreach (var item in employee.SigurInfos)
+            {
+                sigurEvents.Add(new SigurEventModel() { CodeNav = item.CodeNav, EventTime = item.EventTime });
+            }
+
+            var model = TimeKeeperConverter.ConvertV3(employee, sigurEvents);
             models.Add(model);
         }
 
