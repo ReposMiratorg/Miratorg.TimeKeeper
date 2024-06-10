@@ -8,17 +8,50 @@ public class EmployeeModel
     public string CodeNav { get; set; }
     public Guid? StoreId { get; set; }
 
+    /// <summary>
+    /// ОБЩИЙ (план + подработка) за месяц
+    /// </summary>
     public Dictionary<DateTime, double> MountPlanUseHours { get; set; } = new Dictionary<DateTime, double>();
+
+    /// <summary>
+    /// Общий план (план + подработка) за день
+    /// </summary>
     public Dictionary<DateTime, double> DayPlanUseMinutes { get; set; } = new Dictionary<DateTime, double>();
+    
+    /// <summary>
+    /// Данные по СКУД за месяц
+    /// </summary>
     public Dictionary<DateTime, double> MountScudUseHours { get; set; } = new Dictionary<DateTime, double>();
+    
+    /// <summary>
+    /// Данные за день СКУД
+    /// </summary>
     public Dictionary<DateTime, double> DayScudUseMinutes { get; set; } = new Dictionary<DateTime, double>();
 
+    /// <summary>
+    /// Все планы (план + подработка) - как в БД
+    /// </summary>
     public List<PlanDetailModel> Plans { get; set; } = new List<PlanDetailModel>();
     public List<Schedule1CPlanModel> WorkDates { get; set; } = new List<Schedule1CPlanModel>();
+
+    /// <summary>
+    /// Данные СКУД - зафиксированные как вход/выход
+    /// </summary>
     public List<ScudInfoModel> ScudInfos { get; set; } = new List<ScudInfoModel>();
+
+    /// <summary>
+    /// Причины отсуствия по 1С
+    /// </summary>
     public List<AbsenceModel> Absences { get; set; } = new List<AbsenceModel>();
 
+    /// <summary>
+    /// Экспорт в 1С план
+    /// </summary>
     public List<ExportTime> ExportPlanTimes { get; set; } = new List<ExportTime>();
+
+    /// <summary>
+    /// Экспорт в 1С факт (по СКУД)
+    /// </summary>
     public List<ExportTime> ExportFactTimes { get; set; } = new List<ExportTime>();
 }
 

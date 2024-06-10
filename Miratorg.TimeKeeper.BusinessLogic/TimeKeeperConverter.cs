@@ -455,8 +455,12 @@ public  class TimeKeeperConverter
             ExportFactTimes = new List<ExportTime>()
         };
 
-        foreach (var plan in employeeEntity.Plans)
+        for (int i = 0; i < employeeEntity.Plans.Count; i++)
         {
+            //ToDo - добавть время отдыха за прошлый день (конец дня)
+
+            var plan = employeeEntity.Plans[i];
+
             var planDetail = new PlanDetailModel()
             {
                 Id = plan.Id,
