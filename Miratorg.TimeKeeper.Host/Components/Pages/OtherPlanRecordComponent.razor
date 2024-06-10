@@ -48,7 +48,7 @@
         {
             foreach (var plan in planedIntervals)
             {
-                var message = $"{plan.Begin.ToShortTimeString()} - {plan.End.ToShortTimeString()} План";
+                var message = $"{plan.OriginalBegin.ToShortTimeString()} - {plan.OriginalEnd.ToShortTimeString()} План";
 
                 <div class="row">
                     <div class="col-9">
@@ -65,7 +65,7 @@
         {
             foreach (var plan in overworkIntervals)
             {
-                var message = $"{plan.Begin.ToShortTimeString()} - {plan.End.ToShortTimeString()} Подработка: {plan.TypeOverWorkName}";
+                var message = $"{plan.OriginalBegin.ToShortTimeString()} - {plan.OriginalEnd.ToShortTimeString()} Подработка: {plan.TypeOverWorkName}";
 
                 <div class="row mt-2">
                     <div class="col-9">
@@ -160,8 +160,8 @@
             weekDay = Helpers.WeekConverter.Convert(currentDate);
 
             var dates = AdditionalEmployeeModels.Where(x => x.Id == EmployeeId).SelectMany(x => x.Plans).ToList();
-            planedIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate.AddDays(1) && x.PlanType == PlanType.Plan).ToList();
-            overworkIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate.AddDays(1) && x.PlanType == PlanType.Overwork).ToList();
+            planedIntervals = dates.Where(x => x.OriginalBegin >= currentDate && x.OriginalEnd <= currentDate.AddDays(1) && x.PlanType == PlanType.Plan).ToList();
+            overworkIntervals = dates.Where(x => x.OriginalBegin >= currentDate && x.OriginalEnd <= currentDate.AddDays(1) && x.PlanType == PlanType.Overwork).ToList();
 
             var schedules = AdditionalEmployeeModels.Where(x => x.Id == EmployeeId).SelectMany(x => x.WorkDates);
             schedule1CPlanModels = schedules.Where(x => x.Begin.Date == currentDate).ToList();

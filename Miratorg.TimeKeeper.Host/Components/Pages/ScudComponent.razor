@@ -78,7 +78,7 @@
 
                     foreach (var planDetailModel in PlanedIntervals)
                     {
-                        var result = TimeKeeperConverter.CheckInterval(date, planDetailModel.Begin, planDetailModel.End);
+                        var result = TimeKeeperConverter.CheckInterval(date, planDetailModel.OriginalBegin, planDetailModel.OriginalEnd);
                         if(result == true)
                         {
                             plan[i] = true;
@@ -87,7 +87,7 @@
 
                     foreach (var overwork in OverWorkPlanedIntervals)
                     {
-                        var result = TimeKeeperConverter.CheckInterval(date, overwork.Begin, overwork.End);
+                        var result = TimeKeeperConverter.CheckInterval(date, overwork.OriginalBegin, overwork.OriginalEnd);
                         if (result == true)
                         {
                             plan[i] = true;

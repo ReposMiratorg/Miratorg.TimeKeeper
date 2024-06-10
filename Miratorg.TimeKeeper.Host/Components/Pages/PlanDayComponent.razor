@@ -49,62 +49,69 @@
 
             </div>
         </div>
+        <div class="row mt-2">
 
-        @if (planedIntervals != null)
-        {
-            foreach (var plan in planedIntervals)
-            {
-                var message = $"{plan.Begin.ToShortTimeString()} - {plan.End.ToShortTimeString()} План";
+            <div class="col-12">
 
-                <div class="row">
-                    <div class="col-9">
-                        <input class="form-control form-control-sm" value="@message" disabled />
-                    </div>
-                    <div class="col-3">
-                        <CustomDeleteDialogComponent Message="@message" Action="@(() => RemovePaln(plan.Id))" />
-                    </div>
-                </div>
-            }
-        }
+                @if (planedIntervals != null)
+                {
+                    foreach (var plan in planedIntervals)
+                    {
+                        var message = $"{plan.OriginalBegin.ToShortTimeString()} - {plan.OriginalEnd.ToShortTimeString()} План";
+                        message += $"         ({plan.CaclWorkTimeMinutes.ToString()} мин. + {plan.ObedTimeMinutes.ToString()} обед)";
 
-        @if (overworkIntervals != null)
-        {
-            foreach (var plan in overworkIntervals)
-            {
-                var message = $"{plan.Begin.ToShortTimeString()} - {plan.End.ToShortTimeString()} Подработка: {plan.TypeOverWorkName}";
+                        <div class="row">
+                            <div class="col-10">
+                                <input class="form-control form-control-sm" value="@message" disabled />
+                            </div>
+                            <div class="col-2">
+                                <CustomDeleteDialogComponent Message="@message" Action="@(() => RemovePaln(plan.Id))" />
+                            </div>
+                        </div>
+                    }
+                }
 
-                <div class="row mt-2">
-                    <div class="col-9">
-                        <input class="form-control form-control-sm" value="@message" disabled />
-                    </div>
-                    <div class="col-3">
-                        <CustomDeleteDialogComponent Message="@message" Action="@(() => RemovePaln(plan.Id))" />
-                    </div>
-                </div>
-            }
-        }
+                @if (overworkIntervals != null)
+                {
+                    foreach (var plan in overworkIntervals)
+                    {
+                        var message = $"{plan.OriginalBegin.ToShortTimeString()} - {plan.OriginalEnd.ToShortTimeString()} Подработка: {plan.TypeOverWorkName}";
+                        message += $"         ({plan.CaclWorkTimeMinutes.ToString()} мин. + {plan.ObedTimeMinutes.ToString()} обед)";
+                        <div class="row mt-2">
+                            <div class="col-10">
+                                <input class="form-control form-control-sm" value="@message" disabled />
+                            </div>
+                            <div class="col-2">
+                                <CustomDeleteDialogComponent Message="@message" Action="@(() => RemovePaln(plan.Id))" />
+                            </div>
+                        </div>
+                    }
+                }
 
-        @if(scudInfoModels != null)
-        {
-            foreach (var scud in scudInfoModels)
-            {
-                var message = $"{scud.Begin.ToShortTimeString()} - {scud.End.ToShortTimeString()} СКУД";
+                @if(scudInfoModels != null)
+                {
+                    foreach (var scud in scudInfoModels)
+                    {
+                        var message = $"{scud.Begin.ToShortTimeString()} - {scud.End.ToShortTimeString()} СКУД";
 
-                message += scud.ScudInfoType == ScudInfoType.Scud ? "" : " (ручной ввод)";
+                        message += scud.ScudInfoType == ScudInfoType.Scud ? "" : " (ручной ввод)";
 
-                <div class="row mt-2">
-                    <div class="col-9">
-                        <input class="form-control form-control-sm" value="@message" disabled />
-                    </div>
-                    <div class="col-3">
-                        @if (scud.ScudInfoType == ScudInfoType.Manual)
-                        {
-                            <CustomDeleteDialogComponent Message="@message" Action="@(() => RemoveManualScud(scud.Id))" />
-                        }
-                    </div>
-                </div>
-            }
-        }
+                        <div class="row mt-2">
+                            <div class="col-10">
+                                <input class="form-control form-control-sm" value="@message" disabled />
+                            </div>
+                            <div class="col-2">
+                                @if (scud.ScudInfoType == ScudInfoType.Manual)
+                                {
+                                    <CustomDeleteDialogComponent Message="@message" Action="@(() => RemoveManualScud(scud.Id))" />
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+
+        </div>
 
         <div class="row">
             <div class="col">
@@ -189,8 +196,8 @@
             weekDay = Helpers.WeekConverter.Convert(currentDate);
 
             var dates = SyncEmployeeService.Employees.Where(x => x.Id == EmployeeId).SelectMany(x => x.Plans).ToList();
-            planedIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate.AddDays(1) && x.PlanType == PlanType.Plan).ToList();
-            overworkIntervals = dates.Where(x => x.Begin >= currentDate && x.End <= currentDate.AddDays(1) && x.PlanType == PlanType.Overwork).ToList();
+            planedIntervals = dates.Where(x => x.OriginalBegin >= currentDate && x.OriginalEnd <= currentDate.AddDays(1) && x.PlanType == PlanType.Plan).ToList();
+            overworkIntervals = dates.Where(x => x.OriginalBegin >= currentDate && x.OriginalEnd <= currentDate.AddDays(1) && x.PlanType == PlanType.Overwork).ToList();
 
             var schedules = SyncEmployeeService.Employees.Where(x => x.Id == EmployeeId).SelectMany(x => x.WorkDates);
             schedule1CPlanModels = schedules.Where(x => x.Begin.Date == currentDate).ToList();

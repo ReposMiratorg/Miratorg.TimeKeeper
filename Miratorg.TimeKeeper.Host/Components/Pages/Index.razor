@@ -413,8 +413,9 @@
             {
                 empl.Plans.Add(new PlanDetailModel()
                     {
-                        Begin = planOverwork.Begin,
-                        End = planOverwork.End,
+                        OriginalBegin = planOverwork.OriginalBegin,
+                        OriginalEnd = planOverwork.OriginalEnd,
+
                         PlanType = planOverwork.PlanType,
                         Id = planOverwork.Id,
                         StoreId = planOverwork.StoreId

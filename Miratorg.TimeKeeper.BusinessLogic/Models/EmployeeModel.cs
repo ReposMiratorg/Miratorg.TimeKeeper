@@ -75,8 +75,10 @@ public class ExportTimeFact : ExportTime
 public class PlanDetailModel
 {
     public Guid Id { get; set; }
-    public DateTime Begin { get; set; }
-    public DateTime End { get; set; }
+    public DateTime OriginalBegin { get; set; }
+    public DateTime OriginalEnd { get; set; }
+    public DateTime CalcBegin { get; set; }
+    public DateTime CalcEnd { get; set; }
     public PlanType PlanType { get; set; }
     public Guid? StoreId { get; set; }
     public string TypeOverWorkName { get; set; }
@@ -84,7 +86,14 @@ public class PlanDetailModel
     /// <summary>
     /// Расчитанное время для работы
     /// </summary>
-    public int WorkTimeMinutes { get; set; }
+    public int CaclWorkTimeMinutes { get; set; }
+    public int CalcWorkDayMinutes { get; set; }
+    public int CalcWorkNightMinutes { get; set; }
+
+    /// <summary>
+    /// Рачетное время обеда
+    /// </summary>
+    public int ObedTimeMinutes { get; set; }
 }
 
 public class Schedule1CPlanModel

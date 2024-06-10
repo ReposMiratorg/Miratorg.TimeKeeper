@@ -56,6 +56,14 @@ public class EmployeeConverter3Tests
         Assert.Equal("regular", deyExportPlan.WorkTime);
         Assert.Equal(660, deyExportFact.DayMinutes);
         Assert.Equal(0, deyExportFact.NightMinutes);
+
+        var plans = employeeModel.Plans.Where(x => x.OriginalBegin.Date == new DateTime(2024, 1, 3)).ToList();
+        Assert.Equal(1, plans.Count);
+        Assert.Equal(60, plans[0].ObedTimeMinutes);
+        Assert.Equal(new DateTime(2024, 1, 3, 8, 0, 0), plans[0].OriginalBegin);
+        Assert.Equal(new DateTime(2024, 1, 3, 8, 0, 0), plans[0].CalcBegin);
+        Assert.Equal(new DateTime(2024, 1, 3, 20, 0, 0), plans[0].OriginalEnd);
+        Assert.Equal(new DateTime(2024, 1, 3, 19, 0, 0), plans[0].CalcEnd);
     }
 
     [Fact]

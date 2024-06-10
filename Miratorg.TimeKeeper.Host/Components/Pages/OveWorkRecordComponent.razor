@@ -36,19 +36,19 @@
 
         foreach (var planInterval in OverWorkPlanedIntervals)
         {
-            if (CurrentDate.AddDays(1) >= planInterval.Begin && CurrentDate <= planInterval.End)
+            if (CurrentDate.AddDays(1) >= planInterval.OriginalBegin && CurrentDate <= planInterval.OriginalEnd)
             {
-                var time = (planInterval.End - planInterval.Begin).TotalHours;
+                var time = (planInterval.OriginalEnd - planInterval.OriginalBegin).TotalHours;
                 if (time > 3)
                 {
                     time = time - 1;
                 }
 
-                interval += TimeSpan.FromMinutes((planInterval.End - planInterval.Begin).TotalMinutes);
+                interval += TimeSpan.FromMinutes((planInterval.OriginalEnd - planInterval.OriginalBegin).TotalMinutes);
                 var date = CurrentDate;
                 for (int i = 0; i < 24; i++)
                 {
-                    if (TimeKeeperConverter.CheckInterval(date, planInterval.Begin, planInterval.End))
+                    if (TimeKeeperConverter.CheckInterval(date, planInterval.OriginalBegin, planInterval.OriginalEnd))
                     {
                         plan[i] = true;
                     }
