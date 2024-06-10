@@ -210,6 +210,11 @@ public class SyncEmployeeService : IHostedService
         {
             await UpdateUsers();
 
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            {
+                return;
+            }
+
             var staffDbContext = await _staffControlDbContextFactory.Create();
             using var dbContext = await _timeKeeperDbContextFactory.Create();
 
