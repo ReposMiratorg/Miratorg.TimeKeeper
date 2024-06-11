@@ -105,7 +105,7 @@ public class EmployeeConverter2Tests
         Assert.NotNull(employeeModel);
         Assert.Equal(StoreId, employeeModel.StoreId);
         Assert.Equal(840, employeeModel.DayPlanUseMinutes[new DateTime(2024, 1, 3)]); // План 12*60=720 + Подработка 3*60=180 Итого 900 (-1:00 обед 90 мин) = 840
-        Assert.Equal(14, employeeModel.MountPlanUseHours[new DateTime(2024, 1, 1)]); // Только 1 день в тесте
+        Assert.Equal(14 * 60, employeeModel.MountPlanUseMinuts[new DateTime(2024, 1, 1)]); // Только 1 день в тесте
 
         var deyExportPlans = employeeModel.ExportPlanTimes.Where(x => x.Date == new DateOnly(2024, 1, 3)).ToList();
         Assert.NotNull(deyExportPlans);

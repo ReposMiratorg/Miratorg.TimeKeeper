@@ -11,7 +11,7 @@ public class EmployeeModel
     /// <summary>
     /// ОБЩИЙ (план + подработка) за месяц
     /// </summary>
-    public Dictionary<DateTime, double> MountPlanUseHours { get; set; } = new Dictionary<DateTime, double>();
+    public Dictionary<DateTime, double> MountPlanUseMinuts { get; set; } = new Dictionary<DateTime, double>();
 
     /// <summary>
     /// Общий план (план + подработка) за день
@@ -21,7 +21,7 @@ public class EmployeeModel
     /// <summary>
     /// Данные по СКУД за месяц
     /// </summary>
-    public Dictionary<DateTime, double> MountScudUseHours { get; set; } = new Dictionary<DateTime, double>();
+    public Dictionary<DateTime, double> MountScudUseMinutes { get; set; } = new Dictionary<DateTime, double>();
     
     /// <summary>
     /// Данные за день СКУД

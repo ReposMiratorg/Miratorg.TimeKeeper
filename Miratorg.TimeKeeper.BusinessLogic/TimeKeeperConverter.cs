@@ -32,7 +32,7 @@ public class TimeKeeperConverter
             Plans = new List<PlanDetailModel>(),
             ScudInfos = new List<ScudInfoModel>(),
             WorkDates = new List<Schedule1CPlanModel>(),
-            MountPlanUseHours = new Dictionary<DateTime, double>(),
+            MountPlanUseMinuts = new Dictionary<DateTime, double>(),
             ExportPlanTimes = new List<ExportTime>(),
             ExportFactTimes = new List<ExportTime>()
         };
@@ -357,8 +357,8 @@ public class TimeKeeperConverter
                 employee.ExportPlanTimes.AddRange(exportTimes);
             }
 
-            employee.MountPlanUseHours.Add(currentMonth, monthPlan.TotalHours);
-            employee.MountScudUseHours.Add(currentMonth, monthScud.TotalHours);
+            employee.MountPlanUseMinuts.Add(currentMonth, monthPlan.TotalMinutes);
+            employee.MountScudUseMinutes.Add(currentMonth, monthScud.TotalMinutes);
         }
 
         return employee;

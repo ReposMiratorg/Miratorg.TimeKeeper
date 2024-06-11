@@ -184,9 +184,16 @@
                         <td>
                             @{
                                 var x = GetFirstDay(_date);
-                                var time = employee.MountPlanUseHours[x];
+                                var time = employee.MountPlanUseMinuts[x];
+                                int hours = 0;
+
+                                if(time > 0)
+                                {
+                                    hours = (int)time / 60;
+                                }
+
                                 <div class="text-center">
-                                    <a class="text-center">@time.ToString("0")</a>
+                                    <a class="text-center">@hours.ToString("0")</a>
                                 </div>
                             }
                         </td>
@@ -196,7 +203,7 @@
                             for (int i = 0; i < 7; i++)
                             {
                                 var currentDate = _selectedWeekBeginDay.AddDays(i);
-                                <td><PlanDayComponent LimitPlanHours="limitPlanHours" PlanHours="planHours" StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" IsShowReasonAbsent="_isShowReasonAbcent" Day="currentDate" EmployeeId="employee.Id" /></td>
+                                <td><PlanDayComponent LimitPlanHours="limitPlanHours" PlanHours="planMinutes" StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" IsShowReasonAbsent="_isShowReasonAbcent" Day="currentDate" EmployeeId="employee.Id" /></td>
                             }
                         }
                         else
@@ -205,7 +212,7 @@
 
                             for (var i = s; i < s.AddMonths(1); i = i.AddDays(1))
                             {
-                                <td><PlanDayComponent LimitPlanHours="limitPlanHours" PlanHours="planHours" StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" IsShowReasonAbsent="_isShowReasonAbcent" Day="i" EmployeeId="employee.Id" /></td>
+                                <td><PlanDayComponent LimitPlanHours="limitPlanHours" PlanHours="planMinutes" StoreId="_selectedStore" AdditionalEmployeeModels="additionalEmployees" Action="UpdateDates" IsShowPlan="_isShowPlan" IsShowOverWork="_isShowOverWork" IsShow1C="_isShow1C" IsShowScud="_isShowScud" IsShowReasonAbsent="_isShowReasonAbcent" Day="i" EmployeeId="employee.Id" /></td>
                             }
                         }
 
@@ -375,7 +382,7 @@
 
     private void SelectStory(Guid storeId)
     {
-        planHours = new TimeSpan();
+        planMinutes = new TimeSpan();
         factHours = new TimeSpan();
         limitPlanHours = 0;
         limitColor = string.Empty;
@@ -406,7 +413,7 @@
                     Plans = new List<PlanDetailModel>(),
                     ScudInfos = new List<ScudInfoModel>(),
                     WorkDates = new List<Schedule1CPlanModel>(),
-                    MountPlanUseHours = new Dictionary<DateTime, double>()
+                    MountPlanUseMinuts = new Dictionary<DateTime, double>()
                 };
 
             foreach (var planOverwork in testData)
@@ -431,27 +438,27 @@
         {
             foreach (var empl in employees)
             {
-                if (empl.MountPlanUseHours.TryGetValue(date, out var time))
+                if (empl.MountPlanUseMinuts.TryGetValue(date, out var time))
                 {
-                    planHours += TimeSpan.FromHours(time);
+                    planMinutes += TimeSpan.FromMinutes(time);
                 }
 
-                if (empl.MountScudUseHours.TryGetValue(date, out var time1))
+                if (empl.MountScudUseMinutes.TryGetValue(date, out var time1))
                 {
-                    factHours += TimeSpan.FromHours(time1);
+                    factHours += TimeSpan.FromMinutes(time1);
                 }
             }
         }
 
         limitPlanHours = store?.Limits?.FirstOrDefault(x => x.Year == date.Year && x.Mouth == (date.Month - 1))?.Limit ?? 0;
 
-        totalPlanMessage = $"{planHours.TotalHours.ToString("0")} из {(limitPlanHours.ToString("0") ?? "0")}";
+        totalPlanMessage = $"{planMinutes.TotalHours.ToString("0")} из {(limitPlanHours.ToString("0") ?? "0")}";
         totalFactMessage = $"{factHours.TotalHours.ToString("0")}";
-        var checkPlan = planHours.TotalHours * 1.1;
+        var checkPlan = planMinutes.TotalHours * 1.1;
         limitColor = checkPlan >= limitPlanHours ? "text-danger" : "";
     }
 
-    private TimeSpan planHours { get; set; } = new TimeSpan();
+    private TimeSpan planMinutes { get; set; } = new TimeSpan();
     private TimeSpan factHours { get; set; } = new TimeSpan();
     private int limitPlanHours { get; set; } = 0;
     private string limitColor { get; set; } = string.Empty;
