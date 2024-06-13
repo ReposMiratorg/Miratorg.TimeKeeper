@@ -13,6 +13,7 @@
     <Content Remove="Components\Pages\WeekPanelComponent.razor" />
     <Content Remove="Components\PlanRecordComponent.razor" />
     <Content Remove="Components\ScudComponent.razor" />
+    <Content Remove="Components\ViewScudDetailsComponent.razor" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,6 +39,7 @@
     <None Include="Components\FactComponent.razor" />
     <None Include="Components\Pages\WeekPanelComponent.razor" />
     <None Include="Components\Pages\PlanRecordComponent.razor" />
+    <None Include="Components\Pages\ViewScudDetailsComponent.razor" />
   </ItemGroup>
 
   <ItemGroup>
@@ -48,6 +50,7 @@
     <_ContentIncludedByDefault Remove="Components\Pages\EditCreatePlanDialog.razor" />
     <_ContentIncludedByDefault Remove="Components\Pages\WeekPanelComponent.razor" />
     <_ContentIncludedByDefault Remove="Components\PlanRecordComponent.razor" />
+    <_ContentIncludedByDefault Remove="Components\ViewScudDetailsComponent.razor" />
   </ItemGroup>
 
   <ItemGroup>
@@ -56,6 +59,10 @@
 
   <ItemGroup>
     <UpToDateCheckInput Remove="Components\PlanRecordComponent.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Components\ViewScudDetailsComponent.razor" />
   </ItemGroup>
 
 </Project>

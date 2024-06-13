@@ -1,0 +1,69 @@
+﻿<CustomModalDialog DialogSize="ModalDialogSize.Standard" @ref="modalDialog">
+
+    <FrontObject>
+        <button class="btn btn-info btn-sm" @onclick="Open">События SCUD</button>
+    </FrontObject>
+
+    <Body>
+        @if(events != null)
+        {
+            foreach (var item in events)
+            {
+                <a>@item.ToString("yyyy-MM-dd HH:mm")</a>
+            }
+        }
+    </Body>
+
+    <Footer>
+        <button class="btn btn-info btn-sm" @onclick="Close">Закрыть</button>
+    </Footer>
+
+</CustomModalDialog>
+
+@code {
+
+    [Parameter]
+    public DateTime CurrentDate { get; set; }
+
+    [Parameter]
+    public Guid EmoloyeeId { get; set; }
+
+    [Inject]
+    public ITimeKeeperDbContextFactory dbContextFactory { get; set; }
+
+    [Inject]
+    public ILogger<ViewScudDetailsComponent> Logger { get; set; }
+
+    private List<DateTime> events { get; set; } = new List<DateTime>();
+
+    private async Task LoadScudDetails()
+    {
+        try
+        {
+            var dbContex = await dbContextFactory.Create();
+
+            var sigurInfos = await dbContex.SigurInfos
+                .Where(x => x.EmployeeId == EmoloyeeId && x.EventTime >= CurrentDate && x.EventTime <= CurrentDate.AddDays(1))
+                .ToListAsync();
+
+            events = sigurInfos.OrderBy(x => x.EventTime).Select(x => x.EventTime).ToList();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, ex.Message);
+        }
+    }
+
+    private CustomModalDialog modalDialog { get; set; } = new();
+
+    private async Task Close()
+    {
+        await modalDialog.Close();
+    }
+
+    private async Task Open()
+    {
+        await modalDialog.Open();
+        await LoadScudDetails();
+    }
+}
