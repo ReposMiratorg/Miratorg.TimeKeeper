@@ -220,7 +220,7 @@ public class SyncEmployeeService : IHostedService
 
             var employees = await staffDbContext.Staff
                 .Where(x => x.LegalEntity == "ООО \"ПродМир\"" || x.LegalEntity == "ООО «Стейк и Бургер»")
-                .Where(x => x.DismissalDate == null)
+                .Where(x => x.DismissalDate == null || x.DismissalDate >= new DateTime(2024, 4, 1))
                 .Where(x => x.Guid != null)
                 .ToListAsync();
 
