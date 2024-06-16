@@ -31,7 +31,9 @@ public class EmployeeConverterTests
         var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
 
         Assert.NotNull(employeeModel);
-        Assert.Equal(employeeModel.DayPlanUseMinutes[new DateTime(2024, 1, 3)], 120);
+        Assert.Equal(120, employeeModel.DayPlanUseMinutes[new DateTime(2024, 1, 3)]);
+        Assert.Equal(0, employeeModel.DayScudUseMinutes[new DateTime(2024, 1, 3)]);
+        Assert.Equal(0, employeeModel.MountScudUseMinutes[new DateTime(2024, 1, 1)]);
     }
 
     [Fact]
@@ -59,7 +61,9 @@ public class EmployeeConverterTests
         var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
 
         Assert.NotNull(employeeModel);
-        Assert.Equal(employeeModel.DayPlanUseMinutes[new DateTime(2024, 1, 1)], 180);
+        Assert.Equal(180, employeeModel.DayPlanUseMinutes[new DateTime(2024, 1, 1)]);
+        Assert.Equal(0, employeeModel.DayScudUseMinutes[new DateTime(2024, 1, 1)]);
+        Assert.Equal(0, employeeModel.MountScudUseMinutes[new DateTime(2024, 1, 1)]);
     }
 
     [Fact]
@@ -88,6 +92,8 @@ public class EmployeeConverterTests
 
         Assert.NotNull(employeeModel);
         Assert.Equal(240, employeeModel.DayPlanUseMinutes[new DateTime(2024, 3, 8)]);
+        Assert.Equal(0, employeeModel.DayScudUseMinutes[new DateTime(2024, 3, 8)]);
+        Assert.Equal(0, employeeModel.MountScudUseMinutes[new DateTime(2024, 1, 1)]);
     }
 
     [Fact]
@@ -114,6 +120,7 @@ public class EmployeeConverterTests
         Assert.NotNull(employeeModel);
         Assert.Equal(0, employeeModel.DayPlanUseMinutes[new DateTime(2024, 3, 8)]);
         Assert.Equal(0, employeeModel.DayScudUseMinutes[new DateTime(2024, 3, 8)]);
+        Assert.Equal(0, employeeModel.MountScudUseMinutes[new DateTime(2024, 3, 1)]);
     }
 
     [Fact]
@@ -140,5 +147,6 @@ public class EmployeeConverterTests
         Assert.NotNull(employeeModel);
         Assert.Equal(0, employeeModel.DayPlanUseMinutes[new DateTime(2024, 3, 8)]);
         Assert.Equal(0, employeeModel.DayScudUseMinutes[new DateTime(2024, 3, 8)]);
+        Assert.Equal(0, employeeModel.MountScudUseMinutes[new DateTime(2024, 3, 1)]);
     }
 }

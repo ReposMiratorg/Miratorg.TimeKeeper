@@ -43,6 +43,8 @@ public class EmployeeConverter2Tests
         Assert.NotNull(employeeModel);
         Assert.Equal(StoreId, employeeModel.StoreId);
         Assert.Equal(660, employeeModel.DayPlanUseMinutes[new DateTime(2024, 1, 3)]); // 12 * 60 = 720 (-1:00 обед) = 660
+        Assert.Equal(660, employeeModel.DayScudUseMinutes[new DateTime(2024, 1, 3)]); // 12 * 60 = 720 (-1:00 обед) = 660
+        Assert.Equal(660, employeeModel.MountScudUseMinutes[new DateTime(2024, 1, 1)]); // 12 * 60 = 720 (-1:00 обед) = 660
 
         var deyExportPlan = employeeModel.ExportPlanTimes.FirstOrDefault(x => x.Date == new DateOnly(2024, 1, 3));
         Assert.NotNull(deyExportPlan);
@@ -106,6 +108,8 @@ public class EmployeeConverter2Tests
         Assert.Equal(StoreId, employeeModel.StoreId);
         Assert.Equal(840, employeeModel.DayPlanUseMinutes[new DateTime(2024, 1, 3)]); // План 12*60=720 + Подработка 3*60=180 Итого 900 (-1:00 обед 90 мин) = 840
         Assert.Equal(14 * 60, employeeModel.MountPlanUseMinuts[new DateTime(2024, 1, 1)]); // Только 1 день в тесте
+        Assert.Equal(13 * 60, employeeModel.DayScudUseMinutes[new DateTime(2024, 1, 3)]); // Только 1 день в тесте
+        Assert.Equal(13 * 60, employeeModel.MountScudUseMinutes[new DateTime(2024, 1, 1)]); // Только 1 день в тесте
 
         var deyExportPlans = employeeModel.ExportPlanTimes.Where(x => x.Date == new DateOnly(2024, 1, 3)).ToList();
         Assert.NotNull(deyExportPlans);

@@ -296,10 +296,8 @@ public class TimeKeeperConverter
                 //ToDo - need release
 
                 monthPlan += dayPlanClear;
-                monthScud += dayScud;
 
                 employee.DayPlanUseMinutes.Add(currentDate, dayPlanClear.TotalMinutes);
-                employee.DayScudUseMinutes.Add(currentDate, dayScud.TotalMinutes);
 
                 foreach (var planTime in exportTimes)
                 {
@@ -336,7 +334,6 @@ public class TimeKeeperConverter
 
                         if (actualStart >= fact.End || actualEnd <= fact.Begin)
                         {
-                            //Console.WriteLine("Время пребывания на работе: 0 минут");
                             fact.DayMinutes = 0;
                             fact.NightMinutes = 0;
                         }
@@ -344,10 +341,10 @@ public class TimeKeeperConverter
                         {
                             var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightMinutes(actualStart, actualEnd);
                             // Вычисляем длительность пребывания на работе в минутах
-                            //TimeSpan duration = actualEnd - actualStart;
-                            //Console.WriteLine($"Время пребывания на работе: {duration.TotalMinutes} минут");
                             fact.DayMinutes = planTime.DayMinutes < dayMinutes ? planTime.DayMinutes : dayMinutes;
                             fact.NightMinutes = planTime.NightMinutes < nightMinutes ? planTime.NightMinutes : nightMinutes;
+
+                            dayScud += TimeSpan.FromMinutes(dayMinutes + nightMinutes);
                         }
                     }
 
@@ -355,6 +352,9 @@ public class TimeKeeperConverter
                 }
 
                 employee.ExportPlanTimes.AddRange(exportTimes);
+                employee.DayScudUseMinutes.Add(currentDate, dayScud.TotalMinutes);
+
+                monthScud += dayScud;
             }
 
             employee.MountPlanUseMinuts.Add(currentMonth, monthPlan.TotalMinutes);
