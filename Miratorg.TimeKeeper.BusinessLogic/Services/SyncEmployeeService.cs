@@ -218,9 +218,11 @@ public class SyncEmployeeService : IHostedService
             var staffDbContext = await _staffControlDbContextFactory.Create();
             using var dbContext = await _timeKeeperDbContextFactory.Create();
 
+            DateTime? t = new DateTime(2024, 6, 1);
+
             var employees = await staffDbContext.Staff
                 .Where(x => x.LegalEntity == "ООО \"ПродМир\"" || x.LegalEntity == "ООО «Стейк и Бургер»")
-                .Where(x => x.DismissalDate == null || x.DismissalDate >= new DateTime(2024, 4, 1)) //ToDo добавить условие 7 последних дней от текущего дня
+                .Where(x => x.DismissalDate == null || x.DismissalDate >= t) //ToDo добавить условие 7 последних дней от текущего дня
                 .Where(x => x.Guid != null)
                 .ToListAsync();
 
