@@ -39,7 +39,7 @@ public class EmployeeConverter3Tests
 
         List<SigurEventModel> sigurEvents = new List<SigurEventModel>();
 
-        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV4(employeeEntity, sigurEvents);
 
         Assert.NotNull(employeeModel);
         Assert.Equal(StoreId, employeeModel.StoreId);
@@ -98,7 +98,7 @@ public class EmployeeConverter3Tests
 
         List<SigurEventModel> sigurEvents = new List<SigurEventModel>();
 
-        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV4(employeeEntity, sigurEvents);
 
         Assert.NotNull(employeeModel);
         Assert.Equal(StoreId, employeeModel.StoreId);
@@ -168,7 +168,7 @@ public class EmployeeConverter3Tests
 
         List<SigurEventModel> sigurEvents = new List<SigurEventModel>();
 
-        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV4(employeeEntity, sigurEvents);
 
         Assert.NotNull(employeeModel);
         Assert.Equal(StoreId, employeeModel.StoreId);
@@ -228,7 +228,7 @@ public class EmployeeConverter3Tests
 
         List<SigurEventModel> sigurEvents = new List<SigurEventModel>();
 
-        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV4(employeeEntity, sigurEvents);
 
         Assert.NotNull(employeeModel);
         Assert.Equal(StoreId, employeeModel.StoreId);
@@ -279,7 +279,7 @@ public class EmployeeConverter3Tests
             new SigurEventModel() { CodeNav = string.Empty, EventTime = new DateTime(2024, 6, 2, 13, 50, 0) }
         };
 
-        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV4(employeeEntity, sigurEvents);
 
         Assert.NotNull(employeeModel);
         Assert.Equal(StoreId, employeeModel.StoreId);
@@ -338,7 +338,7 @@ public class EmployeeConverter3Tests
             new SigurEventModel() { CodeNav = string.Empty, EventTime = new DateTime(2024, 6, 3, 7, 0, 0) }
         };
 
-        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV4(employeeEntity, sigurEvents);
 
         Assert.NotNull(employeeModel);
         Assert.Equal(StoreId, employeeModel.StoreId);

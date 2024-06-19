@@ -56,11 +56,11 @@ public class TimeKeeperConverter
 
             if (planDetail.PlanType == PlanType.Plan)
             {
-                planDetail.TypeOverWorkName = "regular";
+                planDetail.WorkTime = "regular";
             }
             else
             {
-                planDetail.TypeOverWorkName = plan.TypeOverWork?.Code ?? "N/D";
+                planDetail.WorkTime = plan.TypeOverWork?.Code ?? "N/D";
             }
 
             employee.Plans.Add(planDetail);
@@ -279,7 +279,7 @@ public class TimeKeeperConverter
                     }
                     else
                     {
-                        exportTime.WorkTime = plan.TypeOverWorkName ?? "N/D";
+                        exportTime.WorkTime = plan.WorkTime ?? "N/D";
                     }
 
                     plan.CaclWorkTimeMinutes = dayMinutes + nightMinutes;
@@ -401,11 +401,11 @@ public class TimeKeeperConverter
 
             if (planDetail.PlanType == PlanType.Plan)
             {
-                planDetail.TypeOverWorkName = "regular";
+                planDetail.WorkTime = "regular";
             }
             else
             {
-                planDetail.TypeOverWorkName = plan.TypeOverWork?.Code ?? "N/D";
+                planDetail.WorkTime = plan.TypeOverWork?.Code ?? "N/D";
             }
 
             employee.Plans.Add(planDetail);
@@ -607,17 +607,9 @@ public class TimeKeeperConverter
                         Begin = plan.CalcBegin,
                         End = plan.CalcEnd,
                         DayMinutes = dayMinutes,
-                        NightMinutes = nightMinutes
+                        NightMinutes = nightMinutes,
+                        WorkTime = plan.WorkTime
                     };
-
-                    if (plan.PlanType == PlanType.Plan)
-                    {
-                        exportTime.WorkTime = "regular";
-                    }
-                    else
-                    {
-                        exportTime.WorkTime = plan.TypeOverWorkName ?? "N/D";
-                    }
 
                     plan.CaclWorkTimeMinutes = dayMinutes + nightMinutes;
                     plan.CalcWorkDayMinutes = dayMinutes;

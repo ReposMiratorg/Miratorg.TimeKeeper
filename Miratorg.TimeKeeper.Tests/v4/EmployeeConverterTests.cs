@@ -28,7 +28,7 @@ public class EmployeeConverterTests
 
         List<BusinessLogic.Models.SigurEventModel> sigurEvents = new List<BusinessLogic.Models.SigurEventModel>();
 
-        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV4(employeeEntity, sigurEvents);
 
         Assert.NotNull(employeeModel);
         Assert.Equal(120, employeeModel.DayPlanUseMinutes[new DateTime(2024, 1, 3)]);
@@ -58,7 +58,7 @@ public class EmployeeConverterTests
 
         List<BusinessLogic.Models.SigurEventModel> sigurEvents = new List<BusinessLogic.Models.SigurEventModel>();
 
-        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV4(employeeEntity, sigurEvents);
 
         Assert.NotNull(employeeModel);
         Assert.Equal(180, employeeModel.DayPlanUseMinutes[new DateTime(2024, 1, 1)]);
@@ -88,7 +88,7 @@ public class EmployeeConverterTests
 
         List<BusinessLogic.Models.SigurEventModel> sigurEvents = new List<BusinessLogic.Models.SigurEventModel>();
 
-        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV4(employeeEntity, sigurEvents);
 
         Assert.NotNull(employeeModel);
         Assert.Equal(240, employeeModel.DayPlanUseMinutes[new DateTime(2024, 3, 8)]);
@@ -115,7 +115,7 @@ public class EmployeeConverterTests
 
         List<BusinessLogic.Models.SigurEventModel> sigurEvents = new List<BusinessLogic.Models.SigurEventModel>();
 
-        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV4(employeeEntity, sigurEvents);
 
         Assert.NotNull(employeeModel);
         Assert.Equal(0, employeeModel.DayPlanUseMinutes[new DateTime(2024, 3, 8)]);
@@ -142,7 +142,7 @@ public class EmployeeConverterTests
 
         List<BusinessLogic.Models.SigurEventModel> sigurEvents = new List<BusinessLogic.Models.SigurEventModel>();
 
-        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV4(employeeEntity, sigurEvents);
 
         Assert.NotNull(employeeModel);
         Assert.Equal(0, employeeModel.DayPlanUseMinutes[new DateTime(2024, 3, 8)]);

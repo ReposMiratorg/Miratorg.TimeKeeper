@@ -81,7 +81,7 @@ public class PlanDetailModel
     public DateTime CalcEnd { get; set; }
     public PlanType PlanType { get; set; }
     public Guid? StoreId { get; set; }
-    public string TypeOverWorkName { get; set; }
+    public string WorkTime { get; set; }
 
     /// <summary>
     /// Расчитанное время для работы
