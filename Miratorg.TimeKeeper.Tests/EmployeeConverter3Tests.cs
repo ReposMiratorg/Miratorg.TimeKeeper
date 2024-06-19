@@ -67,6 +67,65 @@ public class EmployeeConverter3Tests
     }
 
     [Fact]
+    public void PlanDay9HourTest()
+    {
+        var employeeEntity = new EmployeeEntity()
+        {
+            StoreId = StoreId,
+
+            Plans = new List<PlanEntity>()
+            {
+                new PlanEntity()
+                {
+                    Begin = new DateTime(2024, 6, 6, 7, 0, 0),
+                    End = new DateTime(2024, 6, 6, 19, 0, 0),
+                    StoreId = StoreId,
+                    PlanType = PlanType.Plan
+                }
+            },
+
+            ManualScuds = new List<ManualScudEntity>()
+            {
+               new ManualScudEntity()
+               {
+                    Input = new DateTime(2024, 6, 6, 7, 0, 0),
+                    Output = new DateTime(2024, 6, 6, 16, 0, 0)
+               }
+            },
+
+            ScudInfos = new List<ScudInfo>()
+        };
+
+        List<SigurEventModel> sigurEvents = new List<SigurEventModel>();
+
+        var employeeModel = BusinessLogic.TimeKeeperConverter.ConvertV3(employeeEntity, sigurEvents);
+
+        Assert.NotNull(employeeModel);
+        Assert.Equal(StoreId, employeeModel.StoreId);
+        Assert.Equal(660, employeeModel.DayPlanUseMinutes[new DateTime(2024, 6, 6)]); // 12 * 60 = 720 (-1:00 обед) = 660
+
+        var deyExportPlan = employeeModel.ExportPlanTimes.FirstOrDefault(x => x.Date == new DateOnly(2024, 6, 6));
+        Assert.NotNull(deyExportPlan);
+        Assert.Equal("regular", deyExportPlan.WorkTime);
+        Assert.Equal(660, deyExportPlan.DayMinutes);
+        Assert.Equal(0, deyExportPlan.NightMinutes);
+
+        var deyExportFact = employeeModel.ExportFactTimes.FirstOrDefault(x => x.Date == new DateOnly(2024, 6, 6));
+        Assert.NotNull(deyExportFact);
+        Assert.Equal("regular", deyExportPlan.WorkTime);
+        Assert.Equal(480, deyExportFact.DayMinutes);
+        Assert.Equal(0, deyExportFact.NightMinutes);
+
+        var plans = employeeModel.Plans.Where(x => x.OriginalBegin.Date == new DateTime(2024, 6, 6)).ToList();
+        Assert.Equal(1, plans.Count);
+        Assert.Equal(60, plans[0].ObedTimeMinutes);
+        Assert.Equal(new DateTime(2024, 6, 6, 7, 0, 0), plans[0].OriginalBegin);
+        Assert.Equal(new DateTime(2024, 6, 6, 7, 0, 0), plans[0].CalcBegin);
+        Assert.Equal(new DateTime(2024, 6, 6, 15, 0, 0), plans[0].OriginalEnd);
+        Assert.Equal(new DateTime(2024, 6, 6, 16, 0, 0), plans[0].CalcEnd);
+    }
+
+    [Fact]
     public void PlanDay2HourTest()
     {
         var employeeEntity = new EmployeeEntity()
