@@ -1,7 +1,7 @@
 ﻿using Miratorg.TimeKeeper.BusinessLogic.Models;
 using Miratorg.TimeKeeper.DataAccess.Entities;
 
-namespace Miratorg.TimeKeeper.Tests;
+namespace Miratorg.TimeKeeper.Tests.v3;
 
 public class EmployeeConverter3Tests
 {

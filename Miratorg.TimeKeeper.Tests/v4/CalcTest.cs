@@ -1,6 +1,6 @@
 using Miratorg.TimeKeeper.BusinessLogic;
 
-namespace Miratorg.TimeKeeper.Tests;
+namespace Miratorg.TimeKeeper.Tests.v4;
 
 public class CalcTest
 {

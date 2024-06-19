@@ -1,6 +1,6 @@
 ﻿using Miratorg.TimeKeeper.DataAccess.Entities;
 
-namespace Miratorg.TimeKeeper.Tests;
+namespace Miratorg.TimeKeeper.Tests.v4;
 
 public class EmployeeConverter2Tests
 {
