@@ -6,6 +6,12 @@ public class ManualScudEntity : BaseEntity
     public EmployeeEntity Employee { get; set; }
     public DateTime Input { get; set; }
     public DateTime Output { get; set; }
-    public string UserAutorName { get; set; }
-    public DateTime CreateAt { get; set; }
+}
+
+
+public class LogManualScudEntity : LogBaseEntity
+{
+    public Guid EmployeeId { get; set; }
+    public DateTime Input { get; set; }
+    public DateTime Output { get; set; }
 }

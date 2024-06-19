@@ -27,3 +27,14 @@ public enum PlanType
     Plan = 1,
     Overwork = 2
 }
+
+public class LogPlanEntity : LogBaseEntity
+{
+    public Guid EmployeeId { get; set; }
+    public DateTime Begin { get; set; }
+    public DateTime End { get; set; }
+    public PlanType PlanType { get; set; }
+    public Guid StoreId { get; set; }
+    public Guid? CustomTypeWorkId { get; set; }
+    public Guid? TypeOverWorkId { get; set; }
+}

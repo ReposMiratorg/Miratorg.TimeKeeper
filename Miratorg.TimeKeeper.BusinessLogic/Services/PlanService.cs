@@ -134,20 +134,16 @@ public class PlanService : IPlanService
         {
             ManualScudEntity manualScudEntity0 = new ManualScudEntity()
             {
-                CreateAt = DateTime.Now,
                 EmployeeId = employeeId,
                 Input = begin,
-                Output = begin.AddHours(23).AddMinutes(59).AddSeconds(59),
-                UserAutorName = "n/d"
+                Output = begin.AddHours(23).AddMinutes(59).AddSeconds(59)
             };
 
             ManualScudEntity manualScudEntity1 = new ManualScudEntity()
             {
-                CreateAt = DateTime.Now,
                 EmployeeId = employeeId,
                 Input = end.Date,
-                Output = end,
-                UserAutorName = "n/d"
+                Output = end
             };
 
             dbContext.ManualScuds.Add(manualScudEntity0);
@@ -157,11 +153,9 @@ public class PlanService : IPlanService
         {
             ManualScudEntity manualScudEntity = new ManualScudEntity()
             {
-                CreateAt = DateTime.Now,
                 EmployeeId = employeeId,
                 Input = begin,
-                Output = end,
-                UserAutorName = "n/d"
+                Output = end
             };
 
             dbContext.ManualScuds.Add(manualScudEntity);

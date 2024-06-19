@@ -21,6 +21,9 @@ public class TimeKeeperDbContext : DbContext
     public virtual DbSet<ManualScudEntity> ManualScuds { get; set; }
     public virtual DbSet<StoreLimitEntity> StoreLimits { get; set; }
 
+    public virtual DbSet<LogPlanEntity> LogPlans { get; set; }
+    public virtual DbSet<LogManualScudEntity> LogManualScuds { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // modelBuilder.Model.SetCollation("Cyrillic_General_100_CI_AI"); // Note: возможно будет необходимо
