@@ -79,6 +79,8 @@ public class PlanDetailModel
     public DateTime OriginalEnd { get; set; }
     public DateTime PlanCalcBegin { get; set; }
     public DateTime PlanCalcEnd { get; set; }
+    public DateTime FactCalcBegin { get; set; }
+    public DateTime FactCalcEnd { get; set; }
     public PlanType PlanType { get; set; }
     public Guid? StoreId { get; set; }
     public string WorkTime { get; set; }
@@ -93,7 +95,8 @@ public class PlanDetailModel
     /// <summary>
     /// Рачетное время обеда
     /// </summary>
-    public int ObedTimeMinutes { get; set; }
+    public int PlanObedTimeMinutes { get; set; }
+    public int FactObedTimeMinutes { get; set; }
 }
 
 public class Schedule1CPlanModel

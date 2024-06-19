@@ -58,7 +58,7 @@
                     foreach (var plan in planedIntervals)
                     {
                         var message = $"{plan.OriginalBegin.ToShortTimeString()} - {plan.OriginalEnd.ToShortTimeString()} План";
-                        message += $"         ({plan.CaclWorkTimeMinutes.ToString()} мин. + {plan.ObedTimeMinutes.ToString()} обед)";
+                        message += $"         ({plan.CaclWorkTimeMinutes.ToString()} мин. + {plan.PlanObedTimeMinutes.ToString()} обед)";
 
                         <div class="row">
                             <div class="col-10">
@@ -76,7 +76,7 @@
                     foreach (var plan in overworkIntervals)
                     {
                         var message = $"{plan.OriginalBegin.ToShortTimeString()} - {plan.OriginalEnd.ToShortTimeString()} Подработка: {plan.WorkTime}";
-                        message += $"         ({plan.CaclWorkTimeMinutes.ToString()} мин. + {plan.ObedTimeMinutes.ToString()} обед)";
+                        message += $"         ({plan.CaclWorkTimeMinutes.ToString()} мин. + {plan.PlanObedTimeMinutes.ToString()} обед)";
                         <div class="row mt-2">
                             <div class="col-10">
                                 <input class="form-control form-control-sm" value="@message" disabled />

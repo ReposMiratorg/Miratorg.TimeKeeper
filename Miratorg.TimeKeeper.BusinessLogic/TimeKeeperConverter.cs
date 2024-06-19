@@ -227,7 +227,7 @@ public class TimeKeeperConverter
                             usedLunch += timeObed30min;
                             obed30min = true;
                             plan.PlanCalcEnd = plan.PlanCalcEnd - TimeSpan.FromMinutes(timeObed30min);
-                            plan.ObedTimeMinutes += timeObed30min;
+                            plan.PlanObedTimeMinutes += timeObed30min;
                             timeObed30min = 0;
                         }
                         else
@@ -237,7 +237,7 @@ public class TimeKeeperConverter
                             time -= TimeSpan.FromMinutes(lunch);
                             usedLunch += lunch;
                             plan.PlanCalcEnd = plan.PlanCalcEnd - TimeSpan.FromMinutes(lunch);
-                            plan.ObedTimeMinutes += lunch;
+                            plan.PlanObedTimeMinutes += lunch;
                         }
                     }
 
@@ -250,7 +250,7 @@ public class TimeKeeperConverter
                             usedLunch += time2Obed30min;
                             obed60min = true;
                             plan.PlanCalcEnd = plan.PlanCalcEnd - TimeSpan.FromMinutes(time2Obed30min);
-                            plan.ObedTimeMinutes += time2Obed30min;
+                            plan.PlanObedTimeMinutes += time2Obed30min;
                             time2Obed30min = 0;
                         }
                         else
@@ -260,7 +260,7 @@ public class TimeKeeperConverter
                             time -= TimeSpan.FromMinutes(lunch);
                             usedLunch += lunch;
                             plan.PlanCalcEnd = plan.PlanCalcEnd - TimeSpan.FromMinutes(lunch);
-                            plan.ObedTimeMinutes += lunch;
+                            plan.PlanObedTimeMinutes += lunch;
                         }
                     }
 
@@ -399,6 +399,8 @@ public class TimeKeeperConverter
                 OriginalEnd = plan.End,
                 PlanCalcBegin = plan.Begin,
                 PlanCalcEnd = plan.End,
+                FactCalcBegin = plan.Begin,
+                FactCalcEnd = plan.End,
                 PlanType = plan.PlanType
             };
 
@@ -434,8 +436,7 @@ public class TimeKeeperConverter
             {
                 if (plan.End.Hour == 23 && plan.End.Minute == 59)
                 {
-                    var sigurInput = sigurEvents.Where(x => x.EventTime >= plan.Begin.AddMinutes(-180) && x.EventTime <= plan.Begin.AddMinutes(60))
-                        .OrderBy(x => x.EventTime).FirstOrDefault()?.EventTime;
+                    var sigurInput = sigurEvents.Where(x => x.EventTime >= plan.Begin.AddMinutes(-180) && x.EventTime <= plan.Begin.AddMinutes(60)).OrderBy(x => x.EventTime).FirstOrDefault()?.EventTime;
 
                     if (sigurInput != null) //Если есть вход
                     {
@@ -451,11 +452,8 @@ public class TimeKeeperConverter
                 }
                 else
                 {
-                    var sigurInput = sigurEvents.Where(x => x.EventTime >= plan.Begin.AddMinutes(-180) && x.EventTime <= plan.Begin.AddMinutes(60))
-                        .OrderBy(x => x.EventTime).FirstOrDefault()?.EventTime;
-
-                    var sigurOutput = sigurEvents.Where(x => x.EventTime >= plan.End.AddMinutes(-60) && x.EventTime <= plan.End.AddMinutes(180))
-                        .OrderByDescending(x => x.EventTime).FirstOrDefault()?.EventTime;
+                    var sigurInput = sigurEvents.Where(x => x.EventTime >= plan.Begin.AddMinutes(-180) && x.EventTime <= plan.Begin.AddMinutes(60)).OrderBy(x => x.EventTime).FirstOrDefault()?.EventTime;
+                    var sigurOutput = sigurEvents.Where(x => x.EventTime >= plan.End.AddMinutes(-60) && x.EventTime <= plan.End.AddMinutes(180)).OrderByDescending(x => x.EventTime).FirstOrDefault()?.EventTime;
 
                     if (sigurInput != null && sigurOutput != null)
                     {
@@ -509,8 +507,26 @@ public class TimeKeeperConverter
             }
         }
 
+        // удаляем отметки если были
+        DateTime start = new DateTime(2024, 1, 1);
+        for (DateTime date = start; date < start.AddMonths(100); date = date.AddDays(1))
+        {
+            var scuds = employee.ScudInfos.Where(x => x.Begin.Date == date && x.ScudInfoType == ScudInfoType.Scud).ToList();
+            var manuals = employee.ScudInfos.Where(x => x.Begin.Date == date && x.ScudInfoType == ScudInfoType.Manual).ToList();
+
+            if (manuals.Count > 0 && scuds.Count > 0)
+            {
+                foreach (var item in scuds)
+                {
+                    employee.ScudInfos.Remove(item);
+                }
+            }
+        }
+
         return employee;
     }
+
+    
 
     public static EmployeeModel ConvertV4(EmployeeEntity employeeEntity, List<SigurEventModel> sigurEvents)
     {
@@ -527,14 +543,19 @@ public class TimeKeeperConverter
             {
                 // План + переработки
                 var plans = employee.Plans.Where(x => x.OriginalBegin >= currentDate && x.OriginalEnd < currentDate.AddDays(1)).OrderBy(x => x.PlanCalcBegin).ToList();
-                var scuds = employeeEntity.ScudInfos.Where(x => x.Input >= currentDate && x.Output < currentDate.AddDays(1)).OrderBy(x => x.Input).ToList();
-                var scudManuals = employeeEntity.ManualScuds.Where(x => x.Input >= currentDate && x.Output < currentDate.AddDays(1)).OrderBy(x => x.Input).ToList();
+                var scuds = employee.ScudInfos.Where(x => x.Begin >= currentDate && x.End < currentDate.AddDays(1)).ToList();
 
                 //Время полного дня (все запланированное время без перерыва)
                 TimeSpan dayPlanFill = new TimeSpan();
 
+                //Время полного дня (все Фактическое время без перерыва)
+                TimeSpan dayFactFill = new TimeSpan();
+
                 //Чистое время работы без перерывов
                 TimeSpan dayPlanClear = new TimeSpan();
+
+                // Чистое время для (факт без пееррыва)
+                TimeSpan dayFactClear = new TimeSpan();
 
                 // Обед 30 минут между 4м и 8м часом работы
                 bool obed30min = false;
@@ -544,8 +565,19 @@ public class TimeKeeperConverter
                 bool obed60min = false;
                 int time2Obed30min = 30;
 
-                List<ExportTime> exportTimes = new List<ExportTime>();
 
+                // Обед 30 минут между 4м и 8м часом работы
+                bool _fact_obed30min = false;
+                int _fact_timeObed30min = 30;
+
+                // Обед 60 минут после 8го часа работы
+                bool _fact_obed60min = false;
+                int _fact_time2Obed30min = 30;
+
+                List<ExportTime> exportTimes = new List<ExportTime>();
+                TimeSpan dayScud = new TimeSpan();
+
+                // расчитываем план
                 for (int i = 0; i < plans.Count; i++)
                 {
                     var plan = plans[i];
@@ -564,7 +596,7 @@ public class TimeKeeperConverter
                             usedLunch += timeObed30min;
                             obed30min = true;
                             plan.PlanCalcEnd = plan.PlanCalcEnd - TimeSpan.FromMinutes(timeObed30min);
-                            plan.ObedTimeMinutes += timeObed30min;
+                            plan.PlanObedTimeMinutes += timeObed30min;
                             timeObed30min = 0;
                         }
                         else
@@ -574,7 +606,7 @@ public class TimeKeeperConverter
                             time -= TimeSpan.FromMinutes(lunch);
                             usedLunch += lunch;
                             plan.PlanCalcEnd = plan.PlanCalcEnd - TimeSpan.FromMinutes(lunch);
-                            plan.ObedTimeMinutes += lunch;
+                            plan.PlanObedTimeMinutes += lunch;
                         }
                     }
 
@@ -587,7 +619,7 @@ public class TimeKeeperConverter
                             usedLunch += time2Obed30min;
                             obed60min = true;
                             plan.PlanCalcEnd = plan.PlanCalcEnd - TimeSpan.FromMinutes(time2Obed30min);
-                            plan.ObedTimeMinutes += time2Obed30min;
+                            plan.PlanObedTimeMinutes += time2Obed30min;
                             time2Obed30min = 0;
                         }
                         else
@@ -597,7 +629,7 @@ public class TimeKeeperConverter
                             time -= TimeSpan.FromMinutes(lunch);
                             usedLunch += lunch;
                             plan.PlanCalcEnd = plan.PlanCalcEnd - TimeSpan.FromMinutes(lunch);
-                            plan.ObedTimeMinutes += lunch;
+                            plan.PlanObedTimeMinutes += lunch;
                         }
                     }
 
@@ -623,65 +655,168 @@ public class TimeKeeperConverter
                     dayPlanClear += time;
                 }
 
-                // факт скуд + ручной скуд
-                TimeSpan dayScud = new TimeSpan();
-                //ToDo - need release
-
                 monthPlan += dayPlanClear;
 
                 employee.DayPlanUseMinutes.Add(currentDate, dayPlanClear.TotalMinutes);
 
-                foreach (var planTime in exportTimes)
+                // расчитываем факт
+                for (int i = 0; i < plans.Count; i++)
                 {
-                    var fact = new ExportTimeFact()
+                    var plan = plans[i];
+
+                    if (scuds.Count == 0)
                     {
-                        Begin = planTime.Begin,
-                        End = planTime.End,
-                        Date = planTime.Date,
-                        WorkTime = planTime.WorkTime
-                    };
-
-                    var day = new DateTime(fact.Date.Year, fact.Date.Month, fact.Date.Day);
-                    var scudInfos = employee.ScudInfos.Where(x => x.Begin.Date == day).ToList();
-
-                    if (scudInfos.Count == 0)
-                    {
-                        // нет фактоы явки
-                        fact.DayMinutes = 0;
-                        fact.NightMinutes = 0;
-                    }
-                    else
-                    {
-                        /*
-                        workStart – начало рабочего дня
-                        workEnd – конец рабочего дня
-                        arrival – фактическое время прихода на работу
-                        departure – фактическое время ухода с работы
-                         */
-                        var scudBegin = scudInfos.Min(x => x.Begin);
-                        var scudEnd = scudInfos.Max(x => x.End);
-
-                        DateTime actualStart = scudBegin < fact.Begin ? fact.Begin : scudBegin;
-                        DateTime actualEnd = scudEnd > fact.End ? fact.End : scudEnd;
-
-                        if (actualStart >= fact.End || actualEnd <= fact.Begin)
+                        var fact = new ExportTimeFact()
                         {
-                            fact.DayMinutes = 0;
-                            fact.NightMinutes = 0;
+                            Begin = plan.FactCalcBegin,
+                            End = plan.FactCalcEnd,
+                            Date = new DateOnly(plan.FactCalcBegin.Date.Year, plan.FactCalcBegin.Date.Month, plan.FactCalcBegin.Date.Day),
+                            WorkTime = plan.WorkTime,
+
+                            DayMinutes = 0,
+                            NightMinutes = 0
+                        };
+
+                        employee.ExportFactTimes.Add(fact);
+                        continue;
+                    }
+
+                    var min = scuds.MinBy(x => x.Begin).Begin;
+                    var max = scuds.MaxBy(x => x.End).End;
+
+                    // корректируем время
+                    plan.FactCalcBegin = plan.FactCalcBegin > min ? plan.FactCalcBegin : min;
+                    plan.FactCalcEnd = plan.FactCalcEnd < max ? plan.FactCalcEnd : max;
+
+                    var time = plan.FactCalcEnd - plan.FactCalcBegin;
+
+                    dayFactFill += time;
+
+                    int usedLunch = 0;
+
+                    if (_fact_obed30min == false && dayFactFill > TimeSpan.FromHours(4))
+                    {
+                        var t0 = dayFactFill - TimeSpan.FromHours(4) - TimeSpan.FromMinutes(_fact_timeObed30min);
+                        if (t0.TotalMinutes >= 0) // если время больше чем 4 часа - убираем обед
+                        {
+                            time -= TimeSpan.FromMinutes(_fact_timeObed30min);
+                            usedLunch += _fact_timeObed30min;
+                            _fact_obed30min = true;
+                            plan.FactCalcEnd = plan.FactCalcEnd - TimeSpan.FromMinutes(_fact_timeObed30min);
+                            plan.FactObedTimeMinutes += _fact_timeObed30min;
+                            _fact_timeObed30min = 0;
                         }
                         else
                         {
-                            var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightMinutes(actualStart, actualEnd);
-                            // Вычисляем длительность пребывания на работе в минутах
-                            fact.DayMinutes = planTime.DayMinutes < dayMinutes ? planTime.DayMinutes : dayMinutes;
-                            fact.NightMinutes = planTime.NightMinutes < nightMinutes ? planTime.NightMinutes : nightMinutes;
-
-                            dayScud += TimeSpan.FromMinutes(dayMinutes + nightMinutes);
+                            int lunch = ((int)t0.TotalMinutes) * -1;
+                            _fact_timeObed30min -= lunch;
+                            time -= TimeSpan.FromMinutes(lunch);
+                            usedLunch += lunch;
+                            plan.FactCalcEnd = plan.FactCalcEnd - TimeSpan.FromMinutes(lunch);
+                            plan.FactObedTimeMinutes += lunch;
                         }
                     }
 
-                    employee.ExportFactTimes.Add(fact);
+                    if (_fact_obed60min == false && dayFactFill > TimeSpan.FromHours(8))
+                    {
+                        var t0 = dayFactFill - TimeSpan.FromHours(8) - TimeSpan.FromMinutes(_fact_time2Obed30min);
+                        if (t0.TotalMinutes >= 0) // если время больше чем 8 часа- убираем обед
+                        {
+                            time -= TimeSpan.FromMinutes(_fact_time2Obed30min);
+                            usedLunch += _fact_time2Obed30min;
+                            obed60min = true;
+                            plan.FactCalcEnd = plan.FactCalcEnd - TimeSpan.FromMinutes(_fact_time2Obed30min);
+                            plan.FactObedTimeMinutes += _fact_time2Obed30min;
+                            _fact_time2Obed30min = 0;
+                        }
+                        else
+                        {
+                            int lunch = ((int)t0.TotalMinutes) * -1;
+                            _fact_time2Obed30min -= lunch;
+                            time -= TimeSpan.FromMinutes(lunch);
+                            usedLunch += lunch;
+                            plan.FactCalcEnd = plan.FactCalcEnd - TimeSpan.FromMinutes(lunch);
+                            plan.FactObedTimeMinutes += lunch;
+                        }
+                    }
+
+                    var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightMinutes(plan.FactCalcBegin, plan.FactCalcEnd);
+                    //dayMinutes -= usedLunch;
+
+                    ExportTime fact1 = new ExportTime()
+                    {
+                        Date = new DateOnly(plan.FactCalcBegin.Year, plan.FactCalcBegin.Month, plan.FactCalcBegin.Day),
+                        Begin = plan.FactCalcBegin,
+                        End = plan.FactCalcEnd,
+                        DayMinutes = dayMinutes,
+                        NightMinutes = nightMinutes,
+                        WorkTime = plan.WorkTime
+                    };
+
+                    dayScud += TimeSpan.FromMinutes(dayMinutes + nightMinutes);
+
+                    employee.ExportFactTimes.Add(fact1);
+
+                    dayFactClear += time;
                 }
+
+                // факт скуд + ручной скуд
+
+                //ToDo - need release
+
+
+
+                //foreach (var planTime in exportTimes)
+                //{
+                //    var fact = new ExportTimeFact()
+                //    {
+                //        Begin = planTime.Begin,
+                //        End = planTime.End,
+                //        Date = planTime.Date,
+                //        WorkTime = planTime.WorkTime
+                //    };
+
+                //    var day = new DateTime(fact.Date.Year, fact.Date.Month, fact.Date.Day);
+                //    var scudInfos = employee.ScudInfos.Where(x => x.Begin.Date == day).ToList();
+
+                //    if (scudInfos.Count == 0)
+                //    {
+                //        // нет фактоы явки
+                //        fact.DayMinutes = 0;
+                //        fact.NightMinutes = 0;
+                //    }
+                //    else
+                //    {
+                //        /*
+                //        workStart – начало рабочего дня
+                //        workEnd – конец рабочего дня
+                //        arrival – фактическое время прихода на работу
+                //        departure – фактическое время ухода с работы
+                //         */
+                //        var scudBegin = scudInfos.Min(x => x.Begin);
+                //        var scudEnd = scudInfos.Max(x => x.End);
+
+                //        DateTime actualStart = scudBegin < fact.Begin ? fact.Begin : scudBegin;
+                //        DateTime actualEnd = scudEnd > fact.End ? fact.End : scudEnd;
+
+                //        if (actualStart >= fact.End || actualEnd <= fact.Begin)
+                //        {
+                //            fact.DayMinutes = 0;
+                //            fact.NightMinutes = 0;
+                //        }
+                //        else
+                //        {
+                //            var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightMinutes(actualStart, actualEnd);
+                //            // Вычисляем длительность пребывания на работе в минутах
+                //            fact.DayMinutes = planTime.DayMinutes < dayMinutes ? planTime.DayMinutes : dayMinutes;
+                //            fact.NightMinutes = planTime.NightMinutes < nightMinutes ? planTime.NightMinutes : nightMinutes;
+
+                //            dayScud += TimeSpan.FromMinutes(dayMinutes + nightMinutes);
+                //        }
+                //    }
+
+                //    employee.ExportFactTimes.Add(fact);
+                //}
 
                 employee.ExportPlanTimes.AddRange(exportTimes);
                 employee.DayScudUseMinutes.Add(currentDate, dayScud.TotalMinutes);

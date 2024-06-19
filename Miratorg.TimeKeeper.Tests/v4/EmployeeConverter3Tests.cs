@@ -59,7 +59,7 @@ public class EmployeeConverter3Tests
 
         var plans = employeeModel.Plans.Where(x => x.OriginalBegin.Date == new DateTime(2024, 1, 3)).ToList();
         Assert.Equal(1, plans.Count);
-        Assert.Equal(60, plans[0].ObedTimeMinutes);
+        Assert.Equal(60, plans[0].PlanObedTimeMinutes);
         Assert.Equal(new DateTime(2024, 1, 3, 8, 0, 0), plans[0].OriginalBegin);
         Assert.Equal(new DateTime(2024, 1, 3, 8, 0, 0), plans[0].PlanCalcBegin);
         Assert.Equal(new DateTime(2024, 1, 3, 20, 0, 0), plans[0].OriginalEnd);
@@ -118,11 +118,11 @@ public class EmployeeConverter3Tests
 
         var plans = employeeModel.Plans.Where(x => x.OriginalBegin.Date == new DateTime(2024, 6, 6)).ToList();
         Assert.Equal(1, plans.Count);
-        Assert.Equal(60, plans[0].ObedTimeMinutes);
+        Assert.Equal(60, plans[0].PlanObedTimeMinutes);
         Assert.Equal(new DateTime(2024, 6, 6, 7, 0, 0), plans[0].OriginalBegin);
         Assert.Equal(new DateTime(2024, 6, 6, 7, 0, 0), plans[0].PlanCalcBegin);
-        Assert.Equal(new DateTime(2024, 6, 6, 15, 0, 0), plans[0].OriginalEnd);
-        Assert.Equal(new DateTime(2024, 6, 6, 16, 0, 0), plans[0].PlanCalcEnd);
+        Assert.Equal(new DateTime(2024, 6, 6, 19, 0, 0), plans[0].OriginalEnd);
+        Assert.Equal(new DateTime(2024, 6, 6, 18, 0, 0), plans[0].PlanCalcEnd);
     }
 
     [Fact]
