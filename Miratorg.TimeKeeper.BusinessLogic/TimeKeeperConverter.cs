@@ -47,10 +47,13 @@ public class TimeKeeperConverter
             {
                 Id = plan.Id,
                 StoreId = plan.StoreId,
+                
                 OriginalBegin = plan.Begin,
                 OriginalEnd = plan.End,
-                CalcBegin = plan.Begin,
-                CalcEnd = plan.End,
+
+                PlanCalcBegin = plan.Begin,
+                PlanCalcEnd = plan.End,
+                
                 PlanType = plan.PlanType
             };
 
@@ -186,7 +189,7 @@ public class TimeKeeperConverter
             for (DateTime currentDate = currentMonth; currentDate < currentMonth.AddMonths(1); currentDate = currentDate.AddDays(1))
             {
                 // План + переработки
-                var plans = employee.Plans.Where(x => x.OriginalBegin >= currentDate && x.OriginalEnd < currentDate.AddDays(1)).OrderBy(x => x.CalcBegin).ToList();
+                var plans = employee.Plans.Where(x => x.OriginalBegin >= currentDate && x.OriginalEnd < currentDate.AddDays(1)).OrderBy(x => x.PlanCalcBegin).ToList();
                 var scuds = employeeEntity.ScudInfos.Where(x => x.Input >= currentDate && x.Output < currentDate.AddDays(1)).OrderBy(x => x.Input).ToList();
                 var scudManuals = employeeEntity.ManualScuds.Where(x => x.Input >= currentDate && x.Output < currentDate.AddDays(1)).OrderBy(x => x.Input).ToList();
 
@@ -209,7 +212,7 @@ public class TimeKeeperConverter
                 for (int i = 0; i < plans.Count; i++)
                 {
                     var plan = plans[i];
-                    var time = plan.CalcEnd - plan.CalcBegin;
+                    var time = plan.PlanCalcEnd - plan.PlanCalcBegin;
 
                     dayPlanFill += time;
 
@@ -223,7 +226,7 @@ public class TimeKeeperConverter
                             time -= TimeSpan.FromMinutes(timeObed30min);
                             usedLunch += timeObed30min;
                             obed30min = true;
-                            plan.CalcEnd = plan.CalcEnd - TimeSpan.FromMinutes(timeObed30min);
+                            plan.PlanCalcEnd = plan.PlanCalcEnd - TimeSpan.FromMinutes(timeObed30min);
                             plan.ObedTimeMinutes += timeObed30min;
                             timeObed30min = 0;
                         }
@@ -233,7 +236,7 @@ public class TimeKeeperConverter
                             timeObed30min -= lunch;
                             time -= TimeSpan.FromMinutes(lunch);
                             usedLunch += lunch;
-                            plan.CalcEnd = plan.CalcEnd - TimeSpan.FromMinutes(lunch);
+                            plan.PlanCalcEnd = plan.PlanCalcEnd - TimeSpan.FromMinutes(lunch);
                             plan.ObedTimeMinutes += lunch;
                         }
                     }
@@ -246,7 +249,7 @@ public class TimeKeeperConverter
                             time -= TimeSpan.FromMinutes(time2Obed30min);
                             usedLunch += time2Obed30min;
                             obed60min = true;
-                            plan.CalcEnd = plan.CalcEnd - TimeSpan.FromMinutes(time2Obed30min);
+                            plan.PlanCalcEnd = plan.PlanCalcEnd - TimeSpan.FromMinutes(time2Obed30min);
                             plan.ObedTimeMinutes += time2Obed30min;
                             time2Obed30min = 0;
                         }
@@ -256,19 +259,19 @@ public class TimeKeeperConverter
                             time2Obed30min -= lunch;
                             time -= TimeSpan.FromMinutes(lunch);
                             usedLunch += lunch;
-                            plan.CalcEnd = plan.CalcEnd - TimeSpan.FromMinutes(lunch);
+                            plan.PlanCalcEnd = plan.PlanCalcEnd - TimeSpan.FromMinutes(lunch);
                             plan.ObedTimeMinutes += lunch;
                         }
                     }
 
-                    var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightMinutes(plan.CalcBegin, plan.CalcEnd);
+                    var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightMinutes(plan.PlanCalcBegin, plan.PlanCalcEnd);
                     //dayMinutes -= usedLunch;
 
                     ExportTime exportTime = new ExportTime()
                     {
-                        Date = new DateOnly(plan.CalcBegin.Year, plan.CalcBegin.Month, plan.CalcBegin.Day),
-                        Begin = plan.CalcBegin,
-                        End = plan.CalcEnd,
+                        Date = new DateOnly(plan.PlanCalcBegin.Year, plan.PlanCalcBegin.Month, plan.PlanCalcBegin.Day),
+                        Begin = plan.PlanCalcBegin,
+                        End = plan.PlanCalcEnd,
                         DayMinutes = dayMinutes,
                         NightMinutes = nightMinutes
                     };
@@ -394,8 +397,8 @@ public class TimeKeeperConverter
                 StoreId = plan.StoreId,
                 OriginalBegin = plan.Begin,
                 OriginalEnd = plan.End,
-                CalcBegin = plan.Begin,
-                CalcEnd = plan.End,
+                PlanCalcBegin = plan.Begin,
+                PlanCalcEnd = plan.End,
                 PlanType = plan.PlanType
             };
 
@@ -523,7 +526,7 @@ public class TimeKeeperConverter
             for (DateTime currentDate = currentMonth; currentDate < currentMonth.AddMonths(1); currentDate = currentDate.AddDays(1))
             {
                 // План + переработки
-                var plans = employee.Plans.Where(x => x.OriginalBegin >= currentDate && x.OriginalEnd < currentDate.AddDays(1)).OrderBy(x => x.CalcBegin).ToList();
+                var plans = employee.Plans.Where(x => x.OriginalBegin >= currentDate && x.OriginalEnd < currentDate.AddDays(1)).OrderBy(x => x.PlanCalcBegin).ToList();
                 var scuds = employeeEntity.ScudInfos.Where(x => x.Input >= currentDate && x.Output < currentDate.AddDays(1)).OrderBy(x => x.Input).ToList();
                 var scudManuals = employeeEntity.ManualScuds.Where(x => x.Input >= currentDate && x.Output < currentDate.AddDays(1)).OrderBy(x => x.Input).ToList();
 
@@ -546,7 +549,7 @@ public class TimeKeeperConverter
                 for (int i = 0; i < plans.Count; i++)
                 {
                     var plan = plans[i];
-                    var time = plan.CalcEnd - plan.CalcBegin;
+                    var time = plan.PlanCalcEnd - plan.PlanCalcBegin;
 
                     dayPlanFill += time;
 
@@ -560,7 +563,7 @@ public class TimeKeeperConverter
                             time -= TimeSpan.FromMinutes(timeObed30min);
                             usedLunch += timeObed30min;
                             obed30min = true;
-                            plan.CalcEnd = plan.CalcEnd - TimeSpan.FromMinutes(timeObed30min);
+                            plan.PlanCalcEnd = plan.PlanCalcEnd - TimeSpan.FromMinutes(timeObed30min);
                             plan.ObedTimeMinutes += timeObed30min;
                             timeObed30min = 0;
                         }
@@ -570,7 +573,7 @@ public class TimeKeeperConverter
                             timeObed30min -= lunch;
                             time -= TimeSpan.FromMinutes(lunch);
                             usedLunch += lunch;
-                            plan.CalcEnd = plan.CalcEnd - TimeSpan.FromMinutes(lunch);
+                            plan.PlanCalcEnd = plan.PlanCalcEnd - TimeSpan.FromMinutes(lunch);
                             plan.ObedTimeMinutes += lunch;
                         }
                     }
@@ -583,7 +586,7 @@ public class TimeKeeperConverter
                             time -= TimeSpan.FromMinutes(time2Obed30min);
                             usedLunch += time2Obed30min;
                             obed60min = true;
-                            plan.CalcEnd = plan.CalcEnd - TimeSpan.FromMinutes(time2Obed30min);
+                            plan.PlanCalcEnd = plan.PlanCalcEnd - TimeSpan.FromMinutes(time2Obed30min);
                             plan.ObedTimeMinutes += time2Obed30min;
                             time2Obed30min = 0;
                         }
@@ -593,19 +596,19 @@ public class TimeKeeperConverter
                             time2Obed30min -= lunch;
                             time -= TimeSpan.FromMinutes(lunch);
                             usedLunch += lunch;
-                            plan.CalcEnd = plan.CalcEnd - TimeSpan.FromMinutes(lunch);
+                            plan.PlanCalcEnd = plan.PlanCalcEnd - TimeSpan.FromMinutes(lunch);
                             plan.ObedTimeMinutes += lunch;
                         }
                     }
 
-                    var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightMinutes(plan.CalcBegin, plan.CalcEnd);
+                    var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightMinutes(plan.PlanCalcBegin, plan.PlanCalcEnd);
                     //dayMinutes -= usedLunch;
 
                     ExportTime exportTime = new ExportTime()
                     {
-                        Date = new DateOnly(plan.CalcBegin.Year, plan.CalcBegin.Month, plan.CalcBegin.Day),
-                        Begin = plan.CalcBegin,
-                        End = plan.CalcEnd,
+                        Date = new DateOnly(plan.PlanCalcBegin.Year, plan.PlanCalcBegin.Month, plan.PlanCalcBegin.Day),
+                        Begin = plan.PlanCalcBegin,
+                        End = plan.PlanCalcEnd,
                         DayMinutes = dayMinutes,
                         NightMinutes = nightMinutes,
                         WorkTime = plan.WorkTime

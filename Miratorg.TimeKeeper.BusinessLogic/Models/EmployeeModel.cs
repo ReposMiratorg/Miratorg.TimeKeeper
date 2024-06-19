@@ -77,8 +77,8 @@ public class PlanDetailModel
     public Guid Id { get; set; }
     public DateTime OriginalBegin { get; set; }
     public DateTime OriginalEnd { get; set; }
-    public DateTime CalcBegin { get; set; }
-    public DateTime CalcEnd { get; set; }
+    public DateTime PlanCalcBegin { get; set; }
+    public DateTime PlanCalcEnd { get; set; }
     public PlanType PlanType { get; set; }
     public Guid? StoreId { get; set; }
     public string WorkTime { get; set; }
