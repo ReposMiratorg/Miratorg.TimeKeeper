@@ -364,7 +364,7 @@ public class TimeKeeperConverter
         return employee;
     }
 
-    public static EmployeeModel ConvertV4(EmployeeEntity employeeEntity, List<SigurEventModel> sigurEvents)
+    private static EmployeeModel PrepareForCalc(EmployeeEntity employeeEntity, List<SigurEventModel> sigurEvents)
     {
         EmployeeModel employee = new EmployeeModel()
         {
@@ -469,21 +469,6 @@ public class TimeKeeperConverter
             }
         }
 
-        // this logic not used more
-
-        //foreach (var scudInfoEntity in employeeEntity.ScudInfos)
-        //{
-        //    var scudModel = new ScudInfoModel()
-        //    {
-        //        Id = Guid.Empty,
-        //        Begin = scudInfoEntity.Input,
-        //        End = scudInfoEntity.Output,
-        //        ScudInfoType = ScudInfoType.Scud
-        //    };
-
-        //    employee.ScudInfos.Add(scudModel);
-        //}
-
         foreach (var item in employeeEntity.ManualScuds)
         {
             var scudModel = new ScudInfoModel()
@@ -520,6 +505,13 @@ public class TimeKeeperConverter
                 });
             }
         }
+
+        return employee;
+    }
+
+    public static EmployeeModel ConvertV4(EmployeeEntity employeeEntity, List<SigurEventModel> sigurEvents)
+    {
+        var employee = PrepareForCalc(employeeEntity, sigurEvents);
 
         // Подсчет часов в магазине за месяц //ToDo -  необходимо учитывать по магазинам
         DateTime start = new DateTime(2024, 1, 1);
