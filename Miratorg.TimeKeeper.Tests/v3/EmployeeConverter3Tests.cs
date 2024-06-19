@@ -67,7 +67,7 @@ public class EmployeeConverter3Tests
     }
 
     [Fact]
-    public void PlanDay9HourTest()
+    public void NotWork_PlanDay9HourTest()
     {
         var employeeEntity = new EmployeeEntity()
         {
@@ -302,7 +302,7 @@ public class EmployeeConverter3Tests
     }
 
     [Fact]
-    public void PlanDay5HourTest()
+    public void NotWork_PlanDay5HourTest()
     {
         // вход и выход опреелдляются через сигур (переходящее рабочее время на другое число)
         var employeeEntity = new EmployeeEntity()
