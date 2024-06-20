@@ -47,7 +47,7 @@ public class ApiService : IApiService
                         sigurEvents.Add(new SigurEventModel() { CodeNav = item.CodeNav, EventTime = item.EventTime });
                     }
 
-                    var model = TimeKeeperConverter.ConvertV3(entity, sigurEvents);
+                    var model = TimeKeeperConverter.ConvertV4(entity, sigurEvents);
 
                     var timeSchist = ConverScudToTimesheetBiomentry(model, from, to, store1cId, employee.Guid1C.ToString());
 
@@ -255,7 +255,7 @@ public class ApiService : IApiService
                         sigurEvents.Add(new SigurEventModel() { CodeNav = item.CodeNav, EventTime = item.EventTime });
                     }
 
-                    var model = TimeKeeperConverter.ConvertV3(entity, sigurEvents);
+                    var model = TimeKeeperConverter.ConvertV4(entity, sigurEvents);
 
                     var timeSchist = ConverPlanToTimesheetFiscal(model, from, to, store1cId, employee.Guid1C.ToString());
 
