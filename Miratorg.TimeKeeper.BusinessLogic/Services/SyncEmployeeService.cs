@@ -85,7 +85,7 @@ public class SyncEmployeeService : IHostedService
                 sigurEvents.Add(new SigurEventModel() { CodeNav = item.CodeNav, EventTime = item.EventTime });
             }
 
-            var model = TimeKeeperConverter.ConvertV3(employee, sigurEvents);
+            var model = TimeKeeperConverter.ConvertV4(employee, sigurEvents);
             models.Add(model);
         }
 
@@ -175,7 +175,7 @@ public class SyncEmployeeService : IHostedService
                 sigurEvents.Add(new SigurEventModel() { CodeNav = item.CodeNav, EventTime = item.EventTime });
             }
 
-            var model = TimeKeeperConverter.ConvertV3(entity, sigurEvents);
+            var model = TimeKeeperConverter.ConvertV4(entity, sigurEvents);
 
             var existUser = Employees.FirstOrDefault(x => x.Id == userId);
 
