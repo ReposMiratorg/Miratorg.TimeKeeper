@@ -760,64 +760,6 @@ public class TimeKeeperConverter
                     dayFactClear += time;
                 }
 
-                // факт скуд + ручной скуд
-
-                //ToDo - need release
-
-
-
-                //foreach (var planTime in exportTimes)
-                //{
-                //    var fact = new ExportTimeFact()
-                //    {
-                //        Begin = planTime.Begin,
-                //        End = planTime.End,
-                //        Date = planTime.Date,
-                //        WorkTime = planTime.WorkTime
-                //    };
-
-                //    var day = new DateTime(fact.Date.Year, fact.Date.Month, fact.Date.Day);
-                //    var scudInfos = employee.ScudInfos.Where(x => x.Begin.Date == day).ToList();
-
-                //    if (scudInfos.Count == 0)
-                //    {
-                //        // нет фактоы явки
-                //        fact.DayMinutes = 0;
-                //        fact.NightMinutes = 0;
-                //    }
-                //    else
-                //    {
-                //        /*
-                //        workStart – начало рабочего дня
-                //        workEnd – конец рабочего дня
-                //        arrival – фактическое время прихода на работу
-                //        departure – фактическое время ухода с работы
-                //         */
-                //        var scudBegin = scudInfos.Min(x => x.Begin);
-                //        var scudEnd = scudInfos.Max(x => x.End);
-
-                //        DateTime actualStart = scudBegin < fact.Begin ? fact.Begin : scudBegin;
-                //        DateTime actualEnd = scudEnd > fact.End ? fact.End : scudEnd;
-
-                //        if (actualStart >= fact.End || actualEnd <= fact.Begin)
-                //        {
-                //            fact.DayMinutes = 0;
-                //            fact.NightMinutes = 0;
-                //        }
-                //        else
-                //        {
-                //            var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightMinutes(actualStart, actualEnd);
-                //            // Вычисляем длительность пребывания на работе в минутах
-                //            fact.DayMinutes = planTime.DayMinutes < dayMinutes ? planTime.DayMinutes : dayMinutes;
-                //            fact.NightMinutes = planTime.NightMinutes < nightMinutes ? planTime.NightMinutes : nightMinutes;
-
-                //            dayScud += TimeSpan.FromMinutes(dayMinutes + nightMinutes);
-                //        }
-                //    }
-
-                //    employee.ExportFactTimes.Add(fact);
-                //}
-
                 employee.ExportPlanTimes.AddRange(exportTimes);
                 employee.DayScudUseMinutes.Add(currentDate, dayScud.TotalMinutes);
 
