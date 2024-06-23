@@ -392,11 +392,11 @@
 
         var date = GetFirstDay(_date);
 
-        var xxx = SyncEmployeeService.Employees.Where(x => x.StoreId != storeId).ToList();
+        var overWorkEmployees = SyncEmployeeService.Employees.Where(x => x.StoreId != storeId).ToList();
 
         List<EmployeeModel> additionals = new List<EmployeeModel>();
 
-        foreach (var item in xxx)
+        foreach (var item in overWorkEmployees)
         {
             var testData = item.Plans.Where(x => x.PlanType == PlanType.Overwork && x.StoreId == storeId).ToList();
 
