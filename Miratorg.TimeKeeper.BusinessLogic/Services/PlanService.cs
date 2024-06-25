@@ -136,6 +136,7 @@ public class PlanService : IPlanService
             dbContext.Plans.Remove(planEntity);
             await dbContext.SaveChangesAsync();
             dbContext.LogPlans.Add(CreatePlanLog(planEntity, autor, TypeLogEvent.Delete));
+            await dbContext.SaveChangesAsync();
         }
         catch (Exception ex)
         {
