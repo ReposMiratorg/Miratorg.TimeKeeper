@@ -11,7 +11,7 @@ public class SyncEmployeeService : IHostedService
     private static ILogger<SyncEmployeeService> _logger;
 
     private bool isWork { get; set; }
-    private readonly TimeSpan pause = TimeSpan.FromHours(4);
+    private readonly TimeSpan pause = TimeSpan.FromDays(1);
 
     public SyncEmployeeService(IStuffControlDbService stuffControlService,
         IStaffControlDbContextFactory staffControlDbContextFactory,

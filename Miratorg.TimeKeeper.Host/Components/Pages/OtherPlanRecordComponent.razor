@@ -133,11 +133,10 @@
     [Parameter]
     public bool IsShowReasonAbsent { get; set; }
 
-    // [Parameter]
-    // public int LimitPlanHours { get; set; }
+    [Inject]
+    public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
-    // [Parameter]
-    // public TimeSpan PlanHours { get; set; }
+    string userName { get; set; }
 
     private DateTime currentDate { get; set; }
 
@@ -181,7 +180,7 @@
 
     private async Task RemovePaln(Guid id)
     {
-        await PlanService.Remove(id);
+        await PlanService.Remove(id, userName);
         await SyncEmployeeService.UpdateUser(EmployeeId);
         await UpdateUI();
     }
@@ -207,6 +206,21 @@
 
     private async Task Open()
     {
+        try
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user?.Identity?.IsAuthenticated == true)
+            {
+                userName = user.Identity?.Name;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+
         await modalDialog.Open();
     }
 

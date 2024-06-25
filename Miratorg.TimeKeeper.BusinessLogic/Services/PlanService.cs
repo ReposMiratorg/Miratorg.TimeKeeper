@@ -1,12 +1,16 @@
-﻿namespace Miratorg.TimeKeeper.BusinessLogic.Services;
+﻿using Microsoft.EntityFrameworkCore.Scaffolding.Metadata;
+using Miratorg.TimeKeeper.DataAccess.Entities;
+using System.Numerics;
+
+namespace Miratorg.TimeKeeper.BusinessLogic.Services;
 
 public interface IPlanService
 {
     public Task<bool> CheckPlan(Guid employeeId, DateTime beginWork, DateTime endWork);
-    public Task Create(Guid employeeId, PlanType planType, DateTime beginWork, DateTime endWork, Guid storeId, Guid? typeOverwork, Guid? customOverwork);
-    public Task Remove(Guid id);
-    public Task RemoveScudManual(Guid id);
-    public Task CreateManualScud(Guid employeeId, DateTime beginWork, DateTime endWork);
+    public Task Create(Guid employeeId, PlanType planType, DateTime beginWork, DateTime endWork, Guid storeId, Guid? typeOverwork, Guid? customOverwork, string autor);
+    public Task Remove(Guid id, string autor);
+    public Task RemoveScudManual(Guid id, string autor);
+    public Task CreateManualScud(Guid employeeId, DateTime beginWork, DateTime endWork, string autor);
 }
 
 public class PlanService : IPlanService
@@ -20,9 +24,14 @@ public class PlanService : IPlanService
         _logger = logger;
     }
 
-    public async Task Create(Guid employeeId, PlanType planType, DateTime begin, DateTime end, Guid storeId, Guid? typeOverwork, Guid? customOverwork)
+    public async Task Create(Guid employeeId, PlanType planType, DateTime begin, DateTime end, Guid storeId, Guid? typeOverwork, Guid? customOverwork, string autor)
     {
         ValidateDates(begin, end);
+
+        if (string.IsNullOrEmpty(autor))
+        {
+            autor = "n/d";
+        }
 
         if (storeId == Guid.Empty)
         {
@@ -68,6 +77,9 @@ public class PlanService : IPlanService
 
             dbContext.Plans.Add(plan0);
             dbContext.Plans.Add(plan1);
+
+            dbContext.LogPlans.Add(CreatePlanLog(plan0, autor, TypeLogEvent.Create));
+            dbContext.LogPlans.Add(CreatePlanLog(plan1, autor, TypeLogEvent.Create));
         }
         else
         {
@@ -83,18 +95,25 @@ public class PlanService : IPlanService
             };
 
             dbContext.Plans.Add(plan);
+            dbContext.LogPlans.Add(CreatePlanLog(plan, autor, TypeLogEvent.Create));
         }
 
         await  dbContext.SaveChangesAsync();
     }
 
-    public async Task RemoveScudManual(Guid id)
+    public async Task RemoveScudManual(Guid id, string autor)
     {
         try
         {
+            if (string.IsNullOrEmpty(autor))
+            {
+                autor = "n/d";
+            }
+
             using var dbContext = await _dbContextFactory.Create();
             var  manualScudEntity = await dbContext.ManualScuds.FirstOrDefaultAsync(x => x.Id == id);
             dbContext.ManualScuds.Remove(manualScudEntity);
+            dbContext.LogManualScuds.Add(CreateScudLog(manualScudEntity, autor, TypeLogEvent.Delete));
             await dbContext.SaveChangesAsync();
         }
         catch (Exception ex)
@@ -103,13 +122,20 @@ public class PlanService : IPlanService
         }
     }
 
-    public async Task Remove(Guid id)
+    public async Task Remove(Guid id, string autor)
     {
         try
         {
+            if (string.IsNullOrEmpty(autor))
+            {
+                autor = "n/d";
+            }
+
             using var dbContext = await _dbContextFactory.Create();
             var planEntity = await dbContext.Plans.FirstOrDefaultAsync(x => x.Id == id);
             dbContext.Plans.Remove(planEntity);
+            await dbContext.SaveChangesAsync();
+            dbContext.LogPlans.Add(CreatePlanLog(planEntity, autor, TypeLogEvent.Delete));
             await dbContext.SaveChangesAsync();
         }
         catch (Exception ex)
@@ -126,9 +152,14 @@ public class PlanService : IPlanService
         }
     }
 
-    public async Task CreateManualScud(Guid employeeId, DateTime begin, DateTime end)
+    public async Task CreateManualScud(Guid employeeId, DateTime begin, DateTime end, string autor)
     {
         using var dbContext = await _dbContextFactory.Create();
+
+        if (string.IsNullOrEmpty(autor))
+        {
+            autor = "n/d";
+        }
 
         if (begin.Date != end.Date)
         {
@@ -148,6 +179,9 @@ public class PlanService : IPlanService
 
             dbContext.ManualScuds.Add(manualScudEntity0);
             dbContext.ManualScuds.Add(manualScudEntity1);
+
+            dbContext.LogManualScuds.Add(CreateScudLog(manualScudEntity0, autor, TypeLogEvent.Create));
+            dbContext.LogManualScuds.Add(CreateScudLog(manualScudEntity1, autor, TypeLogEvent.Create));
         }
         else
         {
@@ -159,6 +193,7 @@ public class PlanService : IPlanService
             };
 
             dbContext.ManualScuds.Add(manualScudEntity);
+            dbContext.LogManualScuds.Add(CreateScudLog(manualScudEntity, autor, TypeLogEvent.Create));
         }
 
         await dbContext.SaveChangesAsync();
@@ -187,6 +222,44 @@ public class PlanService : IPlanService
             _logger.LogError(ex, ex.Message);
             return false;
         }
+    }
+
+    private LogPlanEntity CreatePlanLog(PlanEntity plan, string autor, TypeLogEvent logEvent)
+    {
+        if (string.IsNullOrEmpty(autor))
+        {
+            autor = "n/d";
+        }
+
+        LogPlanEntity log = new LogPlanEntity()
+        {
+            Autor = autor,
+            Begin = plan.Begin,
+            End = plan.End,
+            CreateAt = DateTime.Now,
+            CustomTypeWorkId = plan.CustomTypeWorkId,
+            EmployeeId = plan.EmployeeId,
+            PlanType = plan.PlanType,
+            StoreId = plan.StoreId,
+            TypeLog = logEvent
+        };
+
+        return log;
+    }
+
+    private LogManualScudEntity CreateScudLog(ManualScudEntity manualScudEntity, string autor, TypeLogEvent logEvent)
+    {
+        LogManualScudEntity log = new LogManualScudEntity()
+        {
+            Autor = autor,
+            CreateAt = DateTime.Now,
+            EmployeeId = manualScudEntity.EmployeeId,
+            Input = manualScudEntity.Input,
+            Output = manualScudEntity.Output,
+            TypeLog = logEvent
+        };
+
+        return log;
     }
 }
 
