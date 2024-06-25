@@ -367,6 +367,49 @@ public class TimeKeeperConverter
         return employee;
     }
 
+    public static List<(DateTime Start, DateTime End)> SplitTimePeriod(DateTime start, DateTime end)
+    {
+        List<(DateTime Start, DateTime End)> result = new List<(DateTime Start, DateTime End)>();
+
+        // Define time intervals
+        DateTime startOfDay = start.Date;
+        DateTime endOfDay = start.Date.AddDays(1).AddSeconds(-1);
+
+        DateTime period1Start = startOfDay.AddHours(0);
+        DateTime period1End = startOfDay.AddHours(6);
+        DateTime period2Start = startOfDay.AddHours(6);
+        DateTime period2End = startOfDay.AddHours(22);
+        DateTime period3Start = startOfDay.AddHours(22);
+        DateTime period3End = endOfDay;
+
+        // Check and split periods
+        if (start < period1End && end > period1Start)
+        {
+            result.Add((
+                Start: start > period1Start ? start : period1Start,
+                End: end < period1End ? end : period1End
+            ));
+        }
+
+        if (start < period2End && end > period2Start)
+        {
+            result.Add((
+                Start: start > period2Start ? start : period2Start,
+                End: end < period2End ? end : period2End
+            ));
+        }
+
+        if (start < period3End && end > period3Start)
+        {
+            result.Add((
+                Start: start > period3Start ? start : period3Start,
+                End: end < period3End ? end : period3End
+            ));
+        }
+
+        return result;
+    }
+
     private static EmployeeModel PrepareForCalc(EmployeeEntity employeeEntity, List<SigurEventModel> sigurEvents)
     {
         EmployeeModel employee = new EmployeeModel()
@@ -385,11 +428,35 @@ public class TimeKeeperConverter
             ExportFactTimes = new List<ExportTime>()
         };
 
-        for (int i = 0; i < employeeEntity.Plans.Count; i++)
+        var plans = new List<PlanEntity>();
+
+        foreach (var item in employeeEntity.Plans)
+        {
+            var resultCheck = SplitTimePeriod(item.Begin, item.End);
+            foreach (var plan in resultCheck)
+            {
+                plans.Add(new PlanEntity()
+                {
+                    Begin = plan.Start,
+                    End = plan.End,
+                    CustomTypeWorkId = item.CustomTypeWorkId,
+                    TypeOverWorkId = item.TypeOverWorkId,
+                    EmployeeId = item.EmployeeId,
+                    Id = item.Id,
+                    PlanType = item.PlanType,
+                    StoreId = item.StoreId,
+                    CustomTypeWork = item.CustomTypeWork,
+                    Employee = item.Employee,
+                    TypeOverWork = item.TypeOverWork
+                });
+            }
+        }
+
+        for (int i = 0; i < plans.Count; i++)
         {
             //ToDo - добавить время отдыха за прошлый день (конец дня)
 
-            var plan = employeeEntity.Plans[i];
+            var plan = plans[i];
 
             var planDetail = new PlanDetailModel()
             {

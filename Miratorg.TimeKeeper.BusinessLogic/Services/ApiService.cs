@@ -95,6 +95,11 @@ public class ApiService : IApiService
 
                 foreach (var fact in facts)
                 {
+                    if (fact.DayMinutes == 0 && fact.NightMinutes == 0)
+                    {
+                        continue;
+                    }
+
                     Worktime worktime = new()
                     {
                         type = fact.WorkTime,
@@ -175,6 +180,11 @@ public class ApiService : IApiService
 
                 foreach (var fact in plans)
                 {
+                    if (fact.DayMinutes == 0 && fact.NightMinutes == 0)
+                    {
+                        continue;
+                    }
+
                     Worktime worktime = new()
                     {
                         type = fact.WorkTime,
