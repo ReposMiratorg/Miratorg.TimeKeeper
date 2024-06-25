@@ -37,8 +37,13 @@
     [Parameter]
     public EventCallback Action { get; set; }
 
-    // [Inject]
-    // public ITimeKeeperDbContextFactory dbContextFactory { get; set; }
+    [Inject]
+    public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
+    [Inject]
+    public ILogger<CreateManualScudDialog> Logger { get; set; }
+
+    string userName { get; set; }
 
     [Inject]
     public IPlanService PlanService { get; set; }
@@ -56,6 +61,21 @@
     private async Task Open()
     {
         invalidClass = string.Empty;
+
+        try
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user?.Identity?.IsAuthenticated == true)
+            {
+                userName = user.Identity?.Name;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
 
         begin = CurrentDate.Date.AddHours(8);
         end = CurrentDate.Date.AddHours(20);
@@ -83,7 +103,7 @@
                 return;
             }
 
-            await PlanService.CreateManualScud(EmoloyeeId, begin, end);
+            await PlanService.CreateManualScud(EmoloyeeId, begin, end, userName);
             await SyncEmployeeService.UpdateUser(EmoloyeeId);
         }
         catch (Exception ex)

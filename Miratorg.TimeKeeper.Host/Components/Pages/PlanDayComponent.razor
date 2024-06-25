@@ -183,6 +183,11 @@
     private List<ScudInfoModel> scudInfoModels { get; set; }
     private string risonAbsent { get; set; }
 
+    [Inject]
+    public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
+    string userName { get; set; }
+
     protected override async void OnParametersSet()
     {
         await UpdateUI();
@@ -217,7 +222,7 @@
 
     private async Task RemovePaln(Guid id)
     {
-        await PlanService.Remove(id);
+        await PlanService.Remove(id, userName);
         await SyncEmployeeService.UpdateUser(EmployeeId);
         await UdateUIAction();
 
@@ -225,7 +230,7 @@
 
     private async Task RemoveManualScud(Guid id)
     {
-        await PlanService.RemoveScudManual(id);
+        await PlanService.RemoveScudManual(id, userName);
         await SyncEmployeeService.UpdateUser(EmployeeId);
         await UdateUIAction();
 
@@ -252,6 +257,21 @@
 
     private async Task Open()
     {
+        try
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user?.Identity?.IsAuthenticated == true)
+            {
+                userName = user.Identity?.Name;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+
         await modalDialog.Open();
     }
 

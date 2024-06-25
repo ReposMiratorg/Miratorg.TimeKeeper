@@ -28,6 +28,11 @@ public class PlanService : IPlanService
     {
         ValidateDates(begin, end);
 
+        if (string.IsNullOrEmpty(autor))
+        {
+            autor = "n/d";
+        }
+
         if (storeId == Guid.Empty)
         {
             throw new Exception("StoreId == Guid.Empty");
@@ -100,6 +105,11 @@ public class PlanService : IPlanService
     {
         try
         {
+            if (string.IsNullOrEmpty(autor))
+            {
+                autor = "n/d";
+            }
+
             using var dbContext = await _dbContextFactory.Create();
             var  manualScudEntity = await dbContext.ManualScuds.FirstOrDefaultAsync(x => x.Id == id);
             dbContext.ManualScuds.Remove(manualScudEntity);
@@ -116,6 +126,11 @@ public class PlanService : IPlanService
     {
         try
         {
+            if (string.IsNullOrEmpty(autor))
+            {
+                autor = "n/d";
+            }
+
             using var dbContext = await _dbContextFactory.Create();
             var planEntity = await dbContext.Plans.FirstOrDefaultAsync(x => x.Id == id);
             dbContext.Plans.Remove(planEntity);
@@ -139,6 +154,11 @@ public class PlanService : IPlanService
     public async Task CreateManualScud(Guid employeeId, DateTime begin, DateTime end, string autor)
     {
         using var dbContext = await _dbContextFactory.Create();
+
+        if (string.IsNullOrEmpty(autor))
+        {
+            autor = "n/d";
+        }
 
         if (begin.Date != end.Date)
         {
@@ -205,6 +225,11 @@ public class PlanService : IPlanService
 
     private LogPlanEntity CreatePlanLog(PlanEntity plan, string autor, TypeLogEvent logEvent)
     {
+        if (string.IsNullOrEmpty(autor))
+        {
+            autor = "n/d";
+        }
+
         LogPlanEntity log = new LogPlanEntity()
         {
             Autor = autor,

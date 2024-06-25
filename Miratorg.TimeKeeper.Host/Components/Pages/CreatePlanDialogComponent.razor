@@ -146,6 +146,11 @@
         var y = LimitPlanHours;
     }
 
+    [Inject]
+    public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
+    string userName { get; set; }
+
     private async Task Open()
     {
         Error = false;
@@ -157,6 +162,21 @@
         end = CurrentDate.Date.AddHours(20);
 
         await modalDialog.Open();
+
+        try
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user?.Identity?.IsAuthenticated == true)
+            {
+                userName = user.Identity?.Name;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
 
         try
         {
@@ -214,7 +234,7 @@
             invalidClass = string.Empty;
 
             Guid? customOverworkId = customOverwork == Guid.Empty ? null : customOverwork;
-            await PlanService.Create(EmployeeId, planType, begin, end, storeId, typeOverWork, customOverworkId);
+            await PlanService.Create(EmployeeId, planType, begin, end, storeId, typeOverWork, customOverworkId, userName);
             await SyncEmployeeService.UpdateUser(EmployeeId);
 
             StateHasChanged();
