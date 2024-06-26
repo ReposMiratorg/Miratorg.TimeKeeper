@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 
 namespace Miratorg.TimeKeeper.BusinessLogic;
 
@@ -481,11 +482,14 @@ public class TimeKeeperConverter
             }
 
             employee.Plans.Add(planDetail);
+        }
 
+        foreach (var plan in employeeEntity.Plans)
+        {
             if (plan.Begin.Hour == 0 && plan.Begin.Minute == 0) // Время входа засчитывается если нет точного времени
             {
                 var sigurOutput = sigurEvents.Where(x => x.EventTime >= plan.End && x.EventTime <= plan.End.AddMinutes(180))
-                    .OrderByDescending(x => x.EventTime).FirstOrDefault()?.EventTime;
+                .OrderByDescending(x => x.EventTime).FirstOrDefault()?.EventTime;
 
                 if (sigurOutput != null) //если сотрудник был на работе
                 {
