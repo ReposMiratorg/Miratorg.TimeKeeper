@@ -89,7 +89,7 @@
     </Body>
 
     <Footer>
-        <button class="btn btn-primary btn-sm" @onclick="Create">Добавить</button>
+        <button class="btn btn-primary btn-sm" @onclick="Create" disabled="@isBlockButton">Добавить</button>
         <button class="btn btn-info btn-sm" @onclick="Close">Отмена</button>
     </Footer>
 
@@ -154,8 +154,10 @@
     private async Task Open()
     {
         Error = false;
-
+        isBlockButton = false;
         invalidClass = string.Empty;
+
+        StateHasChanged();
 
         storeId = StoreId;
         begin = CurrentDate.Date.AddHours(8);
@@ -200,10 +202,16 @@
 
     private bool Error { get; set; }
 
+    private bool isBlockButton { get; set; } = false;
+
     private async Task Create()
     {
+        isBlockButton = true;
+        StateHasChanged();
+
         try
         {
+
             var time = (end - begin).TotalHours;
             if (LimitPlanHours < (PlanHours.TotalHours + time))
             {
@@ -221,12 +229,19 @@
 
             Error = false;
 
+            isBlockButton = true;
+            StateHasChanged();
+
             var resultCheckInterval = await PlanService.CheckPlan(EmployeeId, begin, end);
 
             if(resultCheckInterval == false)
             {
                 invalidClass = "is-invalid";
                 errorMessage = "Проверьте выбранную дату";
+
+                isBlockButton = false;
+                StateHasChanged();
+
                 return;
             }
 
@@ -236,8 +251,6 @@
             Guid? customOverworkId = customOverwork == Guid.Empty ? null : customOverwork;
             await PlanService.Create(EmployeeId, planType, begin, end, storeId, typeOverWork, customOverworkId, userName);
             await SyncEmployeeService.UpdateUser(EmployeeId);
-
-            StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -256,6 +269,9 @@
         {
             //ToDo - записать лог и отобразить сообщение
         }
+
+        isBlockButton = false;
+        StateHasChanged();
 
         await modalDialog.Close();
     }
