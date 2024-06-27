@@ -74,6 +74,11 @@ public class ApiService : IApiService
         // формируем данные на каждый день
         for (DateTime currentDate = from; currentDate <= to; currentDate = currentDate.AddDays(1))
         {
+            if (model.DismissalDate != null && model.DismissalDate?.Date < currentDate)
+            {
+                continue;
+            }
+
             var facts = model.ExportFactTimes
                 .Where(x => x.Begin.Date.Date == currentDate)
                 .ToList();
@@ -153,6 +158,11 @@ public class ApiService : IApiService
 
         for (DateTime currentDate = from; currentDate <= to; currentDate = currentDate.AddDays(1))
         {
+            if (model.DismissalDate != null && model.DismissalDate?.Date < currentDate)
+            {
+                continue;
+            }
+
             var plans = model.ExportPlanTimes
                 .Where(x => x.Begin.Date.Date == currentDate)
                 .ToList();
