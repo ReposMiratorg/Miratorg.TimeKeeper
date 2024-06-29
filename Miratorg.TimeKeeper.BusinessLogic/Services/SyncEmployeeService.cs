@@ -281,7 +281,8 @@ public class SyncEmployeeService : IHostedService
                         Name = $"{employee.LastName} {employee.FirstName} {employee.MiddleName}",
                         StoreId = store.Id,
                         Position = position?.Description ?? "n/d",
-                        Guid1C = employee.Guid ?? Guid.Empty
+                        Guid1C = employee.Guid ?? Guid.Empty,
+                        DismissalDate = employee.DismissalDate
                     };
 
                     currentEmployee.UpdateAt = DateTime.Now;
@@ -293,6 +294,7 @@ public class SyncEmployeeService : IHostedService
                 {
                     currentEmployee.Name = $"{employee.LastName} {employee.FirstName} {employee.MiddleName}";
                     currentEmployee.CodeNav = employee.Code;
+                    currentEmployee.DismissalDate = employee.DismissalDate;
                     currentEmployee.StoreId = store.Id;
                     currentEmployee.Position = position?.Description ?? "n/d";
                     currentEmployee.Guid1C = employee.Guid ?? Guid.Empty;

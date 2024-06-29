@@ -6,6 +6,7 @@ public class EmployeeModel
     public string Name { get; set; }
     public string Position { get; set; }
     public string CodeNav { get; set; }
+    public DateTime? DismissalDate { get; set; }
     public Guid? StoreId { get; set; }
 
     /// <summary>

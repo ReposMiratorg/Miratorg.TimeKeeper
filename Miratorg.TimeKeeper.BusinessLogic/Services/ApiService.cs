@@ -74,6 +74,11 @@ public class ApiService : IApiService
         // формируем данные на каждый день
         for (DateTime currentDate = from; currentDate <= to; currentDate = currentDate.AddDays(1))
         {
+            if (model.DismissalDate != null && model.DismissalDate?.Date < currentDate)
+            {
+                continue;
+            }
+
             var facts = model.ExportFactTimes
                 .Where(x => x.Begin.Date.Date == currentDate)
                 .ToList();
@@ -95,6 +100,11 @@ public class ApiService : IApiService
 
                 foreach (var fact in facts)
                 {
+                    if (fact.DayMinutes == 0 && fact.NightMinutes == 0)
+                    {
+                        continue;
+                    }
+
                     Worktime worktime = new()
                     {
                         type = fact.WorkTime,
@@ -148,6 +158,11 @@ public class ApiService : IApiService
 
         for (DateTime currentDate = from; currentDate <= to; currentDate = currentDate.AddDays(1))
         {
+            if (model.DismissalDate != null && model.DismissalDate?.Date < currentDate)
+            {
+                continue;
+            }
+
             var plans = model.ExportPlanTimes
                 .Where(x => x.Begin.Date.Date == currentDate)
                 .ToList();
@@ -175,6 +190,11 @@ public class ApiService : IApiService
 
                 foreach (var fact in plans)
                 {
+                    if (fact.DayMinutes == 0 && fact.NightMinutes == 0)
+                    {
+                        continue;
+                    }
+
                     Worktime worktime = new()
                     {
                         type = fact.WorkTime,
