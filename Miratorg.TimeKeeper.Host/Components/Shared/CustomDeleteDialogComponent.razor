@@ -10,7 +10,7 @@
 
     <Footer>
         <button class="btn btn-danger btn-sm" @onclick="Delete">Удалить</button>
-        <button class="btn btn-info btn-sm" @onclick="Close">Отмена</button>
+        <button class="btn btn-info btn-sm" @onclick="Close">Закрыть</button>
     </Footer>
 
 </CustomModalDialog>
@@ -20,7 +20,13 @@
     public string Message { get; set; }
 
     [Parameter]
+    public DateTime Day { get; set; }
+
+    [Parameter]
     public EventCallback Action { get; set; }
+
+    [Inject]
+    public IBlockingConfig BlockingConfig { get; set; }
 
     private CustomModalDialog modalDialog { get; set; } = new ();
 

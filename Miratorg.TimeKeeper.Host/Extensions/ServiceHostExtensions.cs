@@ -7,6 +7,7 @@ using Miratorg.Common.Extensions;
 using Miratorg.DataService.Extensions;
 using Miratorg.DataService.Interfaces;
 using Miratorg.DataService.Services;
+using Miratorg.TimeKeeper.BusinessLogic.Configs;
 using Miratorg.TimeKeeper.BusinessLogic.Services;
 using Miratorg.TimeKeeper.Host.Controllers;
 using System.Security.Claims;
@@ -56,6 +57,7 @@ public static class ServiceHostExtensions
         services.AddLdapService();
         services.AddStaffControlDbContext();
 
+        services.AddSingleton<IBlockingConfig, BlockingConfig>();
         services.AddSingleton<IStuffControlDbService, StuffControlDbService>();
         services.AddSingleton<ISigurService, SigurService>();
         services.AddHostedService<SyncEmployeeService>();
