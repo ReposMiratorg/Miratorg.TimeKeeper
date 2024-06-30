@@ -254,13 +254,30 @@ public class TimeKeeperConverter
     {
         var employee = PrepareForCalc(employeeEntity, sigurEvents);
 
+        // Обед 30 минут между 4м и 8м часом работы
+        bool obed30min = false;
+        int timeObed30min = 30;
+
+        // Обед 60 минут после 8го часа работы
+        bool obed60min = false;
+        int time2Obed30min = 30;
+
+
+        // Обед 30 минут между 4м и 8м часом работы
+        bool _fact_obed30min = false;
+        int _fact_timeObed30min = 30;
+
+        // Обед 60 минут после 8го часа работы
+        bool _fact_obed60min = false;
+        int _fact_time2Obed30min = 30;
+
         // Подсчет часов в магазине за месяц //ToDo -  необходимо учитывать по магазинам
         DateTime start = new DateTime(2024, 1, 1);
         for (DateTime currentMonth = start; currentMonth < start.AddMonths(100); currentMonth = currentMonth.AddMonths(1))
         {
             TimeSpan monthPlan = new TimeSpan();
             TimeSpan monthScud = new TimeSpan();
-
+            List<PlanDetailModel> oldPlans = new List<PlanDetailModel>();
             for (DateTime currentDate = currentMonth; currentDate < currentMonth.AddMonths(1); currentDate = currentDate.AddDays(1))
             {
                 // План + переработки
@@ -279,25 +296,34 @@ public class TimeKeeperConverter
                 // Чистое время для (факт без пееррыва)
                 TimeSpan dayFactClear = new TimeSpan();
 
-                // Обед 30 минут между 4м и 8м часом работы
-                bool obed30min = false;
-                int timeObed30min = 30;
-
-                // Обед 60 минут после 8го часа работы
-                bool obed60min = false;
-                int time2Obed30min = 30;
-
-
-                // Обед 30 минут между 4м и 8м часом работы
-                bool _fact_obed30min = false;
-                int _fact_timeObed30min = 30;
-
-                // Обед 60 минут после 8го часа работы
-                bool _fact_obed60min = false;
-                int _fact_time2Obed30min = 30;
 
                 List<ExportTime> exportTimes = new List<ExportTime>();
                 TimeSpan dayScud = new TimeSpan();
+
+                if (plans.Count > 0 && plans[0].OriginalBegin.Hour == 0 && plans[0].OriginalBegin.Minute == 0 && oldPlans.Count > 0 && oldPlans[oldPlans.Count -1].OriginalEnd.Hour == 23 && oldPlans[oldPlans.Count - 1].OriginalEnd.Minute == 59)
+                {
+                    // используем старый отзезок
+                }
+                else
+                {
+                    // обнуляем
+
+                    // Обед 30 минут между 4м и 8м часом работы
+                    obed30min = false;
+                    timeObed30min = 30;
+
+                    // Обед 60 минут после 8го часа работы
+                    obed60min = false;
+                    time2Obed30min = 30;
+
+                    // Обед 30 минут между 4м и 8м часом работы
+                    _fact_obed30min = false;
+                    _fact_timeObed30min = 30;
+
+                    // Обед 60 минут после 8го часа работы
+                    _fact_obed60min = false;
+                    _fact_time2Obed30min = 30;
+                }
 
                 // расчитываем план
                 for (int i = 0; i < plans.Count; i++)
@@ -486,10 +512,13 @@ public class TimeKeeperConverter
                 employee.DayScudUseMinutes.Add(currentDate, dayScud.TotalMinutes);
 
                 monthScud += dayScud;
+
+                oldPlans = plans; // сохраняем старые планы
             }
 
             employee.MountPlanUseMinuts.Add(currentMonth, monthPlan.TotalMinutes);
             employee.MountScudUseMinutes.Add(currentMonth, monthScud.TotalMinutes);
+            
         }
 
         return employee;

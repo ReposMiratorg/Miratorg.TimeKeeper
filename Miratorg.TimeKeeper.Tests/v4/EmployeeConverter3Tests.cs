@@ -431,31 +431,41 @@ public class EmployeeConverter3Tests
 
         var deyExportPlans2 = employeeModel.ExportPlanTimes.Where(x => x.Date == new DateOnly(2024, 6, 2)).ToList();
         Assert.NotNull(deyExportPlans2);
-        Assert.Equal(1, deyExportPlans2.Count);
+        Assert.Equal(2, deyExportPlans2.Count);
         Assert.Equal("regular", deyExportPlans2[0].WorkTime);
-        Assert.Equal(840, deyExportPlans2[0].DayMinutes); // не верное время - проверить
-        Assert.Equal(119, deyExportPlans2[0].NightMinutes); // не верное время - проверить -> должно быть 119 минут ночью
+        Assert.Equal(780, deyExportPlans2[0].DayMinutes); // не верное время - проверить
+        Assert.Equal(0, deyExportPlans2[0].NightMinutes); // не верное время - проверить -> должно быть 119 минут ночью
+        Assert.Equal(0, deyExportPlans2[1].DayMinutes); // не верное время - проверить
+        Assert.Equal(119, deyExportPlans2[1].NightMinutes); // не верное время - проверить -> должно быть 119 минут ночью
 
         var deyExportFacts2 = employeeModel.ExportFactTimes.Where(x => x.Date == new DateOnly(2024, 6, 2)).ToList();
         Assert.NotNull(deyExportFacts2);
-        Assert.Equal(1, deyExportFacts2.Count);
+        Assert.Equal(2, deyExportFacts2.Count);
         Assert.Equal("regular", deyExportFacts2[0].WorkTime);
-        Assert.Equal(840, deyExportFacts2[0].DayMinutes);
-        Assert.Equal(119, deyExportFacts2[0].NightMinutes);
+        Assert.Equal(780, deyExportFacts2[0].DayMinutes);
+        Assert.Equal(0, deyExportFacts2[0].NightMinutes);
+        Assert.Equal(0, deyExportFacts2[1].DayMinutes);
+        Assert.Equal(119, deyExportFacts2[1].NightMinutes);
 
 
         var deyExportPlans3 = employeeModel.ExportPlanTimes.Where(x => x.Date == new DateOnly(2024, 6, 3)).ToList();
         Assert.NotNull(deyExportPlans3);
-        Assert.Equal(1, deyExportPlans3.Count);
+        Assert.Equal(2, deyExportPlans3.Count);
         Assert.Equal("regular", deyExportPlans3[0].WorkTime);
-        Assert.Equal(60, deyExportPlans3[0].DayMinutes); //
+        Assert.Equal(0, deyExportPlans3[0].DayMinutes); //
         Assert.Equal(360, deyExportPlans3[0].NightMinutes);
+        Assert.Equal("regular", deyExportPlans3[1].WorkTime);
+        Assert.Equal(60, deyExportPlans3[1].DayMinutes); //
+        Assert.Equal(0, deyExportPlans3[1].NightMinutes);
 
         var deyExportFacts3 = employeeModel.ExportFactTimes.Where(x => x.Date == new DateOnly(2024, 6, 3)).ToList();
         Assert.NotNull(deyExportFacts3);
-        Assert.Equal(1, deyExportFacts3.Count);
+        Assert.Equal(2, deyExportFacts3.Count);
         Assert.Equal("regular", deyExportFacts3[0].WorkTime);
-        Assert.Equal(60, deyExportFacts3[0].DayMinutes);
+        Assert.Equal(0, deyExportFacts3[0].DayMinutes);
         Assert.Equal(360, deyExportFacts3[0].NightMinutes);
+        Assert.Equal("regular", deyExportFacts3[1].WorkTime);
+        Assert.Equal(60, deyExportFacts3[1].DayMinutes);
+        Assert.Equal(0, deyExportFacts3[1].NightMinutes);
     }
 }
