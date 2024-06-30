@@ -24,7 +24,7 @@ public class BlockingConfig : IBlockingConfig
 
     public int Hour { get; set; }
 
-    public bool ChechAccess(DateTime inputDateTime)
+    public bool ChechAccess(DateTime inputDate)
     {
         if (IsUse == false)
         {
@@ -32,17 +32,25 @@ public class BlockingConfig : IBlockingConfig
         }
 
         var currentDate = DateTime.Now;
-        inputDateTime = new DateTime(inputDateTime.Year, inputDateTime.Month, inputDateTime.Day, Hour, 0, 0);
+        inputDate = new DateTime(inputDate.Year, inputDate.Month, inputDate.Day, currentDate.Hour, currentDate.Minute, 0);
 
         var blockDates = new List<DateTime>();
         foreach (var item in Dates)
         {
-            blockDates.Add(new DateTime(currentDate.Year, currentDate.Month, item, currentDate.Hour, currentDate.Minute, 0));
+            blockDates.Add(new DateTime(currentDate.Year, currentDate.Month, item, Hour, 0, 0));
         }
 
-        foreach (var dateTime in blockDates)
+        foreach (var blockDate in blockDates)
         {
-            if (inputDateTime < dateTime)
+            if (blockDate.Date == inputDate.Date)
+            {
+                if (Hour <= currentDate.Hour)
+                {
+                    return false;
+                }
+            }
+
+            if (blockDate >= inputDate)
             {
                 return false;
             }
