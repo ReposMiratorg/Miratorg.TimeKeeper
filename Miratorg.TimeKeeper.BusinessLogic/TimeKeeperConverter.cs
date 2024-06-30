@@ -328,6 +328,33 @@ public class TimeKeeperConverter
                 // расчитываем план
                 for (int i = 0; i < plans.Count; i++)
                 {
+                    if (i != 0)
+                    {
+                        var previosPlan = plans[i - 1];
+                        var currentPlan = plans[i];
+                        var timeNotWork = currentPlan.OriginalBegin - previosPlan.OriginalEnd;
+                        if (timeNotWork.TotalHours >= 4) // обнуляем так как новый рабочий день
+                        {
+                            // обнуляем
+
+                            // Обед 30 минут между 4м и 8м часом работы
+                            obed30min = false;
+                            timeObed30min = 30;
+
+                            // Обед 60 минут после 8го часа работы
+                            obed60min = false;
+                            time2Obed30min = 30;
+
+                            //// Обед 30 минут между 4м и 8м часом работы
+                            //_fact_obed30min = false;
+                            //_fact_timeObed30min = 30;
+
+                            //// Обед 60 минут после 8го часа работы
+                            //_fact_obed60min = false;
+                            //_fact_time2Obed30min = 30;
+                        }
+                    }
+
                     var plan = plans[i];
                     var time = plan.PlanCalcEnd - plan.PlanCalcBegin;
 
@@ -382,7 +409,6 @@ public class TimeKeeperConverter
                     }
 
                     var (dayMinutes, nightMinutes) = TimeKeeperConverter.CalculateDayAndNightMinutes(plan.PlanCalcBegin, plan.PlanCalcEnd);
-                    //dayMinutes -= usedLunch;
 
                     ExportTime exportTime = new ExportTime()
                     {
@@ -410,6 +436,33 @@ public class TimeKeeperConverter
                 // расчитываем факт
                 for (int i = 0; i < plans.Count; i++)
                 {
+                    if (i != 0)
+                    {
+                        var previosPlan = plans[i - 1];
+                        var currentPlan = plans[i];
+                        var timeNotWork = currentPlan.OriginalBegin - previosPlan.OriginalEnd;
+                        if (timeNotWork.TotalHours >= 4) // обнуляем так как новый рабочий день
+                        {
+                            // обнуляем
+
+                            //// Обед 30 минут между 4м и 8м часом работы
+                            //obed30min = false;
+                            //timeObed30min = 30;
+
+                            //// Обед 60 минут после 8го часа работы
+                            //obed60min = false;
+                            //time2Obed30min = 30;
+
+                            // Обед 30 минут между 4м и 8м часом работы
+                            _fact_obed30min = false;
+                            _fact_timeObed30min = 30;
+
+                            // Обед 60 минут после 8го часа работы
+                            _fact_obed60min = false;
+                            _fact_time2Obed30min = 30;
+                        }
+                    }
+
                     var plan = plans[i];
 
                     if (scuds.Count == 0)
