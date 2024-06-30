@@ -251,9 +251,8 @@ public class SyncEmployeeService : IHostedService
 
                 var position = positions.FirstOrDefault(x => x.Code.ToLower() == employee.CodePosition);
 
-                var store = dbContext.Stores.FirstOrDefault(x => x.Name == employee.RoutineDivision);
-
                 Guid store1C = Guid.Parse(employee.CodeRoutineDivision);
+                var store = dbContext.Stores.FirstOrDefault(x => x.Name == employee.RoutineDivision && x.StoreId1C == store1C);
 
                 if (store == null)
                 {
