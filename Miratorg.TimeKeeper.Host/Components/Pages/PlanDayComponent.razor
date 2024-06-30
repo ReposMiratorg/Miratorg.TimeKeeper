@@ -35,20 +35,28 @@
     </FrontObject>
 
     <Body>
-        <div class="row mb-2">
-            <div class="col">
-                <CreatePlanDialogComponent Action="UdateUIAction" LimitPlanHours="LimitPlanHours" PlanHours="PlanHours" CurrentDate="currentDate" EmployeeId="EmployeeId" StoreId="StoreId" />
-            </div>
-            <div class="col">
+        @if (BlockingConfig.ChechAccess(Day))
+        {
+            <div class="row mb-2">
+                <div class="col">
+                    <CreatePlanDialogComponent Action="UdateUIAction" LimitPlanHours="LimitPlanHours" PlanHours="PlanHours" CurrentDate="currentDate" EmployeeId="EmployeeId" StoreId="StoreId" />
+                </div>
+                <div class="col">
 
-                <AuthorizeView Roles="UserHr,UserRy,Supermarkets">
-                    <Authorized>
-                        <CreateManualScudDialog Action="UdateUIAction" CurrentDate="currentDate" EmoloyeeId="EmployeeId" />
-                    </Authorized>
-                </AuthorizeView>
-
+                    <AuthorizeView Roles="UserHr,UserRy,Supermarkets">
+                        <Authorized>
+                            <CreateManualScudDialog Action="UdateUIAction" CurrentDate="currentDate" EmoloyeeId="EmployeeId" />
+                        </Authorized>
+                    </AuthorizeView>
+                </div>
             </div>
-        </div>
+        }
+        else
+        {
+            <div class="row mb-2">
+                <div class="col"><a>Изменения запрещены</a></div>
+            </div>
+        }
         <div class="row mt-2">
 
             <div class="col-12">
@@ -72,7 +80,14 @@
                                 <input class="form-control form-control-sm" value="@message" disabled />
                             </div>
                             <div class="col-2">
-                                <CustomDeleteDialogComponent Message="@message" Action="@(() => RemovePaln(item.Key))" />
+                                @if (BlockingConfig.ChechAccess(Day))
+                                {
+                                    <CustomDeleteDialogComponent Message="@message" Day="currentDate" Action="@(() => RemovePaln(item.Key))" />
+                                }
+                                else
+                                {
+                                    <button class="btn btn-secondary btn-sm"><span class="mdi mdi-delete" disabled></span></button>
+                                }
                             </div>
                         </div>
                     }
@@ -104,7 +119,14 @@
                                 <input class="form-control form-control-sm" value="@message" disabled />
                             </div>
                             <div class="col-2">
-                                <CustomDeleteDialogComponent Message="@message" Action="@(() => RemovePaln(plan.Id))" />
+                                @if (BlockingConfig.ChechAccess(Day))
+                                {
+                                    <CustomDeleteDialogComponent Message="@message" Day="currentDate" Action="@(() => RemovePaln(plan.Id))" />
+                                }
+                                else
+                                {
+                                    <button class="btn btn-secondary btn-sm"><span class="mdi mdi-delete" disabled></span></button>
+                                }
                             </div>
                         </div>
                     }
@@ -125,7 +147,14 @@
                             <div class="col-2">
                                 @if (scud.ScudInfoType == ScudInfoType.Manual)
                                 {
-                                    <CustomDeleteDialogComponent Message="@message" Action="@(() => RemoveManualScud(scud.Id))" />
+                                    @if (BlockingConfig.ChechAccess(Day))
+                                    {
+                                        <CustomDeleteDialogComponent Message="@message" Day="currentDate" Action="@(() => RemoveManualScud(scud.Id))" />
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-secondary btn-sm"><span class="mdi mdi-delete" disabled></span></button>
+                                    }
                                 }
                             </div>
                         </div>
@@ -196,6 +225,9 @@
 
     [Parameter]
     public TimeSpan PlanHours { get; set; }
+
+    [Inject]
+    public IBlockingConfig BlockingConfig { get; set; }
 
     private DateTime currentDate { get; set; }
 
