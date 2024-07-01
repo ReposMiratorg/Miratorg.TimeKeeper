@@ -67,6 +67,13 @@ public class BlockingConfig : IBlockingConfig
             return false;
         }
 
+        if (calendarDay <= now )
+        {
         return true;
+    }
+        else
+        {
+            return false;
+        }
     }
 }

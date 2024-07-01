@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Miratorg.TimeKeeper.BusinessLogic.Configs;
 using Moq;
+using Xunit;
 
 namespace Miratorg.TimeKeeper.Tests.v4;
 
@@ -49,4 +50,16 @@ public class IBlockingConfigTests
         Assert.False(blockingConfig.IsUse);
         Assert.False(result);
     }
+
+    [Fact]
+    public void Check_next_date()
+    {
+        var blockingConfig = mockBlockingConfig.Object;
+
+        DateTime currentDate = new DateTime(2024, 7, 1, 7, 0, 0);
+
+        Assert.False(blockingConfig.IsBlockedDay(new DateTime(2024, 9, 5), currentDate));
+        Assert.False(blockingConfig.IsBlockedDay(new DateTime(2025, 1, 1), currentDate));
+    }
+
 }
