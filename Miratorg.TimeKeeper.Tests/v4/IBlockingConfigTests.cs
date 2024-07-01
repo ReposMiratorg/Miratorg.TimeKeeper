@@ -35,4 +35,18 @@ public class IBlockingConfigTests
         Assert.Equal(1, blockingConfig.Dates[0]);
         Assert.Equal(16, blockingConfig.Dates[1]);
     }
+
+    [Fact]
+    public void CheckNotUse()
+    {
+        mockBlockingConfig.SetupGet(m => m.IsUse).Returns(false);
+
+        var blockingConfig = mockBlockingConfig.Object;
+
+        var result = blockingConfig.IsBlockedDay(new DateTime(2024, 1, 10), new DateTime(2024, 1, 10, 0, 0, 0));
+
+        // Assert
+        Assert.False(blockingConfig.IsUse);
+        Assert.False(result);
+    }
 }

@@ -9,6 +9,7 @@ public interface IBlockingConfig
     int Hour { get; }
 
     bool ChechAccess(DateTime date);
+    bool IsBlockedDay(DateTime calendarDay, DateTime now);
 }
 
 public class BlockingConfig : IBlockingConfig
@@ -17,7 +18,7 @@ public class BlockingConfig : IBlockingConfig
     {
         configuration.GetSection(nameof(BlockingConfig)).Bind(this);
     }
-
+    
     public bool IsUse { get; set; }
 
     public int[] Dates { get; set; }
@@ -54,6 +55,16 @@ public class BlockingConfig : IBlockingConfig
             {
                 return false;
             }
+        }
+
+        return true;
+    }
+
+    public bool IsBlockedDay(DateTime calendarDay, DateTime now)
+    {
+        if (this.IsUse == false)
+        {
+            return false;
         }
 
         return true;
