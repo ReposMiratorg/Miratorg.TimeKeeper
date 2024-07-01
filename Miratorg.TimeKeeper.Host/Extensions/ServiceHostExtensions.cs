@@ -57,7 +57,7 @@ public static class ServiceHostExtensions
         services.AddLdapService();
         services.AddStaffControlDbContext();
 
-        services.AddOptions<BlockingConfig>();
+        services.Configure<BlockingConfig>(configuration.GetSection(nameof(BlockingConfig)));
         services.AddSingleton<IBlockingService, BlockingService>();
         services.AddSingleton<IStuffControlDbService, StuffControlDbService>();
         services.AddSingleton<ISigurService, SigurService>();

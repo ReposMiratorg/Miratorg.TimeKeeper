@@ -35,7 +35,7 @@
     </FrontObject>
 
     <Body>
-        @if (BlockingConfig.IsBlockedDay(Day, DateTime.Now))
+        @if (!BlockingConfig.IsBlockedDay(Day, DateTime.Now))
         {
             <div class="row mb-2">
                 <div class="col">
@@ -80,7 +80,7 @@
                                 <input class="form-control form-control-sm" value="@message" disabled />
                             </div>
                             <div class="col-2">
-                                @if (BlockingConfig.IsBlockedDay(Day, DateTime.Now))
+                                @if (!BlockingConfig.IsBlockedDay(Day, DateTime.Now))
                                 {
                                     <CustomDeleteDialogComponent Message="@message" Day="currentDate" Action="@(() => RemovePaln(item.Key))" />
                                 }
@@ -119,7 +119,7 @@
                                 <input class="form-control form-control-sm" value="@message" disabled />
                             </div>
                             <div class="col-2">
-                                @if (BlockingConfig.IsBlockedDay(Day, DateTime.Now))
+                                @if (!BlockingConfig.IsBlockedDay(Day, DateTime.Now))
                                 {
                                     <CustomDeleteDialogComponent Message="@message" Day="currentDate" Action="@(() => RemovePaln(plan.Id))" />
                                 }
@@ -147,7 +147,7 @@
                             <div class="col-2">
                                 @if (scud.ScudInfoType == ScudInfoType.Manual)
                                 {
-                                    @if (BlockingConfig.IsBlockedDay(Day, DateTime.Now))
+                                    @if(!BlockingConfig.IsBlockedDay(Day, DateTime.Now))
                                     {
                                         <CustomDeleteDialogComponent Message="@message" Day="currentDate" Action="@(() => RemoveManualScud(scud.Id))" />
                                     }
