@@ -26,7 +26,7 @@
     public EventCallback Action { get; set; }
 
     [Inject]
-    public IBlockingConfig BlockingConfig { get; set; }
+    public IBlockingService BlockingConfig { get; set; }
 
     private CustomModalDialog modalDialog { get; set; } = new ();
 
